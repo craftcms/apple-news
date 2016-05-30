@@ -1,0 +1,117 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "6844087d99de3890ad2fab3f5fdb9e76",
+    "content-hash": "758d3ef6ec98d0a0a71cd15b4284c845",
+    "packages": [
+        {
+            "name": "chapter-three/apple-news-api",
+            "version": "0.3.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/chapter-three/AppleNewsAPI.git",
+                "reference": "24db9ef5a4387e89d13f62cfbfe85984cfeacd31"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/chapter-three/AppleNewsAPI/zipball/24db9ef5a4387e89d13f62cfbfe85984cfeacd31",
+                "reference": "24db9ef5a4387e89d13f62cfbfe85984cfeacd31",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0",
+                "php-curl-class/php-curl-class": "^4.6"
+            },
+            "require-dev": {
+                "mikey179/vfsstream": "1.5.*",
+                "phpunit/phpunit": "4.7.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ChapterThree\\AppleNewsAPI\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL"
+            ],
+            "description": "Push content to Apple News.",
+            "homepage": "https://github.com/chapter-three/AppleNewsAPI",
+            "keywords": [
+                "api",
+                "apple",
+                "news",
+                "push"
+            ],
+            "time": "2015-10-28 16:50:41"
+        },
+        {
+            "name": "php-curl-class/php-curl-class",
+            "version": "4.11.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-curl-class/php-curl-class.git",
+                "reference": "f85d7aebe750c1ac21b40c7d433d5a615ffdc5f1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-curl-class/php-curl-class/zipball/f85d7aebe750c1ac21b40c7d433d5a615ffdc5f1",
+                "reference": "f85d7aebe750c1ac21b40c7d433d5a615ffdc5f1",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">=5.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Curl\\": "src/Curl/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Unlicense"
+            ],
+            "authors": [
+                {
+                    "name": "Zach Borboa"
+                }
+            ],
+            "description": "PHP Curl Class is an object-oriented wrapper of the PHP cURL extension.",
+            "homepage": "https://github.com/php-curl-class/php-curl-class",
+            "keywords": [
+                "api",
+                "class",
+                "client",
+                "curl",
+                "framework",
+                "http",
+                "http client",
+                "json",
+                "php",
+                "requests",
+                "rest",
+                "restful",
+                "web service",
+                "xml"
+            ],
+            "time": "2016-03-09 00:50:07"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}

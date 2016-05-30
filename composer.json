@@ -1,0 +1,9 @@
+{
+    "homepage": "http://github.com/pixelandtonic/AppleNews",
+    "config": {
+        "vendor-dir": "applenews/vendor"
+    },
+    "require": {
+        "chapter-three/apple-news-api": "^0.3.8"
+    }
+}
