@@ -7,9 +7,9 @@ use Craft\DateTimeHelper;
 use Craft\RichTextData;
 
 /**
- * Class SandboxChannel
+ * Class MyNewsChannel
  */
-class SandboxChannel extends BaseAppleNewsChannel
+class MyNewsChannel extends BaseAppleNewsChannel
 {
 	protected $channelId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx';
 	protected $apiKeyId  = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx';
