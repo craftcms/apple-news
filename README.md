@@ -21,21 +21,38 @@ To install Apple News for Craft CMS, follow these steps:
 2.  Go to Settings > Plugins from your Craft control panel and install the Apple News plugin.
 
 
-## Setup
+## Configuration
 
-Each Apple News channel needs a corresponding PHP class implementing the [IAppleNewsChannel](https://github.com/pixelandtonic/AppleNews/blob/master/applenews/IAppleNewsChannel.php) interface. These classes tell the plugin everything it needs to know to start posting articles to Apple News. You can place these classes within `craft/applenewschannels`. (Note that you should **not** give them a `Craft` namespace like you would for plugin classes.)
+Apple News for Craft CMS gets its own configuration file, located at `craft/config/applenews.php`. It can have the following config settings:
 
-In addition to creating the Channel classes, you will also need to tell the plugin where to find them. You do that by creating a new file within craft/config/ called `applenews.php`. Give it the following contents:
+- **channels** – An array of Channel class configurations, which define the Apple News channels that the plugin should post articles to. Each configuration can be defined in one of the following ways:
+    - A fully qualified class name, in which case an instance of the class will be automatically created. (Note that in this case it is your responsibility to make that class autoloadable.)
+    - A class path alias, e.g. `plugins.myplugin.MyNewsChannel` or `applenewschannels.MyNewsChannel`. The `applenewschannels` alias points to a `craft/applenewschannels` folder you can create. (Note that classes that belong to a plugin should use the `Craft` namespace, but classes that live in the `craft/applenewschannels` folder should use the global namespace.)
+    - An array which includes a `class` key that is either a fully qualified class name or a class path alias, and may also include additional name-value pairs that the object will be initialized with.
+
+Here’s an example plugin config, which defines one Apple News channel using a `MyNewsChannel` class, and defining its `$channelId`, `$apiKeyId`, and `$apiSecret` properties right from the class configuration.
 
 ```php
 <?php
 
 return [
     'channels' => [
-        'applenewschannels.MyNewsChannel',
+        [
+            'class'     => 'applenewschannels.MyNewsChannel',
+            'channelId' => 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+            'apiKeyId'  => 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+            'apiSecret' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+        ],
     ],
 ];
+
 ```
+
+
+## Channel Class Definition
+
+Each Channel class must implement the [Craft\IAppleNewsChannel](https://github.com/pixelandtonic/AppleNews/blob/master/applenews/IAppleNewsChannel.php) interface. These classes tell the plugin everything it needs to know to start posting content to corresponding Apple News channel. For your convenience, a base class that implements the interface is provided at [Craft\BaseAppleNewsChannel](https://github.com/pixelandtonic/AppleNews/blob/master/applenews/BaseAppleNewsChannel.php).
+
 
 An example Channel class is provided at [applenewschannels/MyNewsChannel.php](https://github.com/pixelandtonic/AppleNews/blob/master/applenewschannels/MyNewsChannel.php), which will more or less work with the “News” section within the [Happy Lager demo site](https://github.com/pixelandtonic/HappyLager).
 
