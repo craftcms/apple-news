@@ -30,7 +30,7 @@ Apple News for Craft CMS gets its own configuration file, located at `craft/conf
     - A class path alias, e.g. `plugins.myplugin.MyNewsChannel` or `applenewschannels.MyNewsChannel`. The `applenewschannels` alias points to a `craft/applenewschannels` folder you can create. (Note that classes that belong to a plugin should use the `Craft` namespace, but classes that live in the `craft/applenewschannels` folder should use the global namespace.)
     - An array which includes a `class` key that is either a fully qualified class name or a class path alias, and may also include additional name-value pairs that the object will be initialized with.
 
-Here’s an example plugin config, which defines one Apple News channel using a `MyNewsChannel` class, and defining its `$channelId`, `$apiKeyId`, and `$apiSecret` properties right from the class configuration.
+Here’s an example plugin config, which defines one Apple News channel using a `MyNewsChannel` class, and defines its `$channelId`, `$apiKeyId`, and `$apiSecret` properties right from the class configuration.
 
 ```php
 <?php
