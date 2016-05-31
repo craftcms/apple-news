@@ -51,7 +51,7 @@ class AppleNewsController extends BaseController
 		// Create the zip file
 		$zipDir = craft()->path->getTempPath().StringHelper::UUID();
 		IOHelper::createFolder($zipDir);
-		IOHelper::writeToFile($zipDir.'/article.json', JsonHelper::encode($article));
+		IOHelper::writeToFile($zipDir.'/article.json', JsonHelper::encode($article->getContent()));
 
 		$zipFile = $zipDir.'.zip';
 		IOHelper::createFile($zipFile);
