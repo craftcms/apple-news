@@ -5,7 +5,7 @@ This plugin provides an Apple News integration for Craft CMS, making it possible
 
 ## Requirements
 
-Apple News requires Craft CMS 2 and PHP 5.4 or later.
+Apple News for Craft CMS requires Craft CMS 2 and PHP 5.4 or later.
 
 
 ## Before You Begin
@@ -15,7 +15,7 @@ You will need at least one active Apple News channel. Visit the [iCloud News Pub
 
 ## Installation
 
-To install Apple News, follow these steps:
+To install Apple News for Craft CMS, follow these steps:
 
 1.  Upload the `applenews` folder to your `craft/plugins` folder.
 2.  Go to Settings > Plugins from your Craft control panel and install the Apple News plugin.
