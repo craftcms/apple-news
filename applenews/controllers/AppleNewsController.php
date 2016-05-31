@@ -48,16 +48,29 @@ class AppleNewsController extends BaseController
 		
 		$article = $channel->createArticle($entry);
 
-		// Create the zip file
+		// Prep the zip staging folder
 		$zipDir = craft()->path->getTempPath().StringHelper::UUID();
+		$zipContentDir = $zipDir.'/'.$entry->slug;
 		IOHelper::createFolder($zipDir);
-		IOHelper::writeToFile($zipDir.'/article.json', JsonHelper::encode($article->getContent()));
+		IOHelper::createFolder($zipContentDir);
+
+		// Create article.json
+		$json = JsonHelper::encode($article->getContent());
+		IOHelper::writeToFile($zipContentDir.'/article.json', $json);
+
+		// Copy the files
+		$files = $article->getFiles();
+		if ($files) {
+			foreach ($files as $uri => $path) {
+				IOHelper::copyFile($path, $zipContentDir.'/'.$uri);
+			}
+		}
 
 		$zipFile = $zipDir.'.zip';
 		IOHelper::createFile($zipFile);
 
 		Zip::add($zipFile, $zipDir, $zipDir);
-		craft()->request->sendFile($zipFile, '', array('filename' => 'Article.zip', 'forceDownload' => true), false);
+		craft()->request->sendFile($zipFile, IOHelper::getFileContents($zipFile), array('filename' => $entry->slug.'.zip', 'forceDownload' => true), false);
 		IOHelper::deleteFolder($zipDir);
 		IOHelper::deleteFile($zipFile);
 	}
