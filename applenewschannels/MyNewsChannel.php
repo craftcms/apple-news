@@ -1,5 +1,7 @@
 <?php
 
+use Craft\AppleNewsArticle;
+use Craft\BaseAppleNewsChannel;
 use Craft\AssetFileModel;
 use Craft\EntryModel;
 use Craft\AppleNewsHelper;

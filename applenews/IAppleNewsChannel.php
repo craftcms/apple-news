@@ -1,6 +1,5 @@
 <?php
-
-use Craft\EntryModel;
+namespace Craft;
 
 /**
  * Interface IAppleNewsChannel

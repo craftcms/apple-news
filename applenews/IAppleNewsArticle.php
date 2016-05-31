@@ -1,4 +1,5 @@
 <?php
+namespace Craft;
 
 /**
  * Interface IAppleNewsArticle
@@ -24,9 +25,9 @@ interface IAppleNewsArticle
 	 *
 	 * This should be set to an array where the keys are the file URIs within the publish request
 	 * (everything after "bundle://") and the values are either strings (local path to the file)
-	 * or {@link Craft\AssetFileModel}s.
+	 * or {@link AssetFileModel}s.
 	 *
-	 * @return string[]|\Craft\AssetFileModel[]|null The files that are included in the article
+	 * @return string[]|AssetFileModel[]|null The files that are included in the article
 	 */
 	public function getFiles();
 

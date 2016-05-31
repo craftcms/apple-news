@@ -2,8 +2,6 @@
 namespace Craft;
 
 use ChapterThree\AppleNewsAPI\PublisherAPI;
-use IAppleNewsChannel;
-use IAppleNewsArticle;
 
 /**
  * Class AppleNewsService
@@ -32,11 +30,10 @@ class AppleNewsService extends BaseApplicationComponent
 	public function init()
 	{
 		// Import base classes
-		$basePath = craft()->path->getPluginsPath().'applenews/';
-		require $basePath.'IAppleNewsArticle.php';
-		require $basePath.'AppleNewsArticle.php';
-		require $basePath.'IAppleNewsChannel.php';
-		require $basePath.'BaseAppleNewsChannel.php';
+		Craft::import('plugins.applenews.IAppleNewsArticle');
+		Craft::import('plugins.applenews.AppleNewsArticle');
+		Craft::import('plugins.applenews.IAppleNewsChannel');
+		Craft::import('plugins.applenews.BaseAppleNewsChannel');
 
 		// Set the applenewschannels alias
 		defined('APPLE_NEWS_CHANELS_PATH') || define('APPLE_NEWS_CHANELS_PATH', CRAFT_BASE_PATH.'applenewschannels/');

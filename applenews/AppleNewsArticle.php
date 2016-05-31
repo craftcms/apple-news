@@ -1,7 +1,5 @@
 <?php
-
-use Craft\AssetFileModel;
-use Craft\IOHelper;
+namespace Craft;
 
 /**
  * Class AppleNewsArticle
