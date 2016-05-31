@@ -112,6 +112,10 @@ class AppleNewsPlugin extends BasePlugin
 		/** @var EntryModel $entry */
 		$entry = $context['entry'];
 
+		if (!$entry->id) {
+			return '';
+		}
+
 		// Find any channels that match this entry
 		/** @var \IAppleNewsChannel[] $channels */
 		$channels = array();
@@ -121,45 +125,54 @@ class AppleNewsPlugin extends BasePlugin
 			}
 		}
 
-		if ($channels) {
-			// Get any existing records for these channels.
-			$records = AppleNews_ArticleRecord::model()->findAllByAttributes(array(
-				'entryId' => $entry->id,
-				'channelId' => array_keys($channels),
-			));
-			$indexedRecords = array();
-			foreach ($records as $record) {
-				$indexedRecords[$record->channelId] = $record;
-			}
-
-			$html = '<div class="pane lightpane meta">' .
-				'<div class="data"><h4 class="heading">'.Craft::t('Apple News Channels').'</h4></div>';
-
-			foreach ($channels as $channelId => $channel) {
-				$html .= '<div class="data">' .
-					'<h5 class="heading">' . $this->getService()->getChannelName($channelId) . '</h5>' .
-					'<div class="value"><a class="btn menubtn" data-icon="settings" title="' . Craft::t('Actions') . '"></a>' .
-					'<div class="menu">' .
-					'<ul>';
-
-				if (isset($indexedRecords[$channelId])) {
-					$shareUrl = $indexedRecords[$channelId]->shareUrl;
-					$html .= '<li><a data-action="copy-share-url" data-url="' . $shareUrl . '">' . Craft::t('Copy share URL') . '</a>';
-				}
-
-				$html .= '<li><a data-action="download-preview">' . Craft::t('Download for News Preview') . '</a>' .
-					'</ul>' .
-					'</div>' .
-					'</div>' .
-					'</div>';
-			};
-
-			$html .= '</div>';
-
-			return $html;
+		if (!$channels) {
+			return '';
 		}
 
-		return '';
+		// Get any existing records for these channels.
+		$records = AppleNews_ArticleRecord::model()->findAllByAttributes(array(
+			'entryId' => $entry->id,
+			'channelId' => array_keys($channels),
+		));
+		$indexedRecords = array();
+		foreach ($records as $record) {
+			$indexedRecords[$record->channelId] = $record;
+		}
+
+		$html = '<div class="pane lightpane meta" id="apple-news-pane">' .
+			'<h4 class="heading">'.Craft::t('Apple News Channels').'</h4>';
+
+		foreach ($channels as $channelId => $channel) {
+			$html .= '<div class="data" data-channel-id="'.$channelId.'">' .
+				'<h5 class="heading">'.$this->getService()->getChannelName($channelId).'</h5>' .
+				'<div class="value"><a class="btn menubtn" data-icon="settings" title="'.Craft::t('Actions').'"></a>' .
+				'<div class="menu">' .
+				'<ul>';
+
+			if (isset($indexedRecords[$channelId])) {
+				$shareUrl = $indexedRecords[$channelId]->shareUrl;
+				$html .= '<li><a data-action="copy-share-url" data-url="'.$shareUrl.'">'.Craft::t('Copy share URL').'</a></li>';
+			}
+
+			$downloadUrl = UrlHelper::getActionUrl('appleNews/downloadArticle', array(
+				'entryId' => $entry->id,
+				'locale' => $entry->locale,
+				'channelId' => $channelId,
+			));
+
+			$html .= '<li><a href="'.$downloadUrl.'">'.Craft::t('Download for News Preview').'</a></li>' .
+				'</ul>' .
+				'</div>' .
+				'</div>' .
+				'</div>';
+		};
+
+		$html .= '</div>';
+
+		craft()->templates->includeCssResource('appleNews/css/edit-entry.css');
+		craft()->templates->includeJsResource('appleNews/js/edit-entry.js');
+
+		return $html;
 	}
 
 	// Protected Methods

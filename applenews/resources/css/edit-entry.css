@@ -1,0 +1,5 @@
+#apple-news-pane > h4 { padding: 12px 24px; margin-bottom: 8px; border-bottom: 1px solid #e3e5e8; }
+
+#apple-news-pane > .data > .value,
+#apple-news-pane > .data > .heading { width: auto; }
+#apple-news-pane > .data > .heading { flex-grow: 1; -ms-flex: 1; }
