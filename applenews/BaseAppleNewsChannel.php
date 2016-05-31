@@ -12,17 +12,17 @@ abstract class BaseAppleNewsChannel implements IAppleNewsChannel
 	/**
 	 * @var string The channel ID
 	 */
-	protected $channelId;
+	public $channelId;
 
 	/**
 	 * @var string The channel API key ID
 	 */
-	protected $apiKeyId;
+	public $apiKeyId;
 
 	/**
 	 * @var string The channel API shared secret
 	 */
-	protected $apiSecret;
+	public $apiSecret;
 
 	// Public Methods
 	// =========================================================================

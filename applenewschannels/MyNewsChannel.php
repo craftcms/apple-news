@@ -13,10 +13,6 @@ use Craft\RichTextData;
  */
 class MyNewsChannel extends BaseAppleNewsChannel
 {
-    protected $channelId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx';
-    protected $apiKeyId  = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx';
-    protected $apiSecret = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
-
     public function matchEntry(EntryModel $entry)
     {
         if ($entry->locale != 'en') {
