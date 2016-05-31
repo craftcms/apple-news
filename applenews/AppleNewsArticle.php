@@ -100,7 +100,7 @@ class AppleNewsArticle implements IAppleNewsArticle
 	public function addMetadata($name, $value)
 	{
 		if (!isset($this->metadata)) {
-			$this->metadata = array();
+			$this->metadata = [];
 		}
 
 		$arr = &$this->metadata;
@@ -111,7 +111,7 @@ class AppleNewsArticle implements IAppleNewsArticle
 
 			foreach ($path as $step) {
 				if (!isset($arr[$step])) {
-					$arr[$step] = array();
+					$arr[$step] = [];
 				}
 				$arr = &$arr[$step];
 			}

@@ -70,7 +70,7 @@ class AppleNewsController extends BaseController
 		IOHelper::createFile($zipFile);
 
 		Zip::add($zipFile, $zipDir, $zipDir);
-		craft()->request->sendFile($zipFile, IOHelper::getFileContents($zipFile), array('filename' => $entry->slug.'.zip', 'forceDownload' => true), false);
+		craft()->request->sendFile($zipFile, IOHelper::getFileContents($zipFile), ['filename' => $entry->slug.'.zip', 'forceDownload' => true], false);
 		IOHelper::deleteFolder($zipDir);
 		IOHelper::deleteFile($zipFile);
 	}

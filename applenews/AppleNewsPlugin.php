@@ -118,7 +118,7 @@ class AppleNewsPlugin extends BasePlugin
 
 		// Find any channels that match this entry
 		/** @var \IAppleNewsChannel[] $channels */
-		$channels = array();
+		$channels = [];
 		foreach ($this->getService()->getChannels() as $channel) {
 			if ($channel->matchEntry($entry)) {
 				$channels[$channel->getChannelId()] = $channel;
@@ -130,11 +130,11 @@ class AppleNewsPlugin extends BasePlugin
 		}
 
 		// Get any existing records for these channels.
-		$records = AppleNews_ArticleRecord::model()->findAllByAttributes(array(
+		$records = AppleNews_ArticleRecord::model()->findAllByAttributes([
 			'entryId' => $entry->id,
 			'channelId' => array_keys($channels),
-		));
-		$indexedRecords = array();
+		]);
+		$indexedRecords = [];
 		foreach ($records as $record) {
 			$indexedRecords[$record->channelId] = $record;
 		}
@@ -154,11 +154,11 @@ class AppleNewsPlugin extends BasePlugin
 				$html .= '<li><a data-action="copy-share-url" data-url="'.$shareUrl.'">'.Craft::t('Copy share URL').'</a></li>';
 			}
 
-			$downloadUrl = UrlHelper::getActionUrl('appleNews/downloadArticle', array(
+			$downloadUrl = UrlHelper::getActionUrl('appleNews/downloadArticle', [
 				'entryId' => $entry->id,
 				'locale' => $entry->locale,
 				'channelId' => $channelId,
-			));
+			]);
 
 			$html .= '<li><a href="'.$downloadUrl.'">'.Craft::t('Download for News Preview').'</a></li>' .
 				'</ul>' .

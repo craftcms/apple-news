@@ -33,9 +33,9 @@ class AppleNews_ArticleRecord extends BaseRecord
 	 */
 	public function defineRelations()
 	{
-		return array(
-			'entry' => array(static::BELONGS_TO, 'EntryRecord', 'onDelete' => static::CASCADE),
-		);
+		return [
+			'entry' => [static::BELONGS_TO, 'EntryRecord', 'onDelete' => static::CASCADE],
+		];
 	}
 
 	/**
@@ -45,9 +45,9 @@ class AppleNews_ArticleRecord extends BaseRecord
 	 */
 	public function defineIndexes()
 	{
-		return array(
-			array('columns' => array('entryId', 'channelId'), 'unique' => true),
-		);
+		return [
+			['columns' => ['entryId', 'channelId'], 'unique' => true],
+		];
 	}
 
 	// Protected Methods
@@ -60,12 +60,12 @@ class AppleNews_ArticleRecord extends BaseRecord
 	 */
 	protected function defineAttributes()
 	{
-		return array(
-			'channelId'        => array(AttributeType::String, 'required' => true, 'length' => 36),
-			'articleId'        => array(AttributeType::String, 'required' => true, 'length' => 36),
-			'revisionId'       => array(AttributeType::String, 'required' => true, 'length' => 24),
-			'shareUrl'         => array(AttributeType::Url),
-			'response'         => array(AttributeType::Mixed),
-		);
+		return [
+			'channelId'        => [AttributeType::String, 'required' => true, 'length' => 36],
+			'articleId'        => [AttributeType::String, 'required' => true, 'length' => 36],
+			'revisionId'       => [AttributeType::String, 'required' => true, 'length' => 24],
+			'shareUrl'         => [AttributeType::Url],
+			'response'         => [AttributeType::Mixed],
+		];
 	}
 }

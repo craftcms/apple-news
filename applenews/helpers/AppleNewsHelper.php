@@ -28,11 +28,11 @@ abstract class AppleNewsHelper
 	 */
 	public static function createKeywords(EntryModel $entry, $fieldHandles)
 	{
-		$keywords = array();
+		$keywords = [];
 
 		// Find the fields
 		/** @var FieldModel[] $fields */
-		$fields = array();
+		$fields = [];
 		foreach ($entry->getFieldLayout()->getFields() as $fieldLayoutField) {
 			$field = $fieldLayoutField->getField();
 			$fieldHandle = $field->handle;

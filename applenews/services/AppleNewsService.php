@@ -136,11 +136,11 @@ class AppleNewsService extends BaseApplicationComponent
 
 			$article = $channel->createArticle($entry);
 			$content = $article->getContent();
-			$metadata = $article->getMetadata() ?: array();
+			$metadata = $article->getMetadata() ?: [];
 
 			// Include the generator metadata in the content
 			$content['metadata'] = array_merge(
-				isset($content['metadata']) ? $content['metadata'] : array(),
+				isset($content['metadata']) ? $content['metadata'] : [],
 				$this->getGeneratorMetadata());
 
 			// Include the latest revision ID if we have one
@@ -150,11 +150,11 @@ class AppleNewsService extends BaseApplicationComponent
 			}
 
 			// Prepare the data and send the request
-			$data = array(
+			$data = [
 				'files' => $article->getFiles(),
-				'metadata' => $metadata ? JsonHelper::encode(array('data' => $metadata)) : null,
+				'metadata' => $metadata ? JsonHelper::encode(['data' => $metadata]) : null,
 				'json' => JsonHelper::encode($content)
-			);
+			];
 
 			// Publish the article
 			if ($articleExists) {
@@ -261,11 +261,11 @@ class AppleNewsService extends BaseApplicationComponent
 	protected function getGeneratorMetadata()
 	{
 		if (!isset($this->_generatorMetadata)) {
-			$this->_generatorMetadata = array(
+			$this->_generatorMetadata = [
 				'generatorIdentifier' => 'AppleNewsForCraftCMS',
 				'generatorName' => 'Apple News for Craft CMS',
 				'generatorVersion' => craft()->plugins->getPlugin('applenews')->getVersion(),
-			);
+			];
 		}
 		return $this->_generatorMetadata;
 	}
