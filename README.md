@@ -48,3 +48,10 @@ Once your Channel classes are set up and included properly, you should be able t
 - **Download for News Preview** – This will download the entry’s article.json (and supplimental files), which can be loaded into the [News Preview](https://developer.apple.com/news-preview/) app, to see exactly how your article will look on various iOS devices once published.
 
 No specific user action is required to publish entries to Apple News. Each time an entry is saved, the plugin will determine if it should push the article to Apple News, depending on the Channel classes’ `matchEntry()` and `canPublish()` responses.
+
+
+## Caveats
+
+Please be aware of the following caveats:
+
+- At this time there is no way to schedule an entry to be pushed to Apple News in the future, nor does Apple News support articles with publish dates set to the future. So if you save an entry with a Post Date set in the future, you will have to manually re-save the entry later on for it to actually get pushed to Apple News.
