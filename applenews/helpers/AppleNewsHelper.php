@@ -1,11 +1,21 @@
 <?php
 namespace Craft;
 
+use League\HTMLToMarkdown\HtmlConverter;
+
 /**
  * Class AppleNewsHelper
  */
 abstract class AppleNewsHelper
 {
+	// Properties
+	// =========================================================================
+
+	private static $_htmlConverter;
+
+	// Public Methods
+	// =========================================================================
+
 	/**
 	 * Formats a language ID into the format required by the Apple News API (e.g. "en" or "en_US").
 	 *
@@ -60,5 +70,77 @@ abstract class AppleNewsHelper
 		}
 
 		return $keywords;
+	}
+
+	/**
+	 * Strips HTML tags from a given string, returning just the text. Block-level tags will be joined by two newlines.
+	 *
+	 * @param string|RichTextData $html HTML-formatted text, or a RichTextData object
+	 *
+	 * @return string Text without HTML tags
+	 */
+	public static function stripHtml($html)
+	{
+		if ($html instanceof RichTextData) {
+			$html = $html->getParsedContent();
+		}
+
+		// Replace block-level tags with newlines
+		$blockTags = 'h1|h2|h3|h4|h5|h6|p|ul|ol|li|div';
+		$html = preg_replace("/<\\/(?:{$blockTags})>/i", "\n\n", $html);
+
+		// Remove <script> tags, including their contents
+		$html = preg_replace('/<script.*>.*<\/script>/isU', '', $html);
+
+		// Remove all remaining tags
+		$html = preg_replace('/<\/?\w+.*>/sU', '', $html);
+
+		// Trim unwanted whitespace
+		$html = preg_replace('/^[ \t]|[ \t]$/m', '', $html);
+		$html = trim($html, "\n\r");
+		$html = preg_replace('/[\n\r]{3,}/', "\n\n", $html);
+
+		return $html;
+	}
+
+	/**
+	 * Converts HTML-formatted text into Markdown, stripped of any tags that aren’t supported by Apple News Format.
+	 *
+	 * @param string|RichTextData $html HTML-formatted text, or a RichTextData object
+	 *
+	 * @return string Markdown-formatted text
+	 */
+	public static function html2Markdown($html)
+	{
+		if ($html instanceof RichTextData) {
+			$html = $html->getParsedContent();
+		}
+
+		// Trim unwanted whitespace within within block tags
+		$blockTags = 'h1|h2|h3|h4|h5|h6|p|ul|ol|li|div';
+		$html = preg_replace("/(<(?:{$blockTags}).*?>)\s*/is", "$1", $html);
+
+		$md = static::getHtmlConverter()->convert($html);
+
+		return $md;
+	}
+
+	// Protected Methods
+	// =========================================================================
+
+	/**
+	 * Returns an instance of HtmlConverter.
+	 *
+	 * @return HtmlConverter
+	 */
+	protected static function getHtmlConverter()
+	{
+		if (!isset(self::$_htmlConverter)) {
+			self::$_htmlConverter = new HtmlConverter([
+				'strip_tags' => true
+			]);
+		}
+
+		return self::$_htmlConverter;
 	}
 }

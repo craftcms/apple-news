@@ -17,20 +17,6 @@ class AppleNews_ApiService extends BaseApplicationComponent
 	// =========================================================================
 
 	/**
-	 * Initializes the application component
-	 *
-	 * @return void
-	 * @throws Exception if the plugin is not configured correctly
-	 */
-	public function init()
-	{
-		// Autoload the API
-		require craft()->path->getPluginsPath().'applenews/vendor/autoload.php';
-
-		parent::init();
-	}
-
-	/**
 	 * Returns information about a channel.
 	 *
 	 * @param string $channelId

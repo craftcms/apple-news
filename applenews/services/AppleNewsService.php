@@ -29,6 +29,9 @@ class AppleNewsService extends BaseApplicationComponent
 	 */
 	public function init()
 	{
+		// Autoload the Composer packages
+		require craft()->path->getPluginsPath().'applenews/vendor/autoload.php';
+
 		// Import base classes
 		Craft::import('plugins.applenews.IAppleNewsArticle');
 		Craft::import('plugins.applenews.AppleNewsArticle');
