@@ -126,13 +126,13 @@ class MyNewsChannel extends BaseAppleNewsChannel
                     $image = $block->image->first();
                     if ($image) {
                         /** @var RichTextData $caption */
-                        $caption = $article->caption;
+                        $caption = $block->caption;
                         $captionText = AppleNewsHelper::stripHtml($caption);
                         $imageUrl = $article->addFile($image);
                         $components[] = [
                             'role' => 'photo',
                             'layout' => 'photoLayout',
-                            'url' => $imageUrl,
+                            'URL' => $imageUrl,
                             'caption' => $captionText,
                         ];
                         if ($captionText) {
