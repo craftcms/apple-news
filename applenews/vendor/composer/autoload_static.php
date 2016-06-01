@@ -7,6 +7,10 @@ namespace Composer\Autoload;
 class ComposerStaticInit72a0d383fb147963484b5336a44650b6
 {
     public static $prefixLengthsPsr4 = array (
+        'L' => 
+        array (
+            'League\\HTMLToMarkdown\\' => 22,
+        ),
         'C' => 
         array (
             'Curl\\' => 5,
@@ -15,6 +19,10 @@ class ComposerStaticInit72a0d383fb147963484b5336a44650b6
     );
 
     public static $prefixDirsPsr4 = array (
+        'League\\HTMLToMarkdown\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/league/html-to-markdown/src',
+        ),
         'Curl\\' => 
         array (
             0 => __DIR__ . '/..' . '/php-curl-class/php-curl-class/src/Curl',
