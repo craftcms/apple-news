@@ -57,7 +57,8 @@ class MyNewsChannel extends BaseAppleNewsChannel
         $components[] = [
             'role' => 'intro',
             'layout' => 'introLayout',
-            'text' => $shortDescription->getParsedContent(),
+            'text' => AppleNewsHelper::html2Markdown($shortDescription),
+            'format' => 'markdown',
             'textStyle' => 'introStyle',
         ];
 
@@ -103,7 +104,8 @@ class MyNewsChannel extends BaseAppleNewsChannel
                     $components[] = [
                         'role' => 'body',
                         'layout' => 'bodyLayout',
-                        'text' => $text->getParsedContent(),
+                        'text' => AppleNewsHelper::html2Markdown($text),
+                        'format' => 'markdown',
                         'textStyle' => 'bodyStyle',
                     ];
                     break;
@@ -123,7 +125,7 @@ class MyNewsChannel extends BaseAppleNewsChannel
                     if ($image) {
                         /** @var RichTextData $caption */
                         $caption = $article->caption;
-                        $captionText = $caption->getParsedContent();
+                        $captionText = AppleNewsHelper::stripHtml($caption);
                         $imageUrl = $article->addFile($image);
                         $components[] = [
                             'role' => 'photo',
@@ -135,7 +137,8 @@ class MyNewsChannel extends BaseAppleNewsChannel
                             $components[] = [
                                 'role' => 'caption',
                                 'layout' => 'captionLayout',
-                                'text' => $captionText,
+                                'text' => AppleNewsHelper::html2Markdown($captionText),
+                                'format' => 'markdown',
                                 'textStyle' => 'captionStyle',
                             ];
                         }
@@ -168,7 +171,7 @@ class MyNewsChannel extends BaseAppleNewsChannel
                 'dateCreated' => DateTimeHelper::toIso8601($entry->dateCreated),
                 'dateModified' => DateTimeHelper::toIso8601($entry->dateUpdated),
                 'datePublished' => DateTimeHelper::toIso8601($entry->postDate),
-                'excerpt' => $shortDescription->getParsedContent(),
+                'excerpt' => AppleNewsHelper::stripHtml($shortDescription),
                 'keywords' => AppleNewsHelper::createKeywords($entry, ['shortDescription']),
                 'thumbnailURL' => isset($featuredImageUrl) ? $featuredImageUrl : null,
             ],
