@@ -35,6 +35,8 @@ abstract class AppleNewsHelper
 	 *
 	 * @param EntryModel $entry        The entry
 	 * @param string[]   $fieldHandles The field handles that the keywords should be extracted from
+	 *
+	 * @return string[] List of keywords for the article
 	 */
 	public static function createKeywords(EntryModel $entry, $fieldHandles)
 	{

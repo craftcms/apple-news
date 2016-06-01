@@ -179,6 +179,8 @@ class AppleNews_ApiService extends BaseApplicationComponent
 	/**
 	 * Returns a publisher API configured for a given channel ID.
 	 *
+	 * @param string $channelId
+	 *
 	 * @return PublisherAPI
 	 */
 	protected function getApi($channelId)

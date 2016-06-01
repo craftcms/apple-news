@@ -6,6 +6,7 @@ use Craft\AssetFileModel;
 use Craft\EntryModel;
 use Craft\AppleNewsHelper;
 use Craft\DateTimeHelper;
+use Craft\MatrixBlockModel;
 use Craft\RichTextData;
 
 /**
@@ -88,6 +89,7 @@ class MyNewsChannel extends BaseAppleNewsChannel
 
         // Body components
         foreach ($entry->articleBody as $block) {
+            /** @var MatrixBlockModel $block */
             switch ($block->getType()->handle) {
                 case 'heading': {
                     $components[] = [

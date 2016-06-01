@@ -106,6 +106,8 @@ class AppleNewsPlugin extends BasePlugin
 
 	/**
 	 * @param array &$context
+	 *
+	 * @return string
 	 */
 	public function addEditEntryPagePane(&$context)
 	{
@@ -117,7 +119,7 @@ class AppleNewsPlugin extends BasePlugin
 		}
 
 		// Find any channels that match this entry
-		/** @var \IAppleNewsChannel[] $channels */
+		/** @var IAppleNewsChannel[] $channels */
 		$channels = [];
 		foreach ($this->getService()->getChannels() as $channel) {
 			if ($channel->matchEntry($entry)) {

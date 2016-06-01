@@ -122,6 +122,7 @@ class AppleNewsService extends BaseApplicationComponent
 	public function postArticle(EntryModel $entry)
 	{
 		$articleRecords = $this->getArticleRecordsForEntry($entry);
+		/** @var IAppleNewsChannel[] $channels */
 		$channels = [];
 
 		foreach ($this->getChannels() as $channel) {
