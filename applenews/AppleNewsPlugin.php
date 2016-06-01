@@ -162,7 +162,7 @@ class AppleNewsPlugin extends BasePlugin
 				'channelId' => $channelId,
 			]);
 
-			$html .= '<li><a href="'.$downloadUrl.'">'.Craft::t('Download for News Preview').'</a></li>' .
+			$html .= '<li><a href="'.$downloadUrl.'" target="_blank">'.Craft::t('Download for News Preview').'</a></li>' .
 				'</ul>' .
 				'</div>' .
 				'</div>' .
