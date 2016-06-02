@@ -182,6 +182,36 @@ class AppleNewsPlugin extends BasePlugin
 		return $html;
 	}
 
+	/**
+	 * Adds new bulk actions to the Entries index page.
+	 *
+	 * @param string $source The currently selected source
+	 *
+	 * @return array The bulk actions
+	 */
+	public function addEntryActions($source)
+	{
+		$actions = [];
+
+		// Post Articles action
+		$canPostArticles = false;
+		$userSessionService = craft()->userSession;
+
+		if ($userSessionService->isAdmin()) {
+			$canPostArticles = true;
+		} else if (preg_match('/^section:(\d+)$/', $source, $matches)) {
+			if ($userSessionService->checkPermission('publishEntries:'.$matches[1])) {
+				$canPostArticles = true;
+			}
+		}
+
+		if ($canPostArticles) {
+			$actions[] = 'AppleNews_PostArticles';
+		}
+
+		return $actions;
+	}
+
 	// Protected Methods
 	// =========================================================================
 
