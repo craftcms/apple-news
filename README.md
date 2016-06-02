@@ -72,3 +72,16 @@ No specific user action is required to publish entries to Apple News. Each time 
 Please be aware of the following caveats:
 
 - At this time there is no way to schedule an entry to be pushed to Apple News in the future, nor does Apple News support articles with publish dates set to the future. So if you save an entry with a Post Date set in the future, you will have to manually re-save the entry later on for it to actually get pushed to Apple News.
+
+
+## Roadmap
+
+The following features are planned:
+
+- State indicator next to each channel listing on Edit Entry pages.
+    - (Blank) = unpublished
+    - Yellow = PROCESSING or PROCESSING_UPDATE (and automatically refresh every few seconds until it's something else)
+    - Red = FAILED_PROCESSING or FAILED_PROCESSING_UPDATE
+    - Green = LIVE
+- News Preview download support for entry revisions
+- Error handling and reporting
