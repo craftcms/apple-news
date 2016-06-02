@@ -8,11 +8,6 @@ use ChapterThree\AppleNewsAPI\PublisherAPI;
  */
 class AppleNews_ApiService extends BaseApplicationComponent
 {
-	// Properties
-	// =========================================================================
-
-	protected $apis;
-
 	// Public Methods
 	// =========================================================================
 
@@ -185,12 +180,10 @@ class AppleNews_ApiService extends BaseApplicationComponent
 	 */
 	protected function getApi($channelId)
 	{
-		if (!isset($this->apis[$channelId])) {
-			$channel = $this->getService()->getChannelById($channelId);
-			$this->apis[$channelId] = new PublisherAPI($channel->getApiKeyId(), $channel->getApiSecret(), 'https://news-api.apple.com');
-		}
+		$channel = $this->getService()->getChannelById($channelId);
+		$api = new PublisherAPI($channel->getApiKeyId(), $channel->getApiSecret(), 'https://news-api.apple.com');
 
-		return $this->apis[$channelId];
+		return $api;
 	}
 
 	/**
