@@ -117,7 +117,7 @@ class AppleNewsService extends BaseApplicationComponent
 	 *
 	 * @param EntryModel $entry
 	 *
-	 * @return void
+	 * @return bool Whether the entry was posted to Apple News successfully
 	 */
 	public function postArticle(EntryModel $entry)
 	{
@@ -189,6 +189,8 @@ class AppleNewsService extends BaseApplicationComponent
 
 		// If there are any records left over, delete them
 		$this->deleteArticlesFromRecords($articleRecords);
+
+		return true;
 	}
 
 	/**

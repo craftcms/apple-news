@@ -88,7 +88,12 @@ class AppleNewsPlugin extends BasePlugin
 		/** @var EntryModel $entry */
 		$entry = $event->params['entry'];
 
-		$this->getService()->postArticle($entry);
+		// Create a new PostArticle task
+		$desc = Craft::t('Posting “{title}” to Apple News', ['title' => $entry->title]);
+		craft()->tasks->createTask('AppleNews_PostArticle', $desc, [
+			'entryId' => $entry->id,
+			'locale' => $entry->locale,
+		]);
 	}
 
 	/**
