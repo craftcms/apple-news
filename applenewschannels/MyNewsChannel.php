@@ -55,13 +55,15 @@ class MyNewsChannel extends BaseAppleNewsChannel
         ];
 
         // Intro
-        $components[] = [
-            'role' => 'intro',
-            'layout' => 'introLayout',
-            'text' => AppleNewsHelper::html2Markdown($shortDescription),
-            'format' => 'markdown',
-            'textStyle' => 'introStyle',
-        ];
+        if ($shortDescription) {
+            $components[] = [
+                'role'      => 'intro',
+                'layout'    => 'introLayout',
+                'text'      => AppleNewsHelper::html2Markdown($shortDescription),
+                'format'    => 'markdown',
+                'textStyle' => 'introStyle',
+            ];
+        }
 
         // Header image
         if (isset($featuredImageUrl)) {
