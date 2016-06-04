@@ -78,9 +78,4 @@ Please be aware of the following caveats:
 
 The following features are planned:
 
-- State indicator next to each channel listing on Edit Entry pages.
-    - (Blank) = unpublished
-    - Yellow = PROCESSING or PROCESSING_UPDATE (and automatically refresh every few seconds until it's something else)
-    - Red = FAILED_PROCESSING or FAILED_PROCESSING_UPDATE
-    - Green = LIVE
 - Error handling and reporting

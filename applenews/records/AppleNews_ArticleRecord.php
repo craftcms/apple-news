@@ -64,6 +64,9 @@ class AppleNews_ArticleRecord extends BaseRecord
 			'channelId'        => [AttributeType::String, 'required' => true, 'length' => 36],
 			'articleId'        => [AttributeType::String, 'required' => true, 'length' => 36],
 			'revisionId'       => [AttributeType::String, 'required' => true, 'length' => 24],
+			'isSponsored'      => [AttributeType::Bool],
+			'isPreview'        => [AttributeType::Bool],
+			'state'            => [AttributeType::String],
 			'shareUrl'         => [AttributeType::Url],
 			'response'         => [AttributeType::Mixed],
 		];

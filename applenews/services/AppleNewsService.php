@@ -113,6 +113,47 @@ class AppleNewsService extends BaseApplicationComponent
 	}
 
 	/**
+	 * Returns all known info about an entry's articles on Apple News.
+	 *
+	 * @param EntryModel           $entry     The entry
+	 * @param string|string[]|null $channelId The channel ID(s) to limit the query to
+	 * @param bool                 $refresh   Whether the info should be refreshed for articles that are processing
+	 *
+	 * @return array[] The info, indexed by channel ID
+	 */
+	public function getArticleInfo(EntryModel $entry, $channelId = null, $refresh = false)
+	{
+		$attributes = ['entryId' => $entry->id];
+		if ($channelId !== null) {
+			$attributes['channelId'] = $channelId;
+		}
+		$records = AppleNews_ArticleRecord::model()->findAllByAttributes($attributes);
+
+		$infos = [];
+
+		foreach ($records as $record) {
+			// Refresh first?
+			if ($refresh && in_array($record->state, ['PROCESSING', 'PROCESSING_UPDATE'])) {
+				$response = $this->getApiService()->readArticle($record->channelId, $record->articleId);
+				if (isset($response->data)) {
+					$this->updateArticleRecord($record, $response);
+				}
+			}
+
+			$infos[$record->channelId] = [
+				'articleId' => $record->articleId,
+				'revisionId' => $record->revisionId,
+				'isSponsored' => (bool)$record->isSponsored,
+				'isPreview' => (bool)$record->isPreview,
+				'state' => $record->state,
+				'shareUrl' => $record->shareUrl,
+			];
+		}
+
+		return $infos;
+	}
+
+	/**
 	 * Returns whether any channels can publish the given entry.
 	 *
 	 * @param EntryModel $entry
@@ -134,16 +175,25 @@ class AppleNewsService extends BaseApplicationComponent
 	/**
 	 * Posts an article to Apple News.
 	 *
-	 * @param EntryModel $entry
+	 * @param EntryModel           $entry
+	 * @param string|string[]|null $channelId The channel ID(s) to post the article to, if not all
 	 *
 	 * @return bool Whether the entry was posted to Apple News successfully
 	 */
-	public function postArticle(EntryModel $entry)
+	public function postArticle(EntryModel $entry, $channelId = null)
 	{
+		if (is_string($channelId)) {
+			$channelId = [$channelId];
+		}
+
 		/** @var IAppleNewsChannel[] $channels */
 		$channels = [];
 
 		foreach ($this->getChannels() as $channel) {
+			if ($channelId !== null && !in_array($channel->getChannelId(), $channelId)) {
+				continue;
+			}
+
 			if ($channel->matchEntry($entry) && $channel->canPublish($entry)) {
 				$channels[] = $channel;
 			}
@@ -199,10 +249,7 @@ class AppleNewsService extends BaseApplicationComponent
 					$record->channelId = $channelId;
 					$record->articleId = $response->data->id;
 				}
-				$record->shareUrl = $response->data->shareUrl;
-				$record->revisionId = $response->data->revision;
-				$record->response = JsonHelper::encode($response);
-				$record->save();
+				$this->updateArticleRecord($record, $response);
 			}
 
 			if ($articleExists) {
@@ -280,6 +327,24 @@ class AppleNewsService extends BaseApplicationComponent
 			$apiService->deleteArticle($channelId, $record->articleId);
 			$record->delete();
 		}
+	}
+
+	/**
+	 * Updates a given Article record with the data in an Apple News API response.
+	 *
+	 * @param AppleNews_ArticleRecord $record
+	 * @param \stdClass               $response
+	 */
+	protected function updateArticleRecord(AppleNews_ArticleRecord $record, $response)
+	{
+		$record->revisionId = $response->data->revision;
+		$record->isSponsored = $response->data->isSponsored;
+		$record->isPreview = $response->data->isPreview;
+		$record->state = $response->data->state;
+		$record->shareUrl = $response->data->shareUrl;
+		$record->response = JsonHelper::encode($response);
+
+		$record->save();
 	}
 
 	/**

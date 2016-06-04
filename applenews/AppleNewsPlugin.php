@@ -146,29 +146,65 @@ class AppleNewsPlugin extends BasePlugin
 			return '';
 		}
 
+		$isVersion = ($entry instanceof EntryVersionModel);
+		$isDraft = ($entry instanceof EntryDraftModel);
+
 		// Get any existing records for these channels.
-		$records = AppleNews_ArticleRecord::model()->findAllByAttributes([
-			'entryId' => $entry->id,
-			'channelId' => array_keys($channels),
-		]);
-		$indexedRecords = [];
-		foreach ($records as $record) {
-			$indexedRecords[$record->channelId] = $record;
-		}
+		$infos = $this->getService()->getArticleInfo($entry, array_keys($channels));
 
 		$html = '<div class="pane lightpane meta" id="apple-news-pane">' .
-			'<h4 class="heading">'.Craft::t('Apple News Channels').'</h4>';
+			'<h4 class="heading">'.Craft::t('Apple News Channels').'</h4>' .
+			'<div class="spinner hidden"></div>';
 
 		foreach ($channels as $channelId => $channel) {
+			$state = isset($infos[$channelId]) ? $infos[$channelId]['state'] : null;
+			switch ($state) {
+				case 'PROCESSING':
+					$statusColor = 'orange';
+					$statusMessage = Craft::t('The article has been published and is going through processing.');
+					break;
+				case 'LIVE':
+					$statusColor = 'green';
+					$statusMessage = Craft::t('The article has been published, finished processing, and is visible in the News app.');
+					break;
+				case 'PROCESSING_UPDATE':
+					$statusColor = 'orange';
+					$statusMessage = Craft::t('A previous version of the article is visible in the News app, and an update is currently in processing.');
+					break;
+				case 'TAKEN_DOWN':
+					$statusColor = null;
+					$statusMessage = Craft::t('The article was previously visible in the News app, but was taken down.');
+					break;
+				case 'FAILED_PROCESSING':
+					$statusColor = 'red';
+					$statusMessage = Craft::t('The article failed during processing and is not visible in the News app.');
+					break;
+				case 'FAILED_PROCESSING_UPDATE':
+					$statusColor = 'red';
+					$statusMessage = Craft::t('A previous version of the article is visible in the News app, but an update failed during processing.');
+					break;
+				default:
+					$statusColor = null;
+					$statusMessage = Craft::t('The article has not been published yet.');
+			}
+
 			$html .= '<div class="data" data-channel-id="'.$channelId.'">' .
-				'<h5 class="heading">'.$this->getService()->getChannelName($channelId).'</h5>' .
+				'<h5 class="heading">' .
+					"<div class=\"status {$statusColor}\" title=\"{$statusMessage}\"></div>" .
+					$this->getService()->getChannelName($channelId) .
+				'</h5>' .
 				'<div class="value"><a class="btn menubtn" data-icon="settings" title="'.Craft::t('Actions').'"></a>' .
 				'<div class="menu">' .
 				'<ul>';
 
-			if (isset($indexedRecords[$channelId])) {
-				$shareUrl = $indexedRecords[$channelId]->shareUrl;
+			if (in_array($state, ['PROCESSING', 'LIVE', 'PROCESSING_UPDATE'])) {
+				$shareUrl = $infos[$channelId]['shareUrl'];
 				$html .= '<li><a data-action="copy-share-url" data-url="'.$shareUrl.'">'.Craft::t('Copy share URL').'</a></li>';
+			} else if (!$isVersion && !$isDraft && $channel->canPublish($entry)) {
+				$html .= '<li><a data-action="post-article">'.Craft::t('Post to Apple News').'</a></li>';
+			} else {
+				// TODO: preview support that ignores canPublish()
+				//$html .= '<li><a data-action="post-preview">'.Craft::t('Post preview to Apple News').'</a></li>';
 			}
 
 			$downloadUrlParams = [
@@ -177,9 +213,9 @@ class AppleNewsPlugin extends BasePlugin
 				'channelId' => $channelId,
 			];
 
-			if ($entry instanceof EntryVersionModel) {
+			if ($isVersion) {
 				$downloadUrlParams['versionId'] = $entry->versionId;
-			} else if ($entry instanceof EntryDraftModel) {
+			} else if ($isDraft) {
 				$downloadUrlParams['draftId'] = $entry->draftId;
 			}
 
@@ -195,7 +231,23 @@ class AppleNewsPlugin extends BasePlugin
 		$html .= '</div>';
 
 		craft()->templates->includeCssResource('appleNews/css/edit-entry.css');
-		craft()->templates->includeJsResource('appleNews/js/edit-entry.js');
+		craft()->templates->includeJsResource('appleNews/js/ArticlePane.js');
+
+		$infosJs = JsonHelper::encode($infos);
+		$versionIdJs = $isVersion ? $entry->versionId : 'null';
+		$draftIdJs = $isDraft ? $entry->draftId : 'null';
+
+		$js = <<<EOT
+Garnish.\$doc.ready(function() {
+	new Craft.AppleNews.ArticlePane(
+		{$entry->id},
+		'{$entry->locale}',
+		{$versionIdJs},
+		{$draftIdJs},
+		{$infosJs});
+});
+EOT;
+		craft()->templates->includeJs($js);
 
 		return $html;
 	}
