@@ -161,11 +161,19 @@ class AppleNewsPlugin extends BasePlugin
 				$html .= '<li><a data-action="copy-share-url" data-url="'.$shareUrl.'">'.Craft::t('Copy share URL').'</a></li>';
 			}
 
-			$downloadUrl = UrlHelper::getActionUrl('appleNews/downloadArticle', [
+			$downloadUrlParams = [
 				'entryId' => $entry->id,
 				'locale' => $entry->locale,
 				'channelId' => $channelId,
-			]);
+			];
+
+			if ($entry instanceof EntryVersionModel) {
+				$downloadUrlParams['versionId'] = $entry->versionId;
+			} else if ($entry instanceof EntryDraftModel) {
+				$downloadUrlParams['draftId'] = $entry->draftId;
+			}
+
+			$downloadUrl = UrlHelper::getActionUrl('appleNews/downloadArticle', $downloadUrlParams);
 
 			$html .= '<li><a href="'.$downloadUrl.'" target="_blank">'.Craft::t('Download for News Preview').'</a></li>' .
 				'</ul>' .

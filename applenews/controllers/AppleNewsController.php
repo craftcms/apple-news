@@ -17,7 +17,16 @@ class AppleNewsController extends BaseController
 		$entryId = craft()->request->getRequiredParam('entryId');
 		$localeId = craft()->request->getRequiredParam('locale');
 		$channelId = craft()->request->getRequiredParam('channelId');
-		$entry = craft()->entries->getEntryById($entryId, $localeId);
+		$versionId = craft()->request->getParam('versionId');
+		$draftId = craft()->request->getParam('draftId');
+
+		if ($versionId) {
+			$entry = craft()->entryRevisions->getVersionById($versionId);
+		} elseif ($draftId) {
+			$entry = craft()->entryRevisions->getDraftById($draftId);
+		} else {
+			$entry = craft()->entries->getEntryById($entryId, $localeId);
+		}
 
 		if (!$entry) {
 			throw new HttpException(404);
@@ -25,13 +34,13 @@ class AppleNewsController extends BaseController
 
 		// Make sure the user is allowed to edit entries in this section
 		craft()->userSession->requirePermission('editEntries:'.$entry->sectionId);
-		
+
 		$channel = $this->getService()->getChannelById($channelId);
-		
+
 		if (!$channel->matchEntry($entry)){
 			throw new Exception('This channel does not want anything to do with this entry.');
 		}
-		
+
 		$article = $channel->createArticle($entry);
 
 		// Prep the zip staging folder
