@@ -160,7 +160,7 @@ class MyNewsChannel extends BaseAppleNewsChannel
         // ---------------------------------------------------------------------
 
         $article->setContent([
-            'version' => '1.0',
+            'version' => '1.1',
             'identifier' => $entry->id,
             'title' => $entry->title,
             'language' => AppleNewsHelper::formatLanguage($entry->locale),
