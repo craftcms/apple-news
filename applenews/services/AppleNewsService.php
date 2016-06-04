@@ -113,6 +113,25 @@ class AppleNewsService extends BaseApplicationComponent
 	}
 
 	/**
+	 * Returns whether any channels can publish the given entry.
+	 *
+	 * @param EntryModel $entry
+	 *
+	 * @return bool Whether the entry can be published to any channels
+	 */
+	public function canPostArticle(EntryModel $entry)
+	{
+		// See if any channels will have it
+		foreach ($this->getChannels() as $channel) {
+			if ($channel->matchEntry($entry) && $channel->canPublish($entry)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Posts an article to Apple News.
 	 *
 	 * @param EntryModel $entry

@@ -88,6 +88,11 @@ class AppleNewsPlugin extends BasePlugin
 		/** @var EntryModel $entry */
 		$entry = $event->params['entry'];
 
+		// Make sure at least one channel is ready to publish it
+		if (!$this->getService()->canPostArticle($entry)) {
+			return;
+		}
+
 		// Create a new PostArticle task
 		$desc = Craft::t('Posting “{title}” to Apple News', ['title' => $entry->title]);
 		craft()->tasks->createTask('AppleNews_PostArticle', $desc, [
