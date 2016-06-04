@@ -83,5 +83,4 @@ The following features are planned:
     - Yellow = PROCESSING or PROCESSING_UPDATE (and automatically refresh every few seconds until it's something else)
     - Red = FAILED_PROCESSING or FAILED_PROCESSING_UPDATE
     - Green = LIVE
-- News Preview download support for entry revisions
 - Error handling and reporting
