@@ -24,6 +24,10 @@ class MyNewsChannel extends BaseAppleNewsChannel
             return false;
         }
 
+        if ($entry->getType()->handle != 'article') {
+            return false;
+        }
+
         return true;
     }
 
