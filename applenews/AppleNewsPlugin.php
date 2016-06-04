@@ -88,6 +88,11 @@ class AppleNewsPlugin extends BasePlugin
 		/** @var EntryModel $entry */
 		$entry = $event->params['entry'];
 
+		// Make sure it's not a revision
+		if ($entry instanceof EntryVersionModel || $entry instanceof EntryDraftModel) {
+			return;
+		}
+
 		// Make sure at least one channel is ready to publish it
 		if (!$this->getService()->canPostArticle($entry)) {
 			return;
