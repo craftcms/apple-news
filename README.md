@@ -79,3 +79,4 @@ Please be aware of the following caveats:
 The following features are planned:
 
 - Error handling and reporting
+- Support for posting previews of otherwise unpublishable entries
