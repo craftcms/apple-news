@@ -57,15 +57,11 @@ class AppleNews_PostArticleTask extends BaseTask
 	{
 		$entry = craft()->entries->getEntryById($this->_entryIds[$step], $this->getSettings()->locale);
 
-		if (!$entry || $this->getService()->postArticle($entry)) {
-			return true;
+		if ($entry) {
+			$this->getService()->postArticle($entry);
 		}
-		else
-		{
-			$error = 'Encountered an error when trying to post the entry "'.$entry.'" with the ID "'.$entry->id.'" to Apple News.';
 
-			return $error;
-		}
+		return true;
 	}
 
 	// Protected Methods

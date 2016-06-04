@@ -140,7 +140,6 @@ class AppleNewsService extends BaseApplicationComponent
 	 */
 	public function postArticle(EntryModel $entry)
 	{
-		$articleRecords = $this->getArticleRecordsForEntry($entry);
 		/** @var IAppleNewsChannel[] $channels */
 		$channels = [];
 
@@ -149,6 +148,12 @@ class AppleNewsService extends BaseApplicationComponent
 				$channels[] = $channel;
 			}
 		}
+
+		if (!$channels) {
+			return false;
+		}
+
+		$articleRecords = $this->getArticleRecordsForEntry($entry);
 
 		foreach ($channels as $channel) {
 			$channelId = $channel->getChannelId();
