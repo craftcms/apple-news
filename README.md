@@ -61,7 +61,7 @@ An example Channel class is provided at [applenewschannels/MyNewsChannel.php](ht
 
 Once your Channel classes are set up and included properly, you should be able to see a new “Apple News Channels” pane within your Edit Entry pages, for entries that have at least one Channel whose `matchEntry()` method returns `true`.
 
-![The Apple News pane](article-pane.png)
+![The Apple News pane](article-pane.png =383x104)
 
 Each channel will display an action menu beside it with the following options:
 
