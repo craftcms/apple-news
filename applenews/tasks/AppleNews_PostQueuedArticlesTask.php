@@ -64,11 +64,9 @@ class AppleNews_PostQueuedArticlesTask extends BaseTask
 					'entryId' => $row['entryId'],
 					'locale' => $row['locale'],
 					'channelIds' => [],
-					'rowIds' => [],
 				];
 			}
 			$this->_stepInfo[$key]['channelIds'][] = $row['channelId'];
-			$this->_stepInfo[$key]['rowIds'][] = $row['id'];
 		}
 
 		return count($this->_stepInfo);
