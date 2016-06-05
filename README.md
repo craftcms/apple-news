@@ -63,12 +63,13 @@ Once your Channel classes are set up and included properly, you should be able t
 
 <img src="article-pane.png" width="383" height="104" alt="The Apple News pane">
 
-Each channel will display an action menu beside it with the following options:
+Each channel will display an action menu beside it with some of the following options, depending on the state of the article:
 
-- **Copy share URL** – If the entry has been published to Apple News, this will present a prompt where you can copy the article’s share URL. If the URL is opened on an iOS device, it will launch the News app and bring you to the article.
-- **Download for News Preview** – This will download the entry’s article.json (and supplemental files), which can be loaded into the [News Preview](https://developer.apple.com/news-preview/) app, to see exactly how your article will look on various iOS devices once published.
+- **Post to Apple News** – Queues the article to be posted to Apple News.
+- **Copy share URL** – Displays a prompt that allows the user to copy the article’s share URL. If the URL is accessed on an iOS device, it will launch the News app and bring you to the article.
+- **Download for News Preview** – Downloads the entry’s article.json (and other files), which can be loaded into the [News Preview](https://developer.apple.com/news-preview/) app, to see exactly how your article will look on various iOS devices once published.
 
-No specific user action is required to publish entries to Apple News. Each time an entry is saved, the plugin will determine if it should push the article to Apple News, depending on the Channel classes’ `matchEntry()` and `canPublish()` responses.
+Note that clicking the “Post to Apple News” action is not necessary to publish an article to Apple News. Each time an entry is saved, the plugin will determine if it should push the article to Apple News, depending on the Channel classes’ `matchEntry()` and `canPublish()` responses.
 
 
 ## Caveats
