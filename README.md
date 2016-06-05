@@ -60,7 +60,7 @@ An example Channel class is provided at [applenewschannels/MyNewsChannel.php](ht
 
 ## Usage
 
-Once your Channel classes are set up and included properly, you should be able to see a new “Apple News Channels” pane within your Edit Entry pages, for entries that have at least one Channel whose `matchEntry()` method returns `true`.
+Once your Channel classes are set up and included properly, a new “Apple News Channels” pane appear in the right column of Edit Entry pages, for entries that have at least one matching channel.
 
 <img src="article-pane.png" width="383" height="104" alt="The Apple News pane">
 
@@ -69,6 +69,10 @@ Each channel will display an action menu beside it with some of the following op
 - **Post to Apple News** – Queues the article to be posted to Apple News.
 - **Copy share URL** – Displays a prompt that allows the user to copy the article’s share URL. If the URL is accessed on an iOS device, it will launch the News app and bring you to the article.
 - **Download for News Preview** – Downloads the entry’s article.json (and other files), which can be loaded into the [News Preview](https://developer.apple.com/news-preview/) app, to see exactly how your article will look on various iOS devices once published.
+
+There will also be a new “Post to Apple News” bulk action on the Entries index page, which makes it possible to queue up several entries to be published at once.
+
+<img src="bulk-action.png" width="306" height="210" alt="The “Post to Apple News” bulk entry action">
 
 
 ## Caveats
