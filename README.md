@@ -88,3 +88,4 @@ The following features are planned:
 
 - Error handling and reporting
 - Support for posting previews of otherwise unpublishable entries
+- Move article deletion to a queue + BG task
