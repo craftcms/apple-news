@@ -145,7 +145,9 @@ Craft.AppleNews.ArticlePane = Garnish.Base.extend({
 				if ($.inArray(newInfos[channelId]['state'], ['QUEUED_UPDATE', 'PROCESSING', 'PROCESSING_UPDATE', 'LIVE']) != -1) {
 					var shareUrl = newInfos[channelId]['shareUrl'];
 					$menu.append($('<li><a data-action="copy-share-url" data-url="'+shareUrl+'">'+Craft.t('Copy share URL')+'</a></li>'));
-				} else if (!this.versionId && !this.draftId && newInfos[channelId]['canPublish']) {
+				}
+
+				if ($.inArray(newInfos[channelId]['state'], ['QUEUED', 'QUEUED_UPDATE']) == -1 && !this.versionId && !this.draftId && newInfos[channelId]['canPublish']) {
 					$menu.append($('<li><a data-action="post-article">'+Craft.t('Post to Apple News')+'</a></li>'));
 				} else {
 					// TODO: preview support that ignores canPublish

@@ -199,7 +199,9 @@ class AppleNewsPlugin extends BasePlugin
 			if (in_array($state, ['QUEUED_UPDATE', 'PROCESSING', 'PROCESSING_UPDATE', 'LIVE'])) {
 				$shareUrl = $infos[$channelId]['shareUrl'];
 				$html .= '<li><a data-action="copy-share-url" data-url="'.$shareUrl.'">'.Craft::t('Copy share URL').'</a></li>';
-			} else if (!$isVersion && !$isDraft && $channel->canPublish($entry)) {
+			}
+
+			if (!in_array($state, ['QUEUED', 'QUEUED_UPDATE']) && !$isVersion && !$isDraft && $channel->canPublish($entry)) {
 				$html .= '<li><a data-action="post-article">'.Craft::t('Post to Apple News').'</a></li>';
 			} else {
 				// TODO: preview support that ignores canPublish()
