@@ -29,6 +29,7 @@ Apple News for Craft CMS gets its own configuration file, located at `craft/conf
     - A fully qualified class name, in which case an instance of the class will be automatically created. (Note that in this case it is your responsibility to make that class autoloadable.)
     - A class path alias, e.g. `plugins.myplugin.MyNewsChannel` or `applenewschannels.MyNewsChannel`. The `applenewschannels` alias points to a `craft/applenewschannels` folder you can create. (Note that classes that belong to a plugin should use the `Craft` namespace, but classes that live in the `craft/applenewschannels` folder should use the global namespace.)
     - An array which includes a `class` key that is either a fully qualified class name or a class path alias, and may also include additional name-value pairs that the object will be initialized with.
+- **autoPostOnSave** – A boolean that indicates whether entries should be automatically posted to Apple News whenever they are saved. (Default is `true`.)
 
 Here’s an example plugin config, which defines one Apple News channel using a `MyNewsChannel` class, and defines its `$channelId`, `$apiKeyId`, and `$apiSecret` properties right from the class configuration.
 
@@ -68,8 +69,6 @@ Each channel will display an action menu beside it with some of the following op
 - **Post to Apple News** – Queues the article to be posted to Apple News.
 - **Copy share URL** – Displays a prompt that allows the user to copy the article’s share URL. If the URL is accessed on an iOS device, it will launch the News app and bring you to the article.
 - **Download for News Preview** – Downloads the entry’s article.json (and other files), which can be loaded into the [News Preview](https://developer.apple.com/news-preview/) app, to see exactly how your article will look on various iOS devices once published.
-
-Note that clicking the “Post to Apple News” action is not necessary to publish an article to Apple News. Each time an entry is saved, the plugin will determine if it should push the article to Apple News, depending on the Channel classes’ `matchEntry()` and `canPublish()` responses.
 
 
 ## Caveats

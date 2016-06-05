@@ -72,7 +72,10 @@ class AppleNewsPlugin extends BasePlugin
 	 */
 	public function init()
 	{
-		craft()->on('entries.saveEntry', [$this, 'handleEntrySave']);
+		if (craft()->config->get('autoPostOnSave', 'applenews')) {
+			craft()->on('entries.saveEntry', [$this, 'handleEntrySave']);
+		}
+
 		craft()->on('entries.beforeDeleteEntry', [$this, 'handleEntryDelete']);
 
 		craft()->templates->hook('cp.entries.edit.right-pane', [$this, 'addEditEntryPagePane']);
