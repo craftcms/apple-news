@@ -85,7 +85,7 @@ Craft.AppleNews.ArticlePane = Garnish.Base.extend({
 			}
 
 			// Skip if we didn't know about this channel to begin with
-			if (typeof this.infos[channelId] == typeof undefined) {
+			if (typeof this.$channelsById[channelId] == typeof undefined) {
 				continue;
 			}
 
@@ -163,7 +163,7 @@ Craft.AppleNews.ArticlePane = Garnish.Base.extend({
 	},
 
 	hasInfoChanged: function (channelId, property, newInfos) {
-		return (this.infos[channelId][property] != newInfos[channelId][property]);
+		return (typeof this.infos[channelId] == typeof undefined || this.infos[channelId][property] != newInfos[channelId][property]);
 	},
 
 	refreshIfProcessing: function(delayed)
