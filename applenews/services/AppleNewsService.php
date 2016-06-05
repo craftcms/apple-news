@@ -306,6 +306,10 @@ class AppleNewsService extends BaseApplicationComponent
 					$record->articleId = $response->data->id;
 				}
 				$this->updateArticleRecord($record, $response);
+
+				// Delete this entry+channel from the queue, if it's in there
+				craft()->db->createCommand()->delete('applenews_articlequeue',
+					['entryId' => $entry->id, 'channelId' => $channelId]);
 			}
 
 			if ($articleExists) {

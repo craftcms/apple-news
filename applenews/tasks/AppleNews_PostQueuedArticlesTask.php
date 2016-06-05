@@ -90,10 +90,6 @@ class AppleNews_PostQueuedArticlesTask extends BaseTask
 			$this->getService()->postArticle($entry, $info['channelIds']);
 		}
 
-		// Delete the queue rows
-		craft()->db->createCommand()->delete('applenews_articlequeue',
-			['in', 'id', $info['rowIds']]);
-
 		return true;
 	}
 
