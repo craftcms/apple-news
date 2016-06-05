@@ -28,19 +28,14 @@ class AppleNews_PostArticlesElementAction extends BaseElementAction
 	 */
 	public function performAction(ElementCriteriaModel $criteria)
 	{
-		// Create a new PostArticle task
-		$entryIds = $criteria->ids();
-		if (count($entryIds) == 1) {
-			$entry = $criteria->first();
-			$desc = Craft::t('Posting “{title}” to Apple News', ['title' => $entry->title]);
-		} else {
-			$desc = Craft::t('Posting {total} entries to Apple News', ['total' => count($entryIds)]);
-		}
+		/** @var AppleNewsService $service */
+		$service = craft()->appleNews;
 
-		craft()->tasks->createTask('AppleNews_PostArticle', $desc, [
-			'entryId' => $entryIds,
-			'locale' => $criteria->locale,
-		]);
+		// Queue them up
+		foreach ($criteria->find() as $entry) {
+			/** @var EntryModel $entry */
+			$service->queueArticle($entry);
+		}
 
 		return true;
 	}
