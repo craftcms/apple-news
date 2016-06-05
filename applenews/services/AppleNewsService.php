@@ -156,7 +156,8 @@ class AppleNewsService extends BaseApplicationComponent
 	/**
 	 * Returns whether any channels can publish the given entry.
 	 *
-	 * @param EntryModel $entry
+	 * @param EntryModel           $entry
+	 * @param string|string[]|null $channelId The channel ID(s) to post the article to, if not all
 	 *
 	 * @return bool Whether the entry can be published to any channels
 	 */
@@ -170,6 +171,61 @@ class AppleNewsService extends BaseApplicationComponent
 		}
 
 		return false;
+	}
+
+	/**
+	 * Queues an article up to be posted.
+	 *
+	 * @param EntryModel           $entry
+	 * @param string|string[]|null $channelIds
+	 *
+	 * @return bool Whether the channel was queued up to be posted in any channels
+	 */
+	public function queueArticle(EntryModel $entry, $channelIds = null)
+	{
+		if ($channelIds === null) {
+			// Queue all of them
+			$channelIds = [];
+			foreach ($this->getChannels() as $channelId => $channel) {
+				if ($channel->matchEntry($entry) && $channel->canPublish($entry)) {
+					$channelIds[] = $channelId;
+				}
+			}
+		} else if (!is_array($channelIds)) {
+			$channelIds = [$channelIds];
+		}
+
+		if ($channelIds) {
+			$db = craft()->db;
+			foreach ($channelIds as $channelId) {
+				$db->createCommand()->insertOrUpdate(
+					'applenews_articlequeue',
+					['entryId' => $entry->id, 'locale' => $entry->locale, 'channelId' => $channelId],
+					[]);
+			}
+
+			// Create a PostQueuedArticles task
+			$this->createPostQueuedArticlesTask();
+
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Creates a new PostQueuedArticles task if there isn't already one pending
+	 *
+	 * @return void
+	 */
+	public function createPostQueuedArticlesTask()
+	{
+		$tasksService = craft()->tasks;
+		$task = $tasksService->getNextPendingTask('AppleNews_PostQueuedArticles');
+
+		if (!$task) {
+			$tasksService->createTask('AppleNews_PostQueuedArticles');
+		}
 	}
 
 	/**

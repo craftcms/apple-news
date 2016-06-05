@@ -93,17 +93,8 @@ class AppleNewsPlugin extends BasePlugin
 			return;
 		}
 
-		// Make sure at least one channel is ready to publish it
-		if (!$this->getService()->canPostArticle($entry)) {
-			return;
-		}
-
-		// Create a new PostArticle task
-		$desc = Craft::t('Posting “{title}” to Apple News', ['title' => $entry->title]);
-		craft()->tasks->createTask('AppleNews_PostArticle', $desc, [
-			'entryId' => $entry->id,
-			'locale' => $entry->locale,
-		]);
+		// Queue it up to be posted to Apple News
+		$this->getService()->queueArticle($entry);
 	}
 
 	/**

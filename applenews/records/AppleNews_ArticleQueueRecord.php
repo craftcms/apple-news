@@ -2,7 +2,7 @@
 namespace Craft;
 
 /**
- * Class AppleNews_ArticleRecord
+ * Class AppleNews_ArticleQueueRecord`
  *
  * @author    Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @copyright Copyright (c) 2014, Pixel & Tonic, Inc.
@@ -11,7 +11,7 @@ namespace Craft;
  * @package   craft.app.records
  * @since     1.0
  */
-class AppleNews_ArticleRecord extends BaseRecord
+class AppleNews_ArticleQueueRecord extends BaseRecord
 {
 	// Public Methods
 	// =========================================================================
@@ -23,7 +23,7 @@ class AppleNews_ArticleRecord extends BaseRecord
 	 */
 	public function getTableName()
 	{
-		return 'applenews_articles';
+		return 'applenews_articlequeue';
 	}
 
 	/**
@@ -46,7 +46,7 @@ class AppleNews_ArticleRecord extends BaseRecord
 	public function defineIndexes()
 	{
 		return [
-			['columns' => ['entryId', 'channelId'], 'unique' => true],
+			['columns' => ['entryId', 'locale', 'channelId'], 'unique' => true],
 		];
 	}
 
@@ -61,14 +61,8 @@ class AppleNews_ArticleRecord extends BaseRecord
 	protected function defineAttributes()
 	{
 		return [
-			'channelId'        => [AttributeType::String, 'required' => true, 'length' => 36],
-			'articleId'        => [AttributeType::String, 'required' => true, 'length' => 36],
-			'revisionId'       => [AttributeType::String, 'required' => true, 'length' => 24],
-			'isSponsored'      => [AttributeType::Bool],
-			'isPreview'        => [AttributeType::Bool],
-			'state'            => [AttributeType::String],
-			'shareUrl'         => [AttributeType::Url],
-			'response'         => [AttributeType::Mixed],
+			'locale'    => [AttributeType::Locale, 'required' => true],
+			'channelId' => [AttributeType::String, 'required' => true, 'length' => 36]
 		];
 	}
 }
