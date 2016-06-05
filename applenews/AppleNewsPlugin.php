@@ -154,17 +154,13 @@ class AppleNewsPlugin extends BasePlugin
 					$statusColor = 'orange';
 					$statusMessage = Craft::t('The article has been published and is going through processing.');
 					break;
-				case 'LIVE':
-					$statusColor = 'green';
-					$statusMessage = Craft::t('The article has been published, finished processing, and is visible in the News app.');
-					break;
 				case 'PROCESSING_UPDATE':
 					$statusColor = 'orange';
 					$statusMessage = Craft::t('A previous version of the article is visible in the News app, and an update is currently in processing.');
 					break;
-				case 'TAKEN_DOWN':
-					$statusColor = null;
-					$statusMessage = Craft::t('The article was previously visible in the News app, but was taken down.');
+				case 'LIVE':
+					$statusColor = 'green';
+					$statusMessage = Craft::t('The article has been published, finished processing, and is visible in the News app.');
 					break;
 				case 'FAILED_PROCESSING':
 					$statusColor = 'red';
@@ -173,6 +169,10 @@ class AppleNewsPlugin extends BasePlugin
 				case 'FAILED_PROCESSING_UPDATE':
 					$statusColor = 'red';
 					$statusMessage = Craft::t('A previous version of the article is visible in the News app, but an update failed during processing.');
+					break;
+				case 'TAKEN_DOWN':
+					$statusColor = null;
+					$statusMessage = Craft::t('The article was previously visible in the News app, but was taken down.');
 					break;
 				default:
 					$statusColor = null;
