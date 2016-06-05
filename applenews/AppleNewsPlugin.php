@@ -150,6 +150,14 @@ class AppleNewsPlugin extends BasePlugin
 		foreach ($channels as $channelId => $channel) {
 			$state = isset($infos[$channelId]) ? $infos[$channelId]['state'] : null;
 			switch ($state) {
+				case 'QUEUED':
+					$statusColor = 'grey';
+					$statusMessage = Craft::t('The article is in the queue to be published.');
+					break;
+				case 'QUEUED_UPDATE':
+					$statusColor = 'grey';
+					$statusMessage = Craft::t('A previous version of the article has been published, and an update is currently in the queue to be published.');
+					break;
 				case 'PROCESSING':
 					$statusColor = 'orange';
 					$statusMessage = Craft::t('The article has been published and is going through processing.');
@@ -188,7 +196,7 @@ class AppleNewsPlugin extends BasePlugin
 				'<div class="menu">' .
 				'<ul>';
 
-			if (in_array($state, ['PROCESSING', 'LIVE', 'PROCESSING_UPDATE'])) {
+			if (in_array($state, ['QUEUED_UPDATE', 'PROCESSING', 'PROCESSING_UPDATE', 'LIVE'])) {
 				$shareUrl = $infos[$channelId]['shareUrl'];
 				$html .= '<li><a data-action="copy-share-url" data-url="'.$shareUrl.'">'.Craft::t('Copy share URL').'</a></li>';
 			} else if (!$isVersion && !$isDraft && $channel->canPublish($entry)) {

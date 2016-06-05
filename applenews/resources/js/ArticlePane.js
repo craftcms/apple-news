@@ -94,6 +94,14 @@ Craft.AppleNews.ArticlePane = Garnish.Base.extend({
 				// Update the status indicator
 				var statusColor, statusMessage;
 				switch (newInfos[channelId]['state']) {
+					case 'QUEUED':
+						statusColor = 'grey';
+						statusMessage = Craft.t('The article is in the queue to be published.');
+						break;
+					case 'QUEUED_UPDATE':
+						statusColor = 'grey';
+						statusMessage = Craft.t('A previous version of the article has been published, and an update is currently in the queue to be published.');
+						break;
 					case 'PROCESSING':
 						statusColor = 'orange';
 						statusMessage = Craft.t('The article has been published and is going through processing.');
@@ -133,7 +141,7 @@ Craft.AppleNews.ArticlePane = Garnish.Base.extend({
 				// Clear the old actions
 				$menu.children().remove();
 
-				if ($.inArray(newInfos[channelId]['state'], ['PROCESSING', 'LIVE', 'PROCESSING_UPDATE']) != -1) {
+				if ($.inArray(newInfos[channelId]['state'], ['QUEUED_UPDATE', 'PROCESSING', 'PROCESSING_UPDATE', 'LIVE']) != -1) {
 					var shareUrl = newInfos[channelId]['shareUrl'];
 					$menu.append($('<li><a data-action="copy-share-url" data-url="'+shareUrl+'">'+Craft.t('Copy share URL')+'</a></li>'));
 				} else if (!this.versionId && !this.draftId && newInfos[channelId]['canPublish']) {
@@ -174,7 +182,7 @@ Craft.AppleNews.ArticlePane = Garnish.Base.extend({
 				continue;
 			}
 
-			if ($.inArray(this.infos[channelId]['state'], ['PROCESSING', 'PROCESSING_UPDATE']) != -1) {
+			if ($.inArray(this.infos[channelId]['state'], ['QUEUED', 'QUEUED_UPDATE', 'PROCESSING', 'PROCESSING_UPDATE']) != -1) {
 				if (!delayed) {
 					this.refresh();
 				} else {

@@ -150,6 +150,18 @@ class AppleNewsService extends BaseApplicationComponent
 			];
 		}
 
+		// Merge in any queue info
+		$queuedChannels = $this->getQueuedChannelIdsForEntry($entry, $channelId);
+
+		foreach ($queuedChannels as $channelId) {
+			// Does an article already exist for this channel?
+			if (isset($infos[$channelId])) {
+				$infos[$channelId]['state'] = 'QUEUED_UPDATE';
+			} else {
+				$infos[$channelId]['state'] = 'QUEUED';
+			}
+		}
+
 		return $infos;
 	}
 
@@ -226,6 +238,32 @@ class AppleNewsService extends BaseApplicationComponent
 		if (!$task) {
 			$tasksService->createTask('AppleNews_PostQueuedArticles');
 		}
+	}
+
+	/**
+	 * Returns the channel IDs that a given entry is queued to be posted in
+	 *
+	 * @param EntryModel           $entry
+	 * @param string|string[]|null $channelId The channel ID(s) the query should be limited to
+	 *
+	 * @return string[]
+	 */
+	public function getQueuedChannelIdsForEntry(EntryModel $entry, $channelId = null)
+	{
+		$queuedChannelQuery = craft()->db->createCommand()
+			->select('channelId')
+			->from('applenews_articlequeue')
+			->where('entryId = :entryId', [':entryId' => $entry->id]);
+
+		if ($channelId !== null) {
+			if (is_array($channelId)) {
+				$queuedChannelQuery->andWhere(['in', 'channelId', $channelId]);
+			} else {
+				$queuedChannelQuery->andWhere('channelId = :channelId', [':channelId' => $channelId]);
+			}
+		}
+
+		return $queuedChannelQuery->queryColumn();
 	}
 
 	/**
