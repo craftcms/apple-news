@@ -73,7 +73,7 @@ class AppleNewsController extends BaseController
 		$channelId = craft()->request->getParam('channelId');
 		$service = $this->getService();
 
-		$service->postArticle($entry, $channelId);
+		$service->queueArticle($entry, $channelId);
 
 		$this->returnJson([
 			'success' => true,

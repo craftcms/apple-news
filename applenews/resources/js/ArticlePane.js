@@ -66,6 +66,7 @@ Craft.AppleNews.ArticlePane = Garnish.Base.extend({
 					if (textStatus == 'success') {
 						if (response.success) {
 							this.updatePane(response.infos);
+							Craft.cp.runPendingTasks();
 						}
 					}
 				}, this));
