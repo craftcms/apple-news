@@ -3,6 +3,8 @@ namespace Craft;
 
 /**
  * Class AppleNews_PostQueuedArticlesTask
+ *
+ * @license https://github.com/pixelandtonic/AppleNews/blob/master/LICENSE
  */
 class AppleNews_PostQueuedArticlesTask extends BaseTask
 {

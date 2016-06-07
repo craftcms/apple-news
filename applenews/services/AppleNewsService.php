@@ -5,6 +5,8 @@ use ChapterThree\AppleNewsAPI\PublisherAPI;
 
 /**
  * Class AppleNewsService
+ *
+ * @license https://github.com/pixelandtonic/AppleNews/blob/master/LICENSE
  */
 class AppleNewsService extends BaseApplicationComponent
 {

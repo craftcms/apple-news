@@ -3,6 +3,8 @@ namespace Craft;
 
 /**
  * Class AppleNewsController
+ * 
+ * @license https://github.com/pixelandtonic/AppleNews/blob/master/LICENSE
  */
 class AppleNewsController extends BaseController
 {

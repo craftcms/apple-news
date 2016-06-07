@@ -3,6 +3,8 @@ namespace Craft;
 
 /**
  * Class BaseAppleNewsChannel
+ *
+ * @license https://github.com/pixelandtonic/AppleNews/blob/master/LICENSE
  */
 abstract class BaseAppleNewsChannel implements IAppleNewsChannel
 {

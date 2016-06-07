@@ -4,6 +4,8 @@ namespace Craft;
 /**
  * Interface IAppleNewsArticle
  *
+ * @license https://github.com/pixelandtonic/AppleNews/blob/master/LICENSE
+ *
  * @see https://developer.apple.com/library/ios/documentation/General/Conceptual/News_API_Ref/CreateArticle.html#//apple_ref/doc/uid/TP40015409-CH14-SW1
  */
 interface IAppleNewsArticle

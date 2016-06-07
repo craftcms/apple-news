@@ -5,6 +5,8 @@ use League\HTMLToMarkdown\HtmlConverter;
 
 /**
  * Class AppleNewsHelper
+ *
+ * @license https://github.com/pixelandtonic/AppleNews/blob/master/LICENSE
  */
 abstract class AppleNewsHelper
 {

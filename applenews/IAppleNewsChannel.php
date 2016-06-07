@@ -3,6 +3,8 @@ namespace Craft;
 
 /**
  * Interface IAppleNewsChannel
+ *
+ * @license https://github.com/pixelandtonic/AppleNews/blob/master/LICENSE
  */
 interface IAppleNewsChannel
 {

@@ -2,14 +2,9 @@
 namespace Craft;
 
 /**
- * Class AppleNews_ArticleQueueRecord`
+ * Class AppleNews_ArticleQueueRecord
  *
- * @author    Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @copyright Copyright (c) 2014, Pixel & Tonic, Inc.
- * @license   http://craftcms.com/license Craft License Agreement
- * @see       http://craftcms.com
- * @package   craft.app.records
- * @since     1.0
+ * @license https://github.com/pixelandtonic/AppleNews/blob/master/LICENSE
  */
 class AppleNews_ArticleQueueRecord extends BaseRecord
 {

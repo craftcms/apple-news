@@ -1,6 +1,11 @@
 <?php
 namespace Craft;
 
+/**
+ * Class AppleNewsPlugin
+ *
+ * @license https://github.com/pixelandtonic/AppleNews/blob/master/LICENSE
+ */
 class AppleNewsPlugin extends BasePlugin
 {
 	// Public Methods

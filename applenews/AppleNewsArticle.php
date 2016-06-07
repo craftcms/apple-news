@@ -3,6 +3,8 @@ namespace Craft;
 
 /**
  * Class AppleNewsArticle
+ *
+ * @license https://github.com/pixelandtonic/AppleNews/blob/master/LICENSE
  */
 class AppleNewsArticle implements IAppleNewsArticle
 {
