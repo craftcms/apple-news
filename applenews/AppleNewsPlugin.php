@@ -7,11 +7,19 @@ class AppleNewsPlugin extends BasePlugin
 	// =========================================================================
 
 	/**
-	 * @return mixed
+	 * @return string
 	 */
 	public function getName()
 	{
 		return Craft::t('Apple News');
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDescription()
+	{
+		return Craft::t('Publish your content with Apple News Format.');
 	}
 
 	/**
