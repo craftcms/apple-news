@@ -58,50 +58,6 @@
         ]
     },
     {
-        "name": "chapter-three/apple-news-api",
-        "version": "0.3.8",
-        "version_normalized": "0.3.8.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/chapter-three/AppleNewsAPI.git",
-            "reference": "24db9ef5a4387e89d13f62cfbfe85984cfeacd31"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/chapter-three/AppleNewsAPI/zipball/24db9ef5a4387e89d13f62cfbfe85984cfeacd31",
-            "reference": "24db9ef5a4387e89d13f62cfbfe85984cfeacd31",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.4.0",
-            "php-curl-class/php-curl-class": "^4.6"
-        },
-        "require-dev": {
-            "mikey179/vfsstream": "1.5.*",
-            "phpunit/phpunit": "4.7.*"
-        },
-        "time": "2015-10-28 16:50:41",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "ChapterThree\\AppleNewsAPI\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "GPL"
-        ],
-        "description": "Push content to Apple News.",
-        "homepage": "https://github.com/chapter-three/AppleNewsAPI",
-        "keywords": [
-            "api",
-            "apple",
-            "news",
-            "push"
-        ]
-    },
-    {
         "name": "league/html-to-markdown",
         "version": "4.2.1",
         "version_normalized": "4.2.1.0",
@@ -165,6 +121,51 @@
         "keywords": [
             "html",
             "markdown"
+        ]
+    },
+    {
+        "name": "chapter-three/apple-news-api",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/chapter-three/AppleNewsAPI.git",
+            "reference": "f22935a97d57b5153fd007437725d9b7f3259752"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/chapter-three/AppleNewsAPI/zipball/f22935a97d57b5153fd007437725d9b7f3259752",
+            "reference": "f22935a97d57b5153fd007437725d9b7f3259752",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.4.0",
+            "php-curl-class/php-curl-class": "^4.6"
+        },
+        "require-dev": {
+            "mikey179/vfsstream": "1.5.*",
+            "phpdocumentor/phpdocumentor": "~2.8",
+            "phpunit/phpunit": "4.7.*"
+        },
+        "time": "2016-06-07 17:06:58",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-4": {
+                "ChapterThree\\AppleNewsAPI\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "description": "Push content to Apple News.",
+        "homepage": "https://github.com/chapter-three/AppleNewsAPI",
+        "keywords": [
+            "api",
+            "apple",
+            "news",
+            "push"
         ]
     }
 ]

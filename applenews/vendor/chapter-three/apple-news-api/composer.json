@@ -3,16 +3,17 @@
     "type": "library",
     "description": "Push content to Apple News.",
     "keywords": ["apple", "push", "news", "api"],
-    "version": "0.3.8",
+    "version": "0.3.9",
     "homepage": "https://github.com/chapter-three/AppleNewsAPI",
-    "license": "GPL",
+    "license": "MIT",
     "require": {
         "php": ">=5.4.0",
         "php-curl-class/php-curl-class": "^4.6"
     },
     "require-dev": {
         "mikey179/vfsStream": "1.5.*",
-        "phpunit/phpunit": "4.7.*"
+        "phpunit/phpunit": "4.7.*",
+        "phpdocumentor/phpdocumentor": "~2.8"
     },
     "autoload": {
         "psr-4": {

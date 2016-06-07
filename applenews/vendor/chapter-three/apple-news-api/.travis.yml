@@ -1,13 +1,14 @@
 language: php
-
 php:
   - 5.4
   - 5.5
   - 5.6
   - hhvm
-
 before_script:
   - composer self-update
   - composer install --prefer-source --no-interaction --dev
+script: "./vendor/bin/phpunit --bootstrap vendor/autoload.php tests"
+notifications:
+  slack:
+    secure: KhXa8DPSNEc5B+frlL1jgwnJKjW724bcCP2AqrhWlCpcGxfM3Uvx4Mphu5PBSmEUDbgs7r4QbPFyNFPpqy28UJJxxR2UAhIH1MKDvqm+M1egOq8lS9vgv5uHXp6TV2q4qXhGVJP8Rls0FRooXeZZKNKwjpUK3bDGHgZQYJeId0tab/UqYl7jbQovUlNAsbxgyu+ZNvSts4sMc7tkYbtgW3Dq04GHkVqwuYRtci8BnsY/RQxamebCNiHLmC6KBdJIuNI/gcq+NTFy2y5TKtWxeQ+GjVxT3lJ1LrBURQHSkAsWNa+Yp0fEaXJOfZZQtuDGI6s4AYewjSQCrQ54tX66OzOujAzpkfU3mGp7RJxIhutudrTXDuBZkV8ukHmrsINaXVOw70thdlpr62vbYvV7kmcjSlwx3i+JuHqRxleY3JC0VIvVTJiySIrDyQrXl/gsCfS7EIZ3gDyvVbLcM/8j+IMpShiCnAAmg4JQPfM2i03IzHzfH08SGTYJhmOl26ZB8ltsstzlF0T1O2eRNSsnexRfR0OKaixiwuRSR1G4Aj86wH9WYpoArKx6XwT7c0PqWgvla+XM3CGvXaAeQzrsIASFo/FAQDMDobrAzrj9I9l9J0EVYDJjn5vgZswqvEmK2P9G2RLL8QPJCB3D8SiiZytlV+d+9KvUXnuYSsi09NU=
 
-script: phpunit

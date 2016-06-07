@@ -1,14 +1,20 @@
 # AppleNewsAPI
 
+[![Travis CI build status](https://travis-ci.org/chapter-three/AppleNewsAPI.svg?branch=master)](https://travis-ci.org/chapter-three/AppleNewsAPI)
+
 `AppleNewsAPI\PublisherAPI` is a PHP library that allows you to publish content to Apple News. You can also retrieve and delete articles you’ve already published, and get basic information about your channel and sections.
 
-`AppleNewsAPI\Document` is a PHP library that helps construct documents in the Apple News native JSON format.
+`AppleNewsAPI\Document` is a PHP library that helps construct documents in the [Apple News JSON format](https://developer.apple.com/library/ios/documentation/General/Conceptual/Apple_News_Format_Ref/).
+
+[API Documentation](http://chapter-three.github.io/AppleNewsAPI/)
 
 ## Installation
 
-To install, simply:
+```shell
+composer require chapter-three/apple-news-api
+```
 
-@todo composer instructions
+or
 
 ```shell
 git clone git@github.com:chapter-three/AppleNewsAPI.git
@@ -17,17 +23,19 @@ curl -sS https://getcomposer.org/installer | php
 ./composer.phar install
 ```
 
-### Unit Tests
+## Document class Quick Start and Examples
 
-```shell
-./vendor/bin/phpunit -v --colors=auto --bootstrap vendor/autoload.php tests
-```
+```php
+use ChapterThree\AppleNewsAPI\Document;
+use ChapterThree\AppleNewsAPI\Document\Components\Body;
+use ChapterThree\AppleNewsAPI\Document\Layouts\Layout;
+use ChapterThree\AppleNewsAPI\Document\Styles\ComponentTextStyle;
 
-To test PublisherAPI GET/POST/DELETE methods use the following pattern:
+$obj = new Document(1, 'title', 'en', new Layout(7, 1024));
+$obj->addComponent(new Body('body text'))
+  ->addComponentTextStyle('default', new ComponentTextStyle());
 
-```shell
-./vendor/bin/phpunit -v --colors=auto --bootstrap vendor/autoload.php 
-tests/PublisherAPITest.php [API_KEY] [API_SECRET] [ENDPOINT_URL] [METHOD] [ENDPOINT_PATH]
+$json = $obj->json();
 ```
 
 ## PublisherAPI class Quick Start and Examples
@@ -144,6 +152,24 @@ $response = $PublisherAPI->delete('/articles/{article_id}',
 );
 ```
 
-## Document class Quick Start and Examples
+## Contribute
 
-@todo
+### Run Unit Tests
+
+```shell
+./vendor/bin/phpunit -v --colors=auto --bootstrap vendor/autoload.php tests
+```
+
+To test PublisherAPI GET/POST/DELETE methods use the following pattern:
+
+```shell
+./vendor/bin/phpunit -v --colors=auto --bootstrap vendor/autoload.php
+tests/PublisherAPITest.php [API_KEY] [API_SECRET] [ENDPOINT_URL] [METHOD] [ENDPOINT_PATH]
+```
+
+### Generate PHPDoc
+
+```shell
+git clone --branch gh-pages git@github.com:chapter-three/AppleNewsAPI.git ../AppleNewsAPI_phpdoc
+./vendor/bin/phpdoc run --title='chapter-three/apple-news-api v'$(cat composer.json | jq -r '.version') -d ./ -i vendor/,tests/ -t ../AppleNewsAPI_phpdoc
+```

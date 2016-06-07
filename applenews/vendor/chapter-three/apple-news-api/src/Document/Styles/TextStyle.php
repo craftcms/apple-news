@@ -18,12 +18,14 @@ class TextStyle extends Base {
   protected $fontName;
   protected $fontSize;
   protected $textColor;
+  protected $textShadow;
   protected $textTransform;
   protected $underline;
   protected $strikethrough;
   protected $backgroundColor;
   protected $verticalAlignment;
   protected $tracking;
+  protected $stroke;
 
   /**
    * Define optional properties.
@@ -33,9 +35,11 @@ class TextStyle extends Base {
       'fontName',
       'fontSize',
       'textColor',
+      'textShadow',
       'textTransform',
       'underline',
       'strikethrough',
+      'stroke',
       'backgroundColor',
       'verticalAlignment',
       'tracking',
@@ -102,6 +106,24 @@ class TextStyle extends Base {
       $this->textColor = $value;
     }
     return $this;
+  }
+
+  /**
+   * Getter for shadow style.
+   *
+   * @return ShadowStyle
+   */
+  public function getTextShadow() {
+    return $this->textShadow;
+  }
+
+  /**
+   * Setter for shadow style.
+   *
+   * @param ShadowStyle $textShadow
+   */
+  public function setTextShadow(ShadowStyle $textShadow) {
+    $this->textShadow = $textShadow;
   }
 
   /**
@@ -174,6 +196,24 @@ class TextStyle extends Base {
       $this->strikethrough = $value;
     }
     return $this;
+  }
+
+  /**
+   * Getter for stroke style.
+   *
+   * @return StrokeStyle
+   */
+  public function getStroke() {
+    return $this->stroke;
+  }
+
+  /**
+   * Setter for stroke style.
+   *
+   * @param StrokeStyle $stroke
+   */
+  public function setStroke(StrokeStyle $stroke) {
+    $this->stroke = $stroke;
   }
 
   /**

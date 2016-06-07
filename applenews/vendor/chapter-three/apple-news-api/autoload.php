@@ -77,6 +77,8 @@ function autoload679875ef60343fd604aa0fa4d353e67e($class) {
             'chapterthree\\applenewsapi\\document\\styles\\fills\\imagefill' => '/src/Document/Styles/Fills/ImageFill.php',
             'chapterthree\\applenewsapi\\document\\styles\\fills\\videofill' => '/src/Document/Styles/Fills/VideoFill.php',
             'chapterthree\\applenewsapi\\document\\styles\\inlinetextstyle' => '/src/Document/Styles/InlineTextStyle.php',
+            'chapterthree\\applenewsapi\\document\\styles\\offset' => '/src/Document/Styles/Offset.php',
+            'chapterthree\\applenewsapi\\document\\styles\\shadowstyle' => '/src/Document/Styles/ShadowStyle.php',
             'chapterthree\\applenewsapi\\document\\styles\\strokestyle' => '/src/Document/Styles/StrokeStyle.php',
             'chapterthree\\applenewsapi\\document\\styles\\textstrokestyle' => '/src/Document/Styles/TextStrokeStyle.php',
             'chapterthree\\applenewsapi\\document\\styles\\textstyle' => '/src/Document/Styles/TextStyle.php',
