@@ -10,7 +10,7 @@ Apple News for Craft CMS requires Craft CMS 2 and PHP 5.4 or later.
 
 ## Before You Begin
 
-You will need at least one active Apple News channel. Visit the [iCloud News Publisher](https://www.icloud.com/#newspublisher) website to create one. Note that new channels must go through a quick approval process before they can be used.
+You will need at least one Apple News channel. Visit the [News Publisher](https://www.icloud.com/#newspublisher) website to create one. Note that new channels must go through a quick approval process before they can be used.
 
 
 ## Installation
