@@ -6,6 +6,7 @@ use Craft\AssetFileModel;
 use Craft\EntryModel;
 use Craft\AppleNewsHelper;
 use Craft\DateTimeHelper;
+use Craft\IAppleNewsArticle;
 use Craft\MatrixBlockModel;
 use Craft\RichTextData;
 
@@ -14,6 +15,16 @@ use Craft\RichTextData;
  */
 class MyNewsChannel extends BaseAppleNewsChannel
 {
+    // Public Methods
+    // =========================================================================
+
+    /**
+     * Determines whether a given entry should be included in the News channel.
+     *
+     * @param EntryModel $entry The entry
+     *
+     * @return bool Whether the entry should be included in the News channel
+     */
     public function matchEntry(EntryModel $entry)
     {
         if ($entry->locale != 'en') {
@@ -31,6 +42,13 @@ class MyNewsChannel extends BaseAppleNewsChannel
         return true;
     }
 
+    /**
+     * Creates an {@link Craft\IAppleNewsArticle} for the given entry
+     *
+     * @param EntryModel $entry The entry
+     *
+     * @return IAppleNewsArticle The article that represents the entry
+     */
     public function createArticle(EntryModel $entry)
     {
         $article = new AppleNewsArticle();
@@ -46,84 +64,162 @@ class MyNewsChannel extends BaseAppleNewsChannel
         /** @var AssetFileModel|null $featuredImage */
         $featuredImage = $entry->featuredImage->first();
 
+        $byline = $entry->getAuthor()->getName().' | '.$entry->postDate->format('F j, Y');
+
         if ($featuredImage) {
             $featuredImageUrl = $article->addFile($featuredImage);
-        }
 
-        // Title
-        $components[] = [
-            'role' => 'title',
-            'layout' => 'titleLayout',
-            'text' => $entry->title,
-            'textStyle' => 'titleStyle',
-        ];
-
-        // Intro
-        if ($shortDescription) {
             $components[] = [
-                'role'      => 'intro',
-                'layout'    => 'introLayout',
-                'text'      => AppleNewsHelper::html2Markdown($shortDescription),
-                'format'    => 'markdown',
-                'textStyle' => 'introStyle',
+                'role' => 'section',
+                'layout' => [
+                    'columnStart' => 0,
+                    'columnSpan' => 12,
+                    'ignoreDocumentMargin' => true,
+                ],
+                'scene' => [
+                    'type' => 'parallax_scale'
+                ],
+                'components' => [
+                    [
+                        'role' => 'header',
+                        'layout' => 'headerLayout',
+                        'style' => [
+                            'fill' => [
+                                'type' => 'image',
+                                'URL' => $featuredImageUrl,
+                                'fillMode' => 'cover',
+                                'verticalAlignment' => 'top',
+                            ],
+                        ],
+                        'components' => [
+                            [
+                                'role' => 'container',
+                                'anchor' => [
+                                    'targetAnchorPosition' => 'bottom',
+                                    'originAnchorPosition' => 'bottom',
+                                ],
+                                'components' => [
+                                    [
+                                        'role' => 'title',
+                                        'layout' => 'titleLayout',
+                                        'text' => $entry->title,
+                                        'textStyle' => 'titleStyle',
+                                    ],
+                                    [
+                                        'role' => 'byline',
+                                        'textStyle' => 'bylineStyle',
+                                        'layout' => 'bylineLayout',
+                                        'text' => $byline,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
             ];
-        }
-
-        // Header image
-        if (isset($featuredImageUrl)) {
+        } else {
             $components[] = [
-                'role' => 'header',
-                'layout' => 'headerImageLayout',
-                'style' => [
-                    'fill' => [
-                        'type' => 'image',
-                        'URL' => $featuredImageUrl,
-                        'fillMode' => 'cover',
-                        'verticalAlignment' => 'center',
+                'role' => 'section',
+                'layout' => [
+                    'columnStart' => 0,
+                    'columnSpan' => 12,
+                    'ignoreDocumentMargin' => true,
+                ],
+                'components' => [
+                    [
+                        'role' => 'container',
+                        'anchor' => [
+                            'targetAnchorPosition' => 'bottom',
+                            'originAnchorPosition' => 'bottom',
+                        ],
+                        'components' => [
+                            [
+                                'role' => 'title',
+                                'layout' => 'titleLayout',
+                                'text' => $entry->title,
+                                'textStyle' => 'titleStyle',
+                            ],
+                            [
+                                'role' => 'byline',
+                                'textStyle' => 'bylineStyle',
+                                'layout' => 'bylineLayout',
+                                'text' => $byline,
+                            ],
+                        ],
                     ],
                 ],
             ];
         }
 
-        // Author
-        $components[] = [
-            'role' => 'author',
-            'layout' => 'authorLayout',
-            'text' => 'By '.$entry->getAuthor()->getName(),
-            'textStyle' => 'authorStyle',
-        ];
-
         // Body components
-        foreach ($entry->articleBody as $block) {
+        $firstBody = true;
+
+        foreach ($entry->articleBody as $i => $block) {
             /** @var MatrixBlockModel $block */
             switch ($block->getType()->handle) {
                 case 'heading': {
                     $components[] = [
-                        'role' => 'heading1',
-                        'layout' => 'heading1Layout',
+                        'role' => 'heading',
+                        'layout' => 'headingLayout',
+                        'textStyle' => 'headingStyle',
                         'text' => $block->heading,
-                        'textStyle' => 'heading1Style',
                     ];
                     break;
                 }
                 case 'text': {
+                    // Is this the first body block?
+                    if ($firstBody) {
+                        $textStyle = 'dropcapBodyStyle';
+                        $firstBody = false;
+                    } else {
+                        $textStyle = 'bodyStyle';
+                    }
                     /** @var RichTextData $text */
                     $text = $block->text;
                     $components[] = [
                         'role' => 'body',
                         'layout' => 'bodyLayout',
+                        'textStyle' => $textStyle,
                         'text' => AppleNewsHelper::html2Markdown($text),
                         'format' => 'markdown',
-                        'textStyle' => 'bodyStyle',
                     ];
                     break;
                 }
                 case 'pullQuote': {
                     $components[] = [
-                        'role' => 'pullquote',
-                        'layout' => 'pullquoteLayout',
-                        'text' => $block->pullQuote,
-                        'textStyle' => 'pullquoteStyle',
+                        'role' => 'container',
+                        'layout' => 'pullquoteContainer',
+                        'components' => [
+                            [
+                                'role' => 'pullquote',
+                                'textStyle' => 'pullquoteStyle',
+                                'layout' => 'pullquoteLayout',
+                                'text' => '“'.$block->pullQuote.'”',
+                                'animation' => ['type' => 'fade_in'],
+                            ],
+                        ],
+                    ];
+                    break;
+                }
+                case 'quote': {
+                    $components[] = [
+                        'role' => 'container',
+                        'layout' => 'pullquoteContainer',
+                        'components' => [
+                            [
+                                'role' => 'pullquote',
+                                'textStyle' => 'pullquoteStyle',
+                                'layout' => 'pullquoteLayout',
+                                'text' => '“'.$block->quote.'”',
+                                'animation' => ['type' => 'fade_in'],
+                            ],
+                            [
+                                'role' => 'pullquote',
+                                'textStyle' => 'pullquoteAuthor',
+                                'layout' => 'pullquoteAuthorLayout',
+                                'text' => $block->attribution,
+                            ],
+                        ],
                     ];
                     break;
                 }
@@ -131,26 +227,58 @@ class MyNewsChannel extends BaseAppleNewsChannel
                     /** @var AssetFileModel|null $image */
                     $image = $block->image->first();
                     if ($image) {
+                        $imageUrl = $article->addFile($image);
                         /** @var RichTextData $caption */
                         $caption = $block->caption;
-                        $captionText = AppleNewsHelper::stripHtml($caption);
-                        $imageUrl = $article->addFile($image);
-                        $components[] = [
-                            'role' => 'photo',
-                            'layout' => 'photoLayout',
-                            'URL' => $imageUrl,
-                            'caption' => $captionText,
+                        $layout = $caption ? 'photoWithCaptionLayout' : 'photoLayout';
+                        $photoComponents = [
+                            [
+                                'role' => 'photo',
+                                'URL' => $imageUrl,
+                                'layout' => $layout,
+                                'caption' => AppleNewsHelper::stripHtml($caption),
+                            ],
                         ];
-                        if ($captionText) {
-                            $components[] = [
-                                'role' => 'caption',
-                                'layout' => 'captionLayout',
-                                'text' => AppleNewsHelper::html2Markdown($captionText),
-                                'format' => 'markdown',
-                                'textStyle' => 'captionStyle',
+                        if ($caption) {
+                            $photoComponents[] = [
+                                'role' => 'container',
+                                'layout' => 'captionContainer',
+                                'style' => 'captionContainerStyle',
+                                'components' => [
+                                    [
+                                        'role' => 'caption',
+                                        'textStyle' => 'photoCaption',
+                                        'layout' => 'captionTitle',
+                                        'format' => 'markdown',
+                                        'text' => AppleNewsHelper::html2Markdown($caption),
+                                    ],
+                                ],
                             ];
                         }
+                        $components[] = [
+                            'role' => 'container',
+                            'layout' => ['ignoreDocumentMargin' => true,],
+                            'components' => $photoComponents,
+                        ];
                     }
+                    break;
+                }
+                case 'gallery': {
+                    $items = [];
+                    foreach ($block->images as $image) {
+                        /** @var AssetFileModel $image */
+                        /** @var RichTextData $imageDescription */
+                        $imageDescription = $image->shortDescription;
+                        $items[] = [
+                            'URL' => $article->addFile($image),
+                            'caption' => AppleNewsHelper::stripHtml($imageDescription),
+                        ];
+                    }
+                    $components[] = [
+                        'role' => 'gallery',
+                        'layout' => 'galleryLayout',
+                        'items' => $items,
+                    ];
                     break;
                 }
             }
@@ -165,10 +293,10 @@ class MyNewsChannel extends BaseAppleNewsChannel
             'title' => $entry->title,
             'language' => AppleNewsHelper::formatLanguage($entry->locale),
             'layout' => [
-                'columns' => 7,
-                'width'   => 1024,
-                'margin'  => 70,
-                'gutter'  => 40,
+                'columns' => 12,
+                'width' => 1024,
+                'margin' => 65,
+                'gutter' => 20,
             ],
             //'subtitle' => 'Non occidere quae cumque vi ventia',
             'metadata' => [
@@ -183,133 +311,203 @@ class MyNewsChannel extends BaseAppleNewsChannel
                 'keywords' => AppleNewsHelper::createKeywords($entry, ['shortDescription']),
                 'thumbnailURL' => isset($featuredImageUrl) ? $featuredImageUrl : null,
             ],
-            'documentStyle' => [
-                'backgroundColor' => '#f6f6f6',
-            ],
             'components' => $components,
-            'componentTextStyles' => $this->getComponentTextStyles(),
             'componentLayouts' => $this->getComponentLayouts(),
+            'componentStyles' => $this->getComponentStyles(),
+            'componentTextStyles' => $this->getComponentTextStyles(),
+            'textStyles' => $this->getTextStyles(),
         ]);
+
         $article->addMetadata('isPreview', false);
 
         return $article;
     }
 
-    protected function getComponentTextStyles()
+    // Protected Methods
+    // =========================================================================
+
+    /**
+     * @return array
+     */
+    protected function getComponentLayouts()
     {
         return [
-            'default-title' => [
-                'fontName'      => 'HelveticaNeue-Thin',
-                'fontSize'      => 36,
-                'textColor'     => '#2F2F2F',
-                'textAlignment' => 'center',
-                'lineHeight'    => 44,
+            'headerLayout' => [
+                'ignoreDocumentMargin' => true,
+                'margin' => ['bottom' => 40],
+                'minimumHeight' => '70vh',
             ],
-            'default-subtitle' => [
-                'fontName'      => 'HelveticaNeue-Thin',
-                'fontSize'      => 20,
-                'textColor'     => '#2F2F2F',
-                'textAlignment' => 'center',
-                'lineHeight'    => 24,
+            'titleLayout' => [
+                'columnStart' => 1,
+                'columnSpan' => 10,
+                'margin' => ['bottom' => 0],
             ],
-            'titleStyle' => [
-                'textAlignment' => 'left',
-                'fontName'      => 'HelveticaNeue-Bold',
-                'fontSize'      => 64,
-                'lineHeight'    => 74,
-                'textColor'     => '#000',
+            'bylineLayout' => [
+                'margin' => ['bottom' => 30],
             ],
-            'introStyle' => [
-                'textAlignment' => 'left',
-                'fontName'      => 'HelveticaNeue-Medium',
-                'fontSize'      => 24,
-                'textColor'     => '#000',
+            'bodyLayout' => [
+                'columnStart' => 1,
+                'columnSpan' => 10,
+                'margin' => ['bottom' => 35],
             ],
-            'authorStyle' => [
-                'textAlignment' => 'left',
-                'fontName'      => 'HelveticaNeue-Bold',
-                'fontSize'      => 16,
-                'textColor'     => '#000',
+            'pullquoteContainer' => [
+                'ignoreDocumentMargin' => true,
+                'columnSpan' => 12,
+                'contentInset' => ['top' => false, 'bottom' => false],
+                'margin' => ['bottom' => 40, 'top' => 0],
             ],
-            'bodyStyle' => [
-                'textAlignment' => 'left',
-                'fontName'      => 'Georgia',
-                'fontSize'      => 18,
-                'lineHeight'    => 26,
-                'textColor'     => '#000',
+            'pullquoteLayout' => [
+                'margin' => ['top' => 0, 'bottom' => 0],
+                'columnStart' => 0,
+                'columnSpan' => 12,
             ],
-            'captionStyle' => [
-                'textAlignment' => 'left',
-                'fontName'      => 'HelveticaNeue-Medium',
-                'fontSize'      => 12,
-                'lineHeight'    => 17,
-                'textColor'     => '#000',
+            'pullquoteAuthorLayout' => [
+                'margin' => ['top' => 0, 'bottom' => 0],
             ],
-            'heading1Style' => [
-                'textAlignment' => 'left',
-                'fontName'      => 'HelveticaNeue-Medium',
-                'fontSize'      => 28,
-                'lineHeight'    => 41,
-                'textColor'     => '#000',
+            'photoLayout' => [
+                'columnSpan' => 12,
+                'ignoreDocumentMargin' => true,
+                'margin' => ['top' => 20, 'bottom' => 20],
             ],
-            'pullquoteStyle' => [
-                'textAlignment' => 'left',
-                'fontName'      => 'HelveticaNeue-Bold',
-                'fontSize'      => 28,
-                'lineHeight'    => 41,
-                'textColor'     => '#000',
+            'photoWithCaptionLayout' => [
+                'columnSpan' => 12,
+                'ignoreDocumentMargin' => true,
+                'margin' => ['top' => 20],
+            ],
+            'captionContainer' => [
+                'ignoreDocumentMargin' => true,
+                'columnSpan' => 12,
+                'contentInset' => ['top' => false, 'bottom' => false],
+                'margin' => ['bottom' => 50],
+            ],
+            'captionTitle' => [
+                'margin' => ['top' => 15, 'bottom' => 0],
+            ],
+            'captionCredit' => [
+                'margin' => ['top' => 0, 'bottom' => 15],
+            ],
+            'headingLayout' => [
+                'columnStart' => 1,
+                'columnSpan' => 10,
+                'margin' => ['bottom' => 10],
+            ],
+            'galleryLayout' => [
+                'margin' => ['top' => 10, 'bottom' => 40],
+            ],
+            'subscribeContainer' => [
+                'ignoreDocumentMargin' => true,
+                'columnSpan' => 12,
+                'contentInset' => true,
+            ],
+            'subscribeLayout' => [
+                'margin' => ['top' => 15, 'bottom' => 15],
             ],
         ];
     }
 
-    protected function getComponentLayouts()
+    /**
+     * @return array
+     */
+    protected function getComponentStyles()
     {
         return [
-            'headerImageLayout' => [
-                'columnStart'          => 0,
-                'columnSpan'           => 7,
-                'ignoreDocumentMargin' => true,
-                'minimumHeight'        => '42vh',
+            'captionContainerStyle' => ['backgroundColor' => '#EEEEEE'],
+            'subscribeContainerStyle' => ['backgroundColor' => '#EEEEEE'],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getComponentTextStyles()
+    {
+        return [
+            'titleStyle' => [
+                'fontName' => 'AvenirNext-Bold',
+                'textColor' => '#FFF',
+                'fontSize' => 75,
+                'lineHeight' => 70,
+                'textAlignment' => 'center',
             ],
-            'titleLayout' => [
-                'columnStart' => 0,
-                'columnSpan'  => 7,
-                'margin'      => ['top' => 30, 'bottom' => 10],
+            'bylineStyle' => [
+                'fontName' => 'AppleSDGothicNeo-Regular',
+                'textColor' => '#FFF',
+                'fontSize' => 13,
+                'textAlignment' => 'center',
             ],
-            'introLayout' => [
-                'columnStart' => 0,
-                'columnSpan'  => 7,
-                'margin'      => ['top' => 15, 'bottom' => 15],
+            'bodyStyle' => [
+                'fontName' => 'AvenirNext-Medium',
+                'textColor' => '#4A4A4A',
+                'fontSize' => 18,
+                'lineHeight' => 28,
+                'hyphenation' => false,
+                'linkStyle' => ['textColor' => '#0072AD', 'underline' => true],
             ],
-            'authorLayout' => [
-                'columnStart' => 0,
-                'columnSpan'  => 7,
-                'margin'      => ['top' => 15, 'bottom' => 15],
+            'dropcapBodyStyle' => [
+                'fontName' => 'AvenirNext-Medium',
+                'textColor' => '#4A4A4A',
+                'fontSize' => 18,
+                'lineHeight' => 28,
+                'hyphenation' => false,
+                'linkStyle' => ['textColor' => '#0072AD', 'underline' => true],
+                'dropCapStyle' => [
+                    'numberOfLines' => 3,
+                    'numberOfCharacters' => 1,
+                    'padding' => 0,
+                    'fontName' => 'AvenirNext-DemiBold',
+                    'textColor' => '#2A2A2A',
+                ],
             ],
-            'bodyLayout' => [
-                'columnStart' => 0,
-                'columnSpan'  => 5,
-                'margin'      => ['top' => 15, 'bottom' => 15],
+            'pullquoteStyle' => [
+                'fontName' => 'AvenirNext-Bold',
+                'textColor' => '#2A2A2A',
+                'fontSize' => 65,
+                'lineHeight' => 72,
+                'textAlignment' => 'center',
             ],
-            'captionLayout' => [
-                'columnStart' => 5,
-                'columnSpan'  => 2,
-                'margin'      => ['top' => 15, 'bottom' => 30],
+            'pullquoteAuthor' => [
+                'fontName' => 'AppleSDGothicNeo-Regular',
+                'textColor' => '#676767',
+                'fontSize' => 13,
+                'textAlignment' => 'center',
             ],
-            'heading1Layout' => [
-                'columnStart' => 0,
-                'columnSpan'  => 5,
-                'margin'      => ['top' => 15],
+            'photoCaption' => [
+                'fontName' => 'AvenirNext-DemiBold',
+                'textColor' => '#2A2A2A',
+                'textAlignment' => 'center',
+                'fontSize' => 18,
             ],
-            'pullquoteLayout' => [
-                'columnStart' => 0,
-                'columnSpan'  => 7,
-                'margin'      => ['top' => 15, 'bottom' => 15],
+            'photoCaptionCredit' => [
+                'fontName' => 'AppleSDGothicNeo-Regular',
+                'textColor' => '#676767',
+                'fontSize' => 13,
+                'textAlignment' => 'center',
             ],
-            'photoLayout' => [
-                'columnStart' => 0,
-                'columnSpan'  => 7,
-                'margin'      => ['top' => 15, 'bottom' => 15],
+            'headingStyle' => [
+                'fontName' => 'AvenirNext-Bold',
+                'textColor' => '#2A2A2A',
+                'fontSize' => 36,
+                'lineHeight' => 42,
+            ],
+            'subscribeText' => [
+                'fontName' => 'AvenirNext-Medium',
+                'textColor' => '#2A2A2A',
+                'textAlignment' => 'center',
+                'fontSize' => 18,
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getTextStyles()
+    {
+        return [
+            'photoCaptionThin' => [
+                'fontName' => 'AppleSDGothicNeo-Regular',
+                'textColor' => '#676767',
+                'fontSize' => 13,
             ],
         ];
     }
