@@ -8,37 +8,37 @@ namespace Craft;
  */
 class AppleNews_PostArticlesElementAction extends BaseElementAction
 {
-	// Public Methods
-	// =========================================================================
+    // Public Methods
+    // =========================================================================
 
-	/**
-	 * @inheritDoc IComponentType::getName()
-	 *
-	 * @return string
-	 */
-	public function getName()
-	{
-		return Craft::t('Post to Apple News');
-	}
+    /**
+     * @inheritDoc IComponentType::getName()
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return Craft::t('Post to Apple News');
+    }
 
-	/**
-	 * @inheritDoc IElementAction::performAction()
-	 *
-	 * @param ElementCriteriaModel $criteria
-	 *
-	 * @return bool
-	 */
-	public function performAction(ElementCriteriaModel $criteria)
-	{
-		/** @var AppleNewsService $service */
-		$service = craft()->appleNews;
+    /**
+     * @inheritDoc IElementAction::performAction()
+     *
+     * @param ElementCriteriaModel $criteria
+     *
+     * @return bool
+     */
+    public function performAction(ElementCriteriaModel $criteria)
+    {
+        /** @var AppleNewsService $service */
+        $service = craft()->appleNews;
 
-		// Queue them up
-		foreach ($criteria->find() as $entry) {
-			/** @var EntryModel $entry */
-			$service->queueArticle($entry);
-		}
+        // Queue them up
+        foreach ($criteria->find() as $entry) {
+            /** @var EntryModel $entry */
+            $service->queueArticle($entry);
+        }
 
-		return true;
-	}
+        return true;
+    }
 }

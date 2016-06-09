@@ -1,6 +1,6 @@
 <?php
 
 return [
-	'channels' => [],
-	'autoPostOnSave' => true,
+    'channels' => [],
+    'autoPostOnSave' => true,
 ];
