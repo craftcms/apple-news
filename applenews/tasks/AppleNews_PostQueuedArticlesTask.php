@@ -26,7 +26,7 @@ class AppleNews_PostQueuedArticlesTask extends BaseTask
      */
     public function getDescription()
     {
-        return Craft::t('Posting articles to Apple News');
+        return Craft::t('Publishing articles to Apple News');
     }
 
     /**

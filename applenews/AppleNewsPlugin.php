@@ -230,7 +230,7 @@ class AppleNewsPlugin extends BasePlugin
                     'QUEUED_UPDATE'
                 ]) && !$isVersion && !$isDraft && $channel->canPublish($entry)
             ) {
-                $html .= '<li><a data-action="post-article">'.Craft::t('Post to Apple News').'</a></li>';
+                $html .= '<li><a data-action="post-article">'.Craft::t('Publish to Apple News').'</a></li>';
             } else {
                 // TODO: preview support that ignores canPublish()
                 //$html .= '<li><a data-action="post-preview">'.Craft::t('Post preview to Apple News').'</a></li>';

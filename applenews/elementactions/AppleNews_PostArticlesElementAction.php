@@ -18,7 +18,7 @@ class AppleNews_PostArticlesElementAction extends BaseElementAction
      */
     public function getName()
     {
-        return Craft::t('Post to Apple News');
+        return Craft::t('Publish to Apple News');
     }
 
     /**
