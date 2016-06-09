@@ -14,7 +14,7 @@ Before you can start posting to Apple News, you’ll need to sign up for [News P
 
 Once you’ve created a channel, you’ll need to write down its Channel ID and API credentials. You can get those from Channel Info → API Key in News Publisher.
 
-For more information about News Publisher, visit [developer.apple.com/news-publisher](https://developer.apple.com/news-publisher/).
+For more information about News Publisher, see [Publishing with Apple News Format](https://developer.apple.com/news-publisher/).
 
 
 ## Installation
@@ -50,8 +50,9 @@ return [
         ],
     ],
 ];
-
 ```
+
+For more information about connecting Apple News to a CMS, see [Use a CMS with News Publisher](https://help.apple.com/newspublisher/icloud/#/apd88c8447e6).
 
 
 ## Channel Class Definition
