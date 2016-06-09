@@ -10,7 +10,7 @@ Publish to Apple News requires Craft CMS 2 and PHP 5.4 or later.
 
 ## Before You Begin
 
-Before you can start publishing to Apple News, you’ll need to sign up for [News Publisher](https://www.icloud.com/#newspublisher) and create your first channel. Make sure you choose to publish with Apple News Format when asked. Note that new channels must go through a quick approval process before they can be used.
+Before you can start publishing to Apple News, you’ll need to sign up for [News Publisher](https://www.icloud.com/newspublisher/) and create your first channel. Make sure you choose to publish with Apple News Format when asked. Note that new channels must go through a quick approval process before they can be used.
 
 Once you’ve created a channel, you’ll need to write down its Channel ID and API credentials. You can get those from Channel Info → API Key in News Publisher.
 
