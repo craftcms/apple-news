@@ -16,7 +16,7 @@ class AppleNewsPlugin extends BasePlugin
      */
     public function getName()
     {
-        return Craft::t('Apple News');
+        return Craft::t('Publish to Apple News');
     }
 
     /**

@@ -1,11 +1,11 @@
-# Apple News for Craft CMS
+# Publish to Apple News
 
 This plugin provides an Apple News integration for Craft CMS, making it possible to publish your content to iPhone and iPad owners around the world.
 
 
 ## Requirements
 
-Apple News for Craft CMS requires Craft CMS 2 and PHP 5.4 or later.
+Publish to Apple News requires Craft CMS 2 and PHP 5.4 or later.
 
 
 ## Before You Begin
@@ -19,15 +19,15 @@ For more information about News Publisher, visit [developer.apple.com/news-publi
 
 ## Installation
 
-To install Apple News for Craft CMS, follow these steps:
+To install Publish to Apple News CMS, follow these steps:
 
 1.  Upload the `applenews` folder to your `craft/plugins` folder.
-2.  Go to Settings → Plugins from your Craft control panel and install the Apple News plugin.
+2.  Go to Settings → Plugins from your Craft control panel and install the Publish to Apple News plugin.
 
 
 ## Configuration
 
-Apple News for Craft CMS gets its own configuration file, located at `craft/config/applenews.php`. It can have the following config settings:
+Publish to Apple News CMS gets its own configuration file, located at `craft/config/applenews.php`. It can have the following config settings:
 
 - **channels** – An array of Channel class configurations, which define the Apple News channels that the plugin should post articles to. Each configuration can be defined in one of the following ways:
     - A fully qualified class name, in which case an instance of the class will be automatically created. (Note that in this case it is your responsibility to make that class autoloadable.)
