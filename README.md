@@ -33,7 +33,7 @@ Publish to Apple News CMS gets its own configuration file, located at `craft/con
     - A fully qualified class name, in which case an instance of the class will be automatically created. (Note that in this case it is your responsibility to make that class autoloadable.)
     - A class path alias, e.g. `plugins.myplugin.MyNewsChannel` or `applenewschannels.MyNewsChannel`. The `applenewschannels` alias points to a `craft/applenewschannels` folder you can create. (Note that classes that belong to a plugin should use the `Craft` namespace, but classes that live in the `craft/applenewschannels` folder should use the global namespace.)
     - An array which includes a `class` key that is either a fully qualified class name or a class path alias, and may also include additional name-value pairs that the object will be initialized with.
-- **autoPostOnSave** – A boolean that indicates whether entries should be automatically posted to Apple News whenever they are saved. (Default is `true`.)
+- **autoPublishOnSave** – A boolean that indicates whether entries should be automatically posted to Apple News whenever they are saved. (Default is `true`.)
 
 Here’s an example plugin config, which defines one Apple News channel using a `MyNewsChannel` class, and defines its `$channelId`, `$apiKeyId`, and `$apiSecret` properties right from the class configuration.
 

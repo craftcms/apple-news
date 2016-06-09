@@ -2,5 +2,5 @@
 
 return [
     'channels' => [],
-    'autoPostOnSave' => true,
+    'autoPublishOnSave' => true,
 ];

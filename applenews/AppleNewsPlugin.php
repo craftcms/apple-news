@@ -85,7 +85,7 @@ class AppleNewsPlugin extends BasePlugin
      */
     public function init()
     {
-        if (craft()->config->get('autoPostOnSave', 'applenews')) {
+        if (craft()->config->get('autoPublishOnSave', 'applenews')) {
             craft()->on('entries.saveEntry', [$this, 'handleEntrySave']);
         }
 
