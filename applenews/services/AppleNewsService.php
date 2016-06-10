@@ -460,8 +460,8 @@ class AppleNewsService extends BaseApplicationComponent
     {
         if (!isset($this->_generatorMetadata)) {
             $this->_generatorMetadata = [
-                'generatorIdentifier' => 'AppleNewsForCraftCMS',
-                'generatorName' => 'Apple News for Craft CMS',
+                'generatorIdentifier' => 'CraftCMS',
+                'generatorName' => 'Craft CMS',
                 'generatorVersion' => craft()->plugins->getPlugin('applenews')->getVersion(),
             ];
         }
