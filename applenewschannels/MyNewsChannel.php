@@ -64,7 +64,7 @@ class MyNewsChannel extends BaseAppleNewsChannel
         /** @var AssetFileModel|null $featuredImage */
         $featuredImage = $entry->featuredImage->first();
 
-        $byline = $entry->getAuthor()->getName().' | '.$entry->postDate->format('F j, Y');
+        $byline = $entry->getAuthor()->getName().($entry->postDate ? ' | '.$entry->postDate->format('F j, Y') : '');
 
         if ($featuredImage) {
             $featuredImageUrl = $article->addFile($featuredImage);
@@ -284,6 +284,22 @@ class MyNewsChannel extends BaseAppleNewsChannel
             }
         }
 
+        // Subscribe component
+        $components[] = [
+            'role' => 'container',
+            'layout' => 'subscribeContainer',
+            'style' => 'subscribeContainerStyle',
+            'components' => [
+                [
+                    'role' => 'body',
+                    'textStyle' => 'subscribeText',
+                    'layout' => 'subscribeLayout',
+                    'format' => 'markdown',
+                    'text' => '[**Subscribe** to this newsletter for up to the minute news.](https://craftcms.com)',
+                ],
+            ],
+        ];
+
         // Set the content/metadata on the article
         // ---------------------------------------------------------------------
 
@@ -306,7 +322,7 @@ class MyNewsChannel extends BaseAppleNewsChannel
                 'canonicalURL' => $entry->getUrl(),
                 'dateCreated' => DateTimeHelper::toIso8601($entry->dateCreated),
                 'dateModified' => DateTimeHelper::toIso8601($entry->dateUpdated),
-                'datePublished' => DateTimeHelper::toIso8601($entry->postDate),
+                'datePublished' => ($entry->postDate ? DateTimeHelper::toIso8601($entry->postDate) : null),
                 'excerpt' => AppleNewsHelper::stripHtml($shortDescription),
                 'keywords' => AppleNewsHelper::createKeywords($entry, ['shortDescription']),
                 'thumbnailURL' => isset($featuredImageUrl) ? $featuredImageUrl : null,
@@ -381,10 +397,7 @@ class MyNewsChannel extends BaseAppleNewsChannel
                 'margin' => ['bottom' => 50],
             ],
             'captionTitle' => [
-                'margin' => ['top' => 15, 'bottom' => 0],
-            ],
-            'captionCredit' => [
-                'margin' => ['top' => 0, 'bottom' => 15],
+                'margin' => ['top' => 15, 'bottom' => 15],
             ],
             'headingLayout' => [
                 'columnStart' => 1,
@@ -476,12 +489,6 @@ class MyNewsChannel extends BaseAppleNewsChannel
                 'textColor' => '#2A2A2A',
                 'textAlignment' => 'center',
                 'fontSize' => 18,
-            ],
-            'photoCaptionCredit' => [
-                'fontName' => 'AppleSDGothicNeo-Regular',
-                'textColor' => '#676767',
-                'fontSize' => 13,
-                'textAlignment' => 'center',
             ],
             'headingStyle' => [
                 'fontName' => 'AvenirNext-Bold',
