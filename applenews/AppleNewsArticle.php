@@ -12,6 +12,11 @@ class AppleNewsArticle implements IAppleNewsArticle
     // =========================================================================
 
     /**
+     * @var EntryModel The associated entry
+     */
+    protected $entry;
+
+    /**
      * @var array The files that should be included in the article (uri => path)
      */
     protected $files;
@@ -28,6 +33,24 @@ class AppleNewsArticle implements IAppleNewsArticle
 
     // Public Methods
     // =========================================================================
+
+    /**
+     * Constructor
+     *
+     * @param EntryModel $entry
+     */
+    public function __construct(EntryModel $entry = null)
+    {
+        $this->entry = $entry;
+        $this->init();
+    }
+
+    /**
+     * Initializes the article
+     */
+    public function init()
+    {
+    }
 
     /**
      * @inheritdoc
