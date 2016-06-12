@@ -108,7 +108,7 @@ class MyNewsArticle extends AppleNewsArticle
 
         $firstBody = true;
 
-        foreach ($this->entry->articleBody as $i => $block) {
+        foreach ($this->entry->articleBody as $block) {
             /** @var MatrixBlockModel $block */
             switch ($block->getType()->handle) {
                 case 'heading': {
