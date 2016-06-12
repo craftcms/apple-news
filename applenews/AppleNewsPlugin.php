@@ -277,8 +277,8 @@ class AppleNewsPlugin extends BasePlugin
 
         $html .= '</div>';
 
-        craft()->templates->includeCssResource('appleNews/css/edit-entry.css');
-        craft()->templates->includeJsResource('appleNews/js/ArticlePane.js');
+        craft()->templates->includeCssResource('applenews/css/edit-entry.css');
+        craft()->templates->includeJsResource('applenews/js/ArticlePane.js');
 
         $infosJs = JsonHelper::encode($infos);
         $versionIdJs = $isVersion ? $entry->versionId : 'null';
