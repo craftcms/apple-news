@@ -1,0 +1,30 @@
+{% extends 'applenews/_layout' %}
+
+{% block content %}
+	{% if not channels %}
+		<p>{{ "You haven’t defined any channels yet."|t }}</p>
+	{% endif %}
+
+	{% for channelId, channel in channels %}
+		<h2>{{ channelNames[channelId] }}</h2>
+
+		{% for section in sections[channelId] %}
+			<h3>{{ section.name }}</h3>
+			<table class="data fullwidth">
+				<tr>
+					<th class="light" width="300">{{ "ID"|t }}</th>
+					<td>{{ section.id }}</td>
+				</tr>
+				<tr>
+					<th class="light" width="300">{{ "Link"|t }}</th>
+					<td>{{ section.links.self }}</td>
+				</tr>
+				<tr>
+					<th class="light" width="300">{{ "Default Section"|t }}</th>
+					<td>{{ section.isDefault ? "Yes"|t : "No"|t }}</td>
+				</tr>
+			</table>
+		{% endfor %}
+		{% if not loop.last %}<hr>{% endif %}
+	{% endfor %}
+{% endblock %}

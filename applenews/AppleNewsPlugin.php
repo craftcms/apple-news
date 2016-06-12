@@ -81,6 +81,24 @@ class AppleNewsPlugin extends BasePlugin
     }
 
     /**
+     * @return string
+     */
+    public function getSettingsUrl()
+    {
+        return 'apple-news';
+    }
+
+    /**
+     * @return array
+     */
+    public function registerCpRoutes()
+    {
+        return [
+            'apple-news' => ['action' => 'appleNews/settings/index'],
+        ];
+    }
+
+    /**
      * @return void
      */
     public function init()
