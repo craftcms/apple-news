@@ -84,6 +84,7 @@ class AppleNewsArticle implements IAppleNewsArticle
 
         // Get a unique filename for the article
         $filename = IOHelper::getFileName($file);
+        $filename = str_replace('@', '', $filename);
         if (isset($this->files[$filename])) {
             $basename = IOHelper::getFileName($file, false);
             $ext = IOHelper::getExtension($file);
