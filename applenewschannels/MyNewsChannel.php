@@ -98,18 +98,40 @@ class MyNewsChannel extends BaseAppleNewsChannel
                                     'targetAnchorPosition' => 'bottom',
                                     'originAnchorPosition' => 'bottom',
                                 ],
+                                'style' => [
+                                    'fill' => [
+                                        'type' => 'linear_gradient',
+                                        'colorStops' => [
+                                            ['color' => '#00000000', 'location' => 50],
+                                            ['color' => '#00000080'],
+                                        ],
+                                    ],
+                                ],
+                                'layout' => [
+                                    'ignoreDocumentMargin' => true,
+                                    'minimumHeight' => '70vh',
+                                ],
                                 'components' => [
                                     [
-                                        'role' => 'title',
-                                        'layout' => 'titleLayout',
-                                        'text' => $entry->title,
-                                        'textStyle' => 'titleStyle',
-                                    ],
-                                    [
-                                        'role' => 'byline',
-                                        'textStyle' => 'bylineStyle',
-                                        'layout' => 'bylineLayout',
-                                        'text' => $byline,
+                                        'role' => 'container',
+                                        'anchor' => [
+                                            'targetAnchorPosition' => 'bottom',
+                                            'originAnchorPosition' => 'bottom',
+                                        ],
+                                        'components' => [
+                                            [
+                                                'role' => 'title',
+                                                'layout' => 'titleLayout',
+                                                'text' => $entry->title,
+                                                'textStyle' => 'titleStyle',
+                                            ],
+                                            [
+                                                'role' => 'byline',
+                                                'textStyle' => 'bylineStyle',
+                                                'layout' => 'bylineLayout',
+                                                'text' => $byline,
+                                            ],
+                                        ],
                                     ],
                                 ],
                             ],
