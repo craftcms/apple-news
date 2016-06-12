@@ -51,6 +51,7 @@ class MyNewsArticle extends AppleNewsArticle
             'version' => '1.1',
             'identifier' => $this->entry->id,
             'title' => $this->entry->title,
+            //'subtitle' => 'Non occidere quae cumque vi ventia',
             'language' => AppleNewsHelper::formatLanguage($this->entry->locale),
             'layout' => [
                 'columns' => 12,
@@ -58,7 +59,6 @@ class MyNewsArticle extends AppleNewsArticle
                 'margin' => 65,
                 'gutter' => 20,
             ],
-            //'subtitle' => 'Non occidere quae cumque vi ventia',
             'metadata' => [
                 'authors' => [
                     $this->entry->getAuthor()->getName()
