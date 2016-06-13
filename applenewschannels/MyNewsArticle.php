@@ -75,7 +75,6 @@ class MyNewsArticle extends AppleNewsArticle
             'componentLayouts' => $this->getComponentLayouts(),
             'componentStyles' => $this->getComponentStyles(),
             'componentTextStyles' => $this->getComponentTextStyles(),
-            'textStyles' => $this->getTextStyles(),
         ]);
 
         // Request metadata
@@ -115,7 +114,7 @@ class MyNewsArticle extends AppleNewsArticle
                     $components[] = [
                         'role' => 'heading',
                         'layout' => 'headingLayout',
-                        'textStyle' => 'headingStyle',
+                        'textStyle' => 'headingTextStyle',
                         'text' => $block->heading,
                     ];
                     break;
@@ -123,30 +122,34 @@ class MyNewsArticle extends AppleNewsArticle
                 case 'text': {
                     // Is this the first body block?
                     if ($firstBody) {
-                        $textStyle = 'dropcapBodyStyle';
+                        $textStyle = 'dropcapBodyTextStyle';
                         $firstBody = false;
                     } else {
-                        $textStyle = 'bodyStyle';
+                        $textStyle = 'bodyTextStyle';
                     }
-                    /** @var RichTextData $text */
-                    $text = $block->text;
-                    $components[] = [
-                        'role' => 'body',
-                        'layout' => 'bodyLayout',
-                        'textStyle' => $textStyle,
-                        'text' => AppleNewsHelper::html2Markdown($text),
-                        'format' => 'markdown',
-                    ];
+                    $textComponents = AppleNewsHelper::html2Components($block->text, [
+                        'heading' => [
+                            'role' => 'heading',
+                            'layout' => 'headingLayout',
+                            'textStyle' => 'headingTextStyle',
+                        ],
+                        'body' => [
+                            'role' => 'body',
+                            'layout' => 'bodyLayout',
+                            'textStyle' => $textStyle,
+                        ],
+                    ]);
+                    $components = array_merge($components, $textComponents);
                     break;
                 }
                 case 'pullQuote': {
                     $components[] = [
                         'role' => 'container',
-                        'layout' => 'pullquoteContainer',
+                        'layout' => 'pullquoteContainerLayout',
                         'components' => [
                             [
                                 'role' => 'pullquote',
-                                'textStyle' => 'pullquoteStyle',
+                                'textStyle' => 'pullquoteTextStyle',
                                 'layout' => 'pullquoteLayout',
                                 'text' => '“'.$block->pullQuote.'”',
                                 'animation' => ['type' => 'fade_in'],
@@ -158,18 +161,18 @@ class MyNewsArticle extends AppleNewsArticle
                 case 'quote': {
                     $components[] = [
                         'role' => 'container',
-                        'layout' => 'pullquoteContainer',
+                        'layout' => 'pullquoteContainerLayout',
                         'components' => [
                             [
                                 'role' => 'pullquote',
-                                'textStyle' => 'pullquoteStyle',
+                                'textStyle' => 'pullquoteTextStyle',
                                 'layout' => 'pullquoteLayout',
                                 'text' => '“'.$block->quote.'”',
                                 'animation' => ['type' => 'fade_in'],
                             ],
                             [
                                 'role' => 'pullquote',
-                                'textStyle' => 'pullquoteAuthor',
+                                'textStyle' => 'pullquoteTextAuthor',
                                 'layout' => 'pullquoteAuthorLayout',
                                 'text' => $block->attribution,
                             ],
@@ -196,13 +199,13 @@ class MyNewsArticle extends AppleNewsArticle
                         if ($caption) {
                             $photoComponents[] = [
                                 'role' => 'container',
-                                'layout' => 'captionContainer',
+                                'layout' => 'captionContainerLayout',
                                 'style' => 'captionContainerStyle',
                                 'components' => [
                                     [
                                         'role' => 'caption',
-                                        'textStyle' => 'photoCaption',
-                                        'layout' => 'captionTitle',
+                                        'textStyle' => 'photoTextCaption',
+                                        'layout' => 'captionTitleLayout',
                                         'format' => 'markdown',
                                         'text' => AppleNewsHelper::html2Markdown($caption),
                                     ],
@@ -243,12 +246,12 @@ class MyNewsArticle extends AppleNewsArticle
 
         $components[] = [
             'role' => 'container',
-            'layout' => 'subscribeContainer',
+            'layout' => 'subscribeContainerLayout',
             'style' => 'subscribeContainerStyle',
             'components' => [
                 [
                     'role' => 'body',
-                    'textStyle' => 'subscribeText',
+                    'textStyle' => 'subscribeTextText',
                     'layout' => 'subscribeLayout',
                     'format' => 'markdown',
                     'text' => '[**Subscribe** to this newsletter for up to the minute news.](https://craftcms.com)',
@@ -327,11 +330,11 @@ class MyNewsArticle extends AppleNewsArticle
                                             'role' => 'title',
                                             'layout' => 'titleLayout',
                                             'text' => $this->entry->title,
-                                            'textStyle' => 'titleStyle',
+                                            'textStyle' => 'titleTextStyle',
                                         ],
                                         [
                                             'role' => 'byline',
-                                            'textStyle' => 'bylineStyle',
+                                            'textStyle' => 'bylineTextStyle',
                                             'layout' => 'bylineLayout',
                                             'text' => $this->byline,
                                         ],
@@ -367,11 +370,11 @@ class MyNewsArticle extends AppleNewsArticle
                     'role' => 'title',
                     'layout' => 'titleLayout',
                     'text' => $this->entry->title,
-                    'textStyle' => 'titleStyle',
+                    'textStyle' => 'titleTextStyle',
                 ],
                 [
                     'role' => 'byline',
-                    'textStyle' => 'bylineStyle',
+                    'textStyle' => 'bylineTextStyle',
                     'layout' => 'bylineLayout',
                     'text' => $this->byline,
                 ],
@@ -403,7 +406,7 @@ class MyNewsArticle extends AppleNewsArticle
                 'columnSpan' => 10,
                 'margin' => ['bottom' => 35],
             ],
-            'pullquoteContainer' => [
+            'pullquoteContainerLayout' => [
                 'ignoreDocumentMargin' => true,
                 'columnSpan' => 12,
                 'contentInset' => ['top' => false, 'bottom' => false],
@@ -427,13 +430,13 @@ class MyNewsArticle extends AppleNewsArticle
                 'ignoreDocumentMargin' => true,
                 'margin' => ['top' => 20],
             ],
-            'captionContainer' => [
+            'captionContainerLayout' => [
                 'ignoreDocumentMargin' => true,
                 'columnSpan' => 12,
                 'contentInset' => ['top' => false, 'bottom' => false],
                 'margin' => ['bottom' => 50],
             ],
-            'captionTitle' => [
+            'captionTitleLayout' => [
                 'margin' => ['top' => 15, 'bottom' => 15],
             ],
             'headingLayout' => [
@@ -444,7 +447,7 @@ class MyNewsArticle extends AppleNewsArticle
             'galleryLayout' => [
                 'margin' => ['top' => 10, 'bottom' => 40],
             ],
-            'subscribeContainer' => [
+            'subscribeContainerLayout' => [
                 'ignoreDocumentMargin' => true,
                 'columnSpan' => 12,
                 'contentInset' => true,
@@ -478,20 +481,20 @@ class MyNewsArticle extends AppleNewsArticle
         }
 
         return [
-            'titleStyle' => [
+            'titleTextStyle' => [
                 'fontName' => 'AvenirNext-Bold',
                 'textColor' => $titleTextColor,
                 'fontSize' => 75,
                 'lineHeight' => 70,
                 'textAlignment' => 'center',
             ],
-            'bylineStyle' => [
+            'bylineTextStyle' => [
                 'fontName' => 'AppleSDGothicNeo-Regular',
                 'textColor' => $titleTextColor,
                 'fontSize' => 13,
                 'textAlignment' => 'center',
             ],
-            'bodyStyle' => [
+            'bodyTextStyle' => [
                 'fontName' => 'AvenirNext-Medium',
                 'textColor' => '#4A4A4A',
                 'fontSize' => 18,
@@ -499,7 +502,7 @@ class MyNewsArticle extends AppleNewsArticle
                 'hyphenation' => false,
                 'linkStyle' => ['textColor' => '#0072AD', 'underline' => true],
             ],
-            'dropcapBodyStyle' => [
+            'dropcapBodyTextStyle' => [
                 'fontName' => 'AvenirNext-Medium',
                 'textColor' => '#4A4A4A',
                 'fontSize' => 18,
@@ -514,50 +517,36 @@ class MyNewsArticle extends AppleNewsArticle
                     'textColor' => '#2A2A2A',
                 ],
             ],
-            'pullquoteStyle' => [
+            'pullquoteTextStyle' => [
                 'fontName' => 'AvenirNext-Bold',
                 'textColor' => '#2A2A2A',
                 'fontSize' => 65,
                 'lineHeight' => 72,
                 'textAlignment' => 'center',
             ],
-            'pullquoteAuthor' => [
+            'pullquoteTextAuthor' => [
                 'fontName' => 'AppleSDGothicNeo-Regular',
                 'textColor' => '#676767',
                 'fontSize' => 13,
                 'textAlignment' => 'center',
             ],
-            'photoCaption' => [
+            'photoTextCaption' => [
                 'fontName' => 'AvenirNext-DemiBold',
                 'textColor' => '#2A2A2A',
                 'textAlignment' => 'center',
                 'fontSize' => 18,
             ],
-            'headingStyle' => [
+            'headingTextStyle' => [
                 'fontName' => 'AvenirNext-Bold',
                 'textColor' => '#2A2A2A',
                 'fontSize' => 36,
                 'lineHeight' => 42,
             ],
-            'subscribeText' => [
+            'subscribeTextText' => [
                 'fontName' => 'AvenirNext-Medium',
                 'textColor' => '#2A2A2A',
                 'textAlignment' => 'center',
                 'fontSize' => 18,
-            ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    protected function getTextStyles()
-    {
-        return [
-            'photoCaptionThin' => [
-                'fontName' => 'AppleSDGothicNeo-Regular',
-                'textColor' => '#676767',
-                'fontSize' => 13,
             ],
         ];
     }
