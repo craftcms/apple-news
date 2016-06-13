@@ -94,3 +94,8 @@ The following features are planned:
 - Error handling and reporting
 - Support for publishing previews of otherwise unpublishable entries
 - Move article deletion to a queue + BG task
+
+
+## Thanks
+
+Many thanks to [Chapter Three](https://www.chapterthree.com/) for their excellent [AppleNewsAPI](https://github.com/chapter-three/AppleNewsAPI) library.
