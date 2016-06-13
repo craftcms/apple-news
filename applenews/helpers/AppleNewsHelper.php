@@ -129,6 +129,195 @@ abstract class AppleNewsHelper
         return $md;
     }
 
+    /**
+     * Converts HTML-formatted text into component definitions.
+     *
+     * The function will replace the following HTML tags with components:
+     *
+     * - <blockquote> => role=quote with `quote` properties
+     * - <code> => role=body with either `code` or `body` properties
+     * - <hr> => role=divider with `divider` properties
+     * - <h1-6> => role=heading1-6 with either `heading1-6` or `heading` properties
+     * - everything else => role=body with `body` properties
+     *
+     * @param string|RichTextData $html       HTML-formatted text, or a RichTextData object
+     * @param array|callable      $properties An array defining the component properties that should be applied to each component type,
+     *                                        or a function that returns the full component definition, given the type and Markdown text.
+     *
+     * @return array Component definitions
+     * @todo Add support for images + captions and videos
+     */
+    public static function html2Components($html, $properties = [])
+    {
+        if ($html instanceof RichTextData) {
+            $html = $html->getParsedContent();
+        }
+
+        // Create a DOMDocument object for the HTML
+        // (from HtmlConverter::convert)
+        $document = new \DOMDocument();
+        libxml_use_internal_errors(true);
+        $document->loadHTML('<?xml encoding="UTF-8">'.$html);
+        $document->encoding = 'UTF-8';
+        libxml_clear_errors();
+        if (!($body = $document->getElementsByTagName('body')->item(0))) {
+            throw new \InvalidArgumentException('Invalid HTML was provided');
+        }
+
+        // Create an array of all the top-level elements
+        $componentInfos = [];
+        $lastWasBody = false;
+
+        foreach ($body->childNodes as $node) {
+            /** @var \DOMNode $node */
+
+            // <pre><code> => <code>
+            if ($node->nodeName == 'pre' && $node->childNodes->length == 1 && $node->firstChild->nodeName == 'code') {
+                $node = $node->firstChild;
+            }
+
+            switch ($node->nodeName) {
+                case 'blockquote': {
+                    $role = 'quote';
+                    $types = ['quote'];
+                    $isBody = false;
+                    $captureText = true;
+                    $captureOuterHtml = false;
+                    break;
+                }
+                case 'code': {
+                    $role = 'body';
+                    $types = ['code', 'body'];
+                    $isBody = false;
+                    $captureText = true;
+                    $captureOuterHtml = false;
+                    break;
+                }
+
+                case 'h1':
+                case 'h2':
+                case 'h3':
+                case 'h4':
+                case 'h5':
+                case 'h6': {
+                    $level = substr($node->nodeName, 1);
+                    $role = 'heading'.$level;
+                    $types = ['heading'.$level, 'heading'];
+                    $isBody = false;
+                    $captureText = true;
+                    $captureOuterHtml = false;
+                    break;
+                }
+
+                case 'hr': {
+                    $role = 'divider';
+                    $types = ['divider'];
+                    $isBody = false;
+                    $captureText = false;
+                    $captureOuterHtml = false;
+                    break;
+                }
+                default: {
+                    // div, p, ol, ul, #text, etc.
+                    $role = 'body';
+                    $types = ['body'];
+                    $isBody = true;
+                    $captureText = true;
+                    $captureOuterHtml = true;
+                }
+            }
+
+            // Do we care about the text value?
+            if ($captureText) {
+                // Is the node type important?
+                if ($captureOuterHtml) {
+                    $nodeHtml = $document->saveHTML($node);
+                } else {
+                    $nodeHtml = '';
+                    foreach ($node->childNodes as $childNode) {
+                        $nodeHtml .= $document->saveHTML($childNode);
+                    }
+                }
+                $nodeHtml = trim($nodeHtml, "\n\r ");
+                if (!$nodeHtml) {
+                    continue;
+                }
+                $text = static::html2Markdown($nodeHtml);
+            } else {
+                $text = null;
+            }
+
+            // If this is a body component and the last one was as well, append the text to the last one
+            if ($isBody && $lastWasBody) {
+                $lastComponentIndex = count($componentInfos) - 1;
+                $componentInfos[$lastComponentIndex]['text'] .= "\n\n".$text;
+            } else {
+                $componentInfos[] = [
+                    'types' => $types,
+                    'role' => $role,
+                    'text' => $text,
+                ];
+                $lastWasBody = $isBody;
+            }
+        }
+
+        $components = [];
+
+        foreach ($componentInfos as $componentInfo) {
+            $component = null;
+            if (is_callable($properties)) {
+                // See if the function cares about any of these types
+                foreach ($componentInfo['types'] as $type) {
+                    $component = $properties($type, $componentInfo['text']);
+                    if ($component) {
+                        break;
+                    }
+                }
+            }
+            if (!$component) {
+                $component = [
+                    'role' => $role,
+                ];
+
+                if ($componentInfo['text']) {
+                    $component['text'] = $componentInfo['text'];
+                    $component['format'] = 'markdown';
+                }
+
+                if (is_array($properties)) {
+                    // Merge in the first matching property key, if any
+                    foreach ($componentInfo['types'] as $type) {
+                        if (isset($properties[$type])) {
+                            $component = array_merge($component, $properties[$type]);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            $components[] = $component;
+        }
+
+        return $components;
+    }
+
+    /**
+     * Converts Markdown-formatted text into component definitions.
+     *
+     * @param string         $text            Markdown-formatted text
+     * @param array|callable $properties      An array defining the component properties that should be applied to each component type,
+     *                                        or a function that returns the full component definition, given the type and Markdown text.
+     *
+     * @return array Component definitions
+     */
+    public static function markdown2Components($text, $properties = [])
+    {
+        // Convert Markdown to HTML and run through html2Components()
+        $html = StringHelper::parseMarkdown($text);
+
+        return static::html2Components($html, $properties);
+    }
+
     // Protected Methods
     // =========================================================================
 
