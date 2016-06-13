@@ -8,6 +8,13 @@
 	{% for channelId, channel in channels %}
 		<h2>{{ channelNames[channelId] }}</h2>
 
+		<table class="data fullwidth">
+			<tr>
+				<th class="light" width="300">{{ "ID"|t }}</th>
+				<td>{{ channelId }}</td>
+			</tr>
+		</table>
+
 		{% for section in sections[channelId] %}
 			<h3>{{ section.name }}</h3>
 			<table class="data fullwidth">
