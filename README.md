@@ -99,3 +99,14 @@ The following features are planned:
 ## Thanks
 
 Many thanks to [Chapter Three](https://www.chapterthree.com/) for their excellent [AppleNewsAPI](https://github.com/chapter-three/AppleNewsAPI) library.
+
+
+## Changelog
+
+### 1.0.1
+
+- Fixed a bug where AppleNewsHelper::formatLanguage() was not placing an underscore between the language and region codes.
+
+### 1.0.0
+
+- Initial release

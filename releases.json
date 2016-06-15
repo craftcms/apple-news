@@ -1,2 +1,10 @@
 [
+  {
+    "version": "1.0.1",
+    "downloadUrl": "https://github.com/pixelandtonic/AppleNews/archive/1.0.1.zip",
+    "date": "2016-06-15T08:00:00-08:00",
+    "notes": [
+      "[Fixed] Fixed a bug where AppleNewsHelper::formatLanguage() was not placing an underscore between the language and region codes."
+    ]
+  }
 ]
