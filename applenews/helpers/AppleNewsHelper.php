@@ -29,7 +29,7 @@ abstract class AppleNewsHelper
     {
         $parts = explode('_', $language);
 
-        return strtolower($parts[0]).(!empty($parts[1]) ? strtoupper($parts[1]) : '');
+        return strtolower($parts[0]).(!empty($parts[1]) ? '_'.strtoupper($parts[1]) : '');
     }
 
     /**
