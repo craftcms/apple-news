@@ -19,7 +19,7 @@ For more information about News Publisher, see [Publishing with Apple News Forma
 
 ## Installation
 
-To install Publish to Apple News CMS, follow these steps:
+To install Publish to Apple News, follow these steps:
 
 1.  Upload the `applenews` folder to your `craft/plugins` folder.
 2.  Go to Settings → Plugins from your Craft control panel and install the Publish to Apple News plugin.
@@ -27,7 +27,7 @@ To install Publish to Apple News CMS, follow these steps:
 
 ## Configuration
 
-Publish to Apple News CMS gets its own configuration file, located at `craft/config/applenews.php`. It can have the following config settings:
+Publish to Apple News gets its own configuration file, located at `craft/config/applenews.php`. It can have the following config settings:
 
 - **channels** – An array of Channel class configurations, which define the Apple News channels that the plugin should publish articles to. Each configuration can be defined in one of the following ways:
     - A fully qualified class name, in which case an instance of the class will be automatically created. (Note that in this case it is your responsibility to make that class autoloadable.)
