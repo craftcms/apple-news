@@ -5,7 +5,7 @@ namespace Curl;
 
 class Curl
 {
-    const VERSION = '4.11.0';
+    const VERSION = '4.13.0';
     const DEFAULT_TIMEOUT = 30;
 
     public static $RFC2616 = array(
@@ -58,7 +58,6 @@ class Curl
 
     public $baseUrl = null;
     public $url = null;
-    public $effectiveUrl = null;
     public $requestHeaders = null;
     public $responseHeaders = null;
     public $rawResponseHeaders = '';
@@ -80,6 +79,12 @@ class Curl
     private $jsonPattern = '/^(?:application|text)\/(?:[a-z]+(?:[\.-][0-9a-z]+){0,}[\+\.]|x-)?json(?:-[a-z]+)?/i';
     private $xmlDecoder = null;
     private $xmlPattern = '~^(?:text/|application/(?:atom\+|rss\+)?)xml~i';
+    private $defaultDecoder = null;
+
+    private static $deferredProperties = array(
+        'effectiveUrl',
+        'totalTime',
+    );
 
     /**
      * Construct
@@ -131,16 +136,14 @@ class Curl
     public function buildPostData($data)
     {
         if (is_array($data)) {
-            if (self::is_array_multidim($data)) {
-                if (isset($this->headers['Content-Type']) &&
-                    preg_match($this->jsonPattern, $this->headers['Content-Type'])) {
-                    $json_str = json_encode($data);
-                    if (!($json_str === false)) {
-                        $data = $json_str;
-                    }
-                } else {
-                    $data = self::http_build_multi_query($data);
+            if (isset($this->headers['Content-Type']) &&
+                preg_match($this->jsonPattern, $this->headers['Content-Type'])) {
+                $json_str = json_encode($data);
+                if (!($json_str === false)) {
+                    $data = $json_str;
                 }
+            } else if (self::is_array_multidim($data)) {
+                $data = self::http_build_multi_query($data);
             } else {
                 $binary_data = false;
                 foreach ($data as $key => $value) {
@@ -161,15 +164,7 @@ class Curl
                 }
 
                 if (!$binary_data) {
-                    if (isset($this->headers['Content-Type']) &&
-                        preg_match($this->jsonPattern, $this->headers['Content-Type'])) {
-                        $json_str = json_encode($data);
-                        if (!($json_str === false)) {
-                            $data = $json_str;
-                        }
-                    } else {
-                        $data = http_build_query($data, '', '&');
-                    }
+                    $data = http_build_query($data, '', '&');
                 }
             }
         }
@@ -332,7 +327,7 @@ class Curl
      * @access public
      * @param  $ch
      *
-     * @return string
+     * @return mixed Returns the value provided by parseResponse.
      */
     public function exec($ch = null)
     {
@@ -346,19 +341,18 @@ class Curl
         }
         $this->curlErrorMessage = curl_error($this->curl);
         $this->curlError = !($this->curlErrorCode === 0);
-        $this->httpStatusCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
+        $this->httpStatusCode = $this->getInfo(CURLINFO_HTTP_CODE);
         $this->httpError = in_array(floor($this->httpStatusCode / 100), array(4, 5));
         $this->error = $this->curlError || $this->httpError;
         $this->errorCode = $this->error ? ($this->curlError ? $this->curlErrorCode : $this->httpStatusCode) : 0;
-        $this->effectiveUrl = curl_getinfo($this->curl, CURLINFO_EFFECTIVE_URL);
 
         // NOTE: CURLINFO_HEADER_OUT set to true is required for requestHeaders
         // to not be empty (e.g. $curl->setOpt(CURLINFO_HEADER_OUT, true);).
         if ($this->getOpt(CURLINFO_HEADER_OUT) === true) {
-            $this->requestHeaders = $this->parseRequestHeaders(curl_getinfo($this->curl, CURLINFO_HEADER_OUT));
+            $this->requestHeaders = $this->parseRequestHeaders($this->getInfo(CURLINFO_HEADER_OUT));
         }
         $this->responseHeaders = $this->parseResponseHeaders($this->rawResponseHeaders);
-        list($this->response, $this->rawResponse) = $this->parseResponse($this->responseHeaders, $this->rawResponse);
+        $this->response = $this->parseResponse($this->responseHeaders, $this->rawResponse);
 
         $this->httpErrorMessage = '';
         if ($this->error) {
@@ -386,7 +380,7 @@ class Curl
      * @param  $url
      * @param  $data
      *
-     * @return string
+     * @return mixed Returns the value provided by exec.
      */
     public function get($url, $data = array())
     {
@@ -398,6 +392,17 @@ class Curl
         $this->setOpt(CURLOPT_CUSTOMREQUEST, 'GET');
         $this->setOpt(CURLOPT_HTTPGET, true);
         return $this->exec();
+    }
+
+    /**
+     * Get Info
+     *
+     * @access public
+     * @param  $opt
+     */
+    public function getInfo($opt)
+    {
+        return curl_getinfo($this->curl, $opt);
     }
 
     /**
@@ -699,6 +704,17 @@ class Curl
     }
 
     /**
+     * Set Cookie String
+     *
+     * @access public
+     * @param  $string
+     */
+    public function setCookieString($string)
+    {
+        return $this->setOpt(CURLOPT_COOKIE, $string);
+    }
+
+    /**
      * Set Cookie File
      *
      * @access public
@@ -724,11 +740,24 @@ class Curl
      * Set Default JSON Decoder
      *
      * @access public
+     * @param  $assoc
+     * @param  $depth
+     * @param  $options
      */
     public function setDefaultJsonDecoder()
     {
-        $this->jsonDecoder = function($response) {
-            $json_obj = json_decode($response, false);
+        $args = func_get_args();
+        $this->jsonDecoder = function($response) use ($args) {
+            array_unshift($args, $response);
+
+            // Call json_decode() without the $options parameter in PHP
+            // versions less than 5.4.0 as the $options parameter was added in
+            // PHP version 5.4.0.
+            if (version_compare(PHP_VERSION, '5.4.0', '<')) {
+                $args = array_slice($args, 0, 3);
+            }
+
+            $json_obj = call_user_func_array('json_decode', $args);
             if (!($json_obj === null)) {
                 $response = $json_obj;
             }
@@ -750,6 +779,25 @@ class Curl
             }
             return $response;
         };
+    }
+
+    /**
+     * Set Default Decoder
+     *
+     * @access public
+     * @param  $decoder string|callable
+     */
+    public function setDefaultDecoder($decoder = 'json')
+    {
+        if (is_callable($decoder)) {
+            $this->defaultDecoder = $decoder;
+        } else {
+            if ($decoder === 'json') {
+                $this->defaultDecoder = $this->jsonDecoder;
+            } elseif ($decoder === 'xml') {
+                $this->defaultDecoder = $this->xmlDecoder;
+            }
+        }
     }
 
     /**
@@ -782,8 +830,6 @@ class Curl
      * @access public
      * @param  $key
      * @param  $value
-     *
-     * @return string
      */
     public function setHeader($key, $value)
     {
@@ -929,10 +975,10 @@ class Curl
      * Verbose
      *
      * @access public
-     * @param bool $on
-     * @param resource $output
+     * @param  bool $on
+     * @param  resource $output
      */
-    public function verbose($on = true, $output=STDERR)
+    public function verbose($on = true, $output = STDERR)
     {
         // Turn off CURLINFO_HEADER_OUT for verbose to work. This has the side
         // effect of causing Curl::requestHeaders to be empty.
@@ -951,6 +997,33 @@ class Curl
     public function __destruct()
     {
         $this->close();
+    }
+
+    public function __get($name)
+    {
+        $return = null;
+        if (in_array($name, self::$deferredProperties) && is_callable(array($this, $getter = '__get_' . $name))) {
+            $return = $this->$name = $this->$getter();
+        }
+        return $return;
+    }
+
+    /**
+     * Get Effective Url
+     *
+     * @access private
+     */
+    private function __get_effectiveUrl() {
+        return $this->getInfo(CURLINFO_EFFECTIVE_URL);
+    }
+
+    /**
+     * Get Total Time
+     *
+     * @access private
+     */
+    private function __get_totalTime() {
+        return $this->getInfo(CURLINFO_TOTAL_TIME);
     }
 
     /**
@@ -1022,7 +1095,10 @@ class Curl
      * @param  $response_headers
      * @param  $raw_response
      *
-     * @return array
+     * @return mixed
+     *   Provided the content-type is determined to be json or xml:
+     *     Returns stdClass object when the default json decoder is used and the content-type is json.
+     *     Returns SimpleXMLElement object when the default xml decoder is used and the content-type is xml.
      */
     private function parseResponse($response_headers, $raw_response)
     {
@@ -1038,10 +1114,15 @@ class Curl
                 if (is_callable($xml_decoder)) {
                     $response = $xml_decoder($response);
                 }
+            } else {
+                $decoder = $this->defaultDecoder;
+                if (is_callable($decoder)) {
+                    $response = $decoder($response);
+                }
             }
         }
 
-        return array($response, $raw_response);
+        return $response;
     }
 
     /**

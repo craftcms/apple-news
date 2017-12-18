@@ -4,7 +4,7 @@
         "vendor-dir": "applenews/vendor"
     },
     "require": {
-        "chapter-three/apple-news-api": "dev-master",
+        "chapter-three/apple-news-api": "^0.3.9",
         "league/html-to-markdown": "^4.2"
     }
 }

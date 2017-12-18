@@ -43,6 +43,8 @@ function autoload679875ef60343fd604aa0fa4d353e67e($class) {
             'chapterthree\\applenewsapi\\document\\components\\illustrator' => '/src/Document/Components/Illustrator.php',
             'chapterthree\\applenewsapi\\document\\components\\image' => '/src/Document/Components/Image.php',
             'chapterthree\\applenewsapi\\document\\components\\instagram' => '/src/Document/Components/Instagram.php',
+            'chapterthree\\applenewsapi\\document\\components\\facebookpost' => '/src/Document/Components/FacebookPost.php',
+            'chapterthree\\applenewsapi\\document\\components\\vinepost' => '/src/Document/Components/VinePost.php',
             'chapterthree\\applenewsapi\\document\\components\\intro' => '/src/Document/Components/Intro.php',
             'chapterthree\\applenewsapi\\document\\components\\logo' => '/src/Document/Components/Logo.php',
             'chapterthree\\applenewsapi\\document\\components\\mosaic' => '/src/Document/Components/Mosaic.php',

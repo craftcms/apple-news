@@ -159,7 +159,7 @@ abstract class Component extends Base {
     if (is_string($style)) {
       // Check that style exists.
       if ($document &&
-          empty($document->getComponentLayouts()[$style])
+          empty($document->getComponentStyles()[$style])
       ) {
         $this->triggerError("No component style \"${style}\" found.");
         return $this;

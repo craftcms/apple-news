@@ -31,7 +31,7 @@ use ChapterThree\AppleNewsAPI\Document\Components\Body;
 use ChapterThree\AppleNewsAPI\Document\Layouts\Layout;
 use ChapterThree\AppleNewsAPI\Document\Styles\ComponentTextStyle;
 
-$obj = new Document(1, 'title', 'en', new Layout(7, 1024));
+$obj = new Document(uniqid(), 'title', 'en', new Layout(7, 1024));
 $obj->addComponent(new Body('body text'))
   ->addComponentTextStyle('default', new ComponentTextStyle());
 

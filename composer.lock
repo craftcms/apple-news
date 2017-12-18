@@ -4,21 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c701038ede051d2f25f9fb867624b3ce",
-    "content-hash": "fcb3663423dc563789ce34c0850d1a34",
+    "content-hash": "bf2cbdf7344268b60c40fa48cafc441d",
     "packages": [
         {
             "name": "chapter-three/apple-news-api",
-            "version": "dev-master",
+            "version": "0.3.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/chapter-three/AppleNewsAPI.git",
-                "reference": "f22935a97d57b5153fd007437725d9b7f3259752"
+                "reference": "c6d9a21f5ab32c91821489c5627064703bffe7b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/chapter-three/AppleNewsAPI/zipball/f22935a97d57b5153fd007437725d9b7f3259752",
-                "reference": "f22935a97d57b5153fd007437725d9b7f3259752",
+                "url": "https://api.github.com/repos/chapter-three/AppleNewsAPI/zipball/c6d9a21f5ab32c91821489c5627064703bffe7b5",
+                "reference": "c6d9a21f5ab32c91821489c5627064703bffe7b5",
                 "shasum": ""
             },
             "require": {
@@ -48,20 +47,20 @@
                 "news",
                 "push"
             ],
-            "time": "2016-06-07 17:06:58"
+            "time": "2016-11-15T21:26:57+00:00"
         },
         {
             "name": "league/html-to-markdown",
-            "version": "4.2.1",
+            "version": "4.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/html-to-markdown.git",
-                "reference": "4e4d46079f59995a37145c19cc688e6fb8c981ab"
+                "reference": "9022e648bc40e44cb3b18438d97ed8715ecbc49b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/html-to-markdown/zipball/4e4d46079f59995a37145c19cc688e6fb8c981ab",
-                "reference": "4e4d46079f59995a37145c19cc688e6fb8c981ab",
+                "url": "https://api.github.com/repos/thephpleague/html-to-markdown/zipball/9022e648bc40e44cb3b18438d97ed8715ecbc49b",
+                "reference": "9022e648bc40e44cb3b18438d97ed8715ecbc49b",
                 "shasum": ""
             },
             "require": {
@@ -80,7 +79,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "4.3-dev"
+                    "dev-master": "4.7-dev"
                 }
             },
             "autoload": {
@@ -112,20 +111,20 @@
                 "html",
                 "markdown"
             ],
-            "time": "2016-05-18 12:57:10"
+            "time": "2017-10-24T02:45:05+00:00"
         },
         {
             "name": "php-curl-class/php-curl-class",
-            "version": "4.11.0",
+            "version": "4.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-curl-class/php-curl-class.git",
-                "reference": "f85d7aebe750c1ac21b40c7d433d5a615ffdc5f1"
+                "reference": "debe0a89ee1eb9a2f15c0bb63ce8b347130af50d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-curl-class/php-curl-class/zipball/f85d7aebe750c1ac21b40c7d433d5a615ffdc5f1",
-                "reference": "f85d7aebe750c1ac21b40c7d433d5a615ffdc5f1",
+                "url": "https://api.github.com/repos/php-curl-class/php-curl-class/zipball/debe0a89ee1eb9a2f15c0bb63ce8b347130af50d",
+                "reference": "debe0a89ee1eb9a2f15c0bb63ce8b347130af50d",
                 "shasum": ""
             },
             "require": {
@@ -168,15 +167,13 @@
                 "web service",
                 "xml"
             ],
-            "time": "2016-03-09 00:50:07"
+            "time": "2016-07-25T19:31:39+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "chapter-three/apple-news-api": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

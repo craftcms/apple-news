@@ -102,6 +102,7 @@ class TextStyle extends Base {
    * @return $this
    */
   public function setTextColor($value) {
+    $value = strtoupper($value);
     if ($this->validateTextColor($value)) {
       $this->textColor = $value;
     }
