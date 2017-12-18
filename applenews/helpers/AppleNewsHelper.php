@@ -276,7 +276,7 @@ abstract class AppleNewsHelper
             }
             if (!$component) {
                 $component = [
-                    'role' => $role,
+                    'role' => $componentInfo['role'],
                 ];
 
                 if ($componentInfo['text']) {
