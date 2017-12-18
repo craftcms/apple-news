@@ -103,6 +103,12 @@ Many thanks to [Chapter Three](https://www.chapterthree.com/) for their excellen
 
 ## Changelog
 
+### 1.0.2
+
+- The “Publishing articles to Apple News” task now logs a message before posting articles, making it easier to track down problem entries.
+- Updated chapter-three/apple-news-api to 0.3.9.
+- Fixed a bug where `AppleNewsHelper::html2Components()` could set the wrong default `role` property on components where a role wasn’t explicitly set.  
+
 ### 1.0.1
 
 - Fixed a bug where AppleNewsHelper::formatLanguage() was not placing an underscore between the language and region codes.
