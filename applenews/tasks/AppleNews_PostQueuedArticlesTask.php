@@ -87,6 +87,7 @@ class AppleNews_PostQueuedArticlesTask extends BaseTask
         $entry = craft()->entries->getEntryById($info['entryId'], $info['locale']);
 
         if ($entry) {
+            Craft::log("Posting entry {$info['entryId']} ({$entry->getCpEditUrl()}) to Apple News.", LogLevel::Info, true);
             $this->getService()->postArticle($entry, $info['channelIds']);
         }
 
