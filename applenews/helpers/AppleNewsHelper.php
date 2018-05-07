@@ -123,6 +123,7 @@ abstract class AppleNewsHelper
         // Trim unwanted whitespace within within block tags
         $blockTags = 'h1|h2|h3|h4|h5|h6|p|ul|ol|li|div';
         $html = preg_replace("/(<(?:{$blockTags}).*?>)\s*/is", "$1", $html);
+        $html = trim($html, chr(0xC2).chr(0xA0));
 
         $md = static::getHtmlConverter()->convert($html);
 
