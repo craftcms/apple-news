@@ -125,6 +125,9 @@ abstract class AppleNewsHelper
         $html = preg_replace("/(<(?:{$blockTags}).*?>)\s*/is", "$1", $html);
         $html = trim($html, chr(0xC2).chr(0xA0));
 
+        // Remove comments
+        $html = preg_replace('<!--.*?-->', '', $html);
+
         $md = static::getHtmlConverter()->convert($html);
 
         return $md;
@@ -153,6 +156,9 @@ abstract class AppleNewsHelper
         if ($html instanceof RichTextData) {
             $html = $html->getParsedContent();
         }
+
+        // Remove comments
+        $html = preg_replace('<!--.*?-->', '', $html);
 
         // Create a DOMDocument object for the HTML
         // (from HtmlConverter::convert)
