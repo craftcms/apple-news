@@ -1,10 +1,42 @@
 {
-    "homepage": "http://github.com/pixelandtonic/AppleNews",
-    "config": {
-        "vendor-dir": "applenews/vendor"
-    },
-    "require": {
-        "chapter-three/apple-news-api": "^0.3.9",
-        "league/html-to-markdown": "^4.2"
+  "name": "craftcms/apple-news",
+  "description": "Publish Craft CMS entries to Apple News",
+  "version": "2.0.0",
+  "type": "craft-plugin",
+  "keywords": [
+    "apple news",
+    "cms",
+    "craftcms",
+    "yii2"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Pixel & Tonic",
+      "homepage": "https://pixelandtonic.com/"
     }
+  ],
+  "support": {
+    "email": "support@craftcms.com",
+    "issues": "https://github.com/craftcms/apple-news/issues?state=open",
+    "source": "https://github.com/craftcms/apple-news",
+    "docs": "https://github.com/craftcms/apple-news/blob/master/README.md",
+    "rss": "https://github.com/craftcms/apple-news/commits/master.atom"
+  },
+  "require": {
+    "craftcms/cms": "^3.3.0",
+    "chapter-three/apple-news-api": "^0.3.9",
+    "league/html-to-markdown": "^4.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "craft\\applenews\\": "src/"
+    }
+  },
+  "extra": {
+    "name": "Apple News",
+    "handle": "apple-news",
+    "description": "Publish entries to Apple News",
+    "documentationUrl": "https://github.com/craftcms/apple-news/blob/master/README.md"
+  }
 }

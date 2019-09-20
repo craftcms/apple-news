@@ -1,0 +1,41 @@
+<div class="readable">
+	<h2>{{ 'Apple News Channels'|t('apple-news') }}</h2>
+
+	{% if not channels %}
+		<p>{{ 'You haven’t defined any channels yet.'|t('apple-news') }}</p>
+	{% endif %}
+
+	{% for channelId, channel in channels %}
+		<div class="pane">
+			<h3>{{ channelNames[channelId] }}</h3>
+
+			<div class="meta">
+				<div class="data">
+					<div class="heading">{{ 'ID'|t('apple-news') }}</div>
+					<div class="value code">{{ channelId }}</div>
+				</div>
+			</div>
+
+			<h4>{{ 'Channel Sections'|t('apple-news') }}</h4>
+
+			{% for section in sections[channelId] %}
+				<h5>
+					{{ section.name }}
+					{% if section.isDefault %}
+						{{ '(Default)'|t('apple-news') }}
+					{% endif %}
+				</h5>
+				<div class="meta">
+					<div class="data">
+						<div class="heading">{{ 'ID'|t('apple-news') }}</div>
+						<div class="value code">{{ section.id }}</div>
+					</div>
+					<div class="data">
+						<div class="heading">{{ 'Link'|t('apple-news') }}</div>
+						<div class="value code">{{ section.links.self }}</div>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	{% endfor %}
+</div>

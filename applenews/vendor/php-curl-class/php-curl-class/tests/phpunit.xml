@@ -1,7 +1,0 @@
-<phpunit bootstrap="../vendor/autoload.php" colors="true">
-    <testsuites>
-        <testsuite name="PHPCurlClass">
-            <directory suffix=".php">./PHPCurlClass/</directory>
-        </testsuite>
-    </testsuites>
-</phpunit>
