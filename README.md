@@ -66,9 +66,6 @@ If you’re in the process of upgrading a Craft 2 project to Craft 3, follow the
      | `Craft\RichTextData`         | `craft\redactor\FieldData`         |
 
    - Add `->all()` calls to any element queries before looping through the results, and replace `->first()` calls with `->one()`.
-
-   - Replace any `'first' => true` endpoint settings to `'one' => true`.
-
    - Replace any `locale` checks with `site->handle` checks.
      ```php
      // Old
