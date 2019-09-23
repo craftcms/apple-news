@@ -53,7 +53,7 @@ class ArticleController extends Controller
         }
 
         // Add article.json
-        $zip->addFromString('article.json', Json::encode($article->getContent()));
+        $zip->addFromString('article.json', Json::encode($article->getContent(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
 
         // Add the article files
         foreach ($article->getFiles() as $uri => $path) {
