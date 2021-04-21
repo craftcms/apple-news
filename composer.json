@@ -1,7 +1,7 @@
 {
   "name": "craftcms/apple-news",
   "description": "Publish Craft CMS entries to Apple News",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "type": "craft-plugin",
   "keywords": [
     "apple news",

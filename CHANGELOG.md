@@ -1,6 +1,6 @@
 # Release Notes for Apple News for Craft CMS
 
-## Unreleased
+## 2.0.1 - 2021-04-21
 
 ### Changed
 - `article.json` files downloaded from the Control Panel now contain pretty-formatted JSON.
