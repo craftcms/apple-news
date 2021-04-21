@@ -88,7 +88,7 @@ If you’re in the process of upgrading a Craft 2 project to Craft 3, follow the
    {
        "autoload": {
            "psr-4": {
-               "applenewschannels\\": "config/apple-news/channels/"
+               "applenewschannels\\": "config/apple-news-channels/"
            }
        }
    }
@@ -141,7 +141,7 @@ To make your channel classes autoloadable, add a new [autoload root](https://get
 {
    "autoload": {
        "psr-4": {
-           "applenewschannels\\": "config/apple-news/channels/"
+           "applenewschannels\\": "config/apple-news-channels/"
        }
    }
 }
