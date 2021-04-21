@@ -249,7 +249,9 @@ class ArticleManager extends Component
     public function delete(Entry $entry, $channelIds = null)
     {
         /** @var ArticleRecord[] $records */
-        $records = $this->createArticleQuery($entry->id, $channelIds)->all();
+        $records = $this->createArticleQuery($entry->id, $channelIds)
+            ->andWhere(['not', ['articleId' => null]])
+            ->all();
         $api = Plugin::getInstance()->api;
 
         foreach ($records as $record) {

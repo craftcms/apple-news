@@ -5,6 +5,9 @@
 ### Changed
 - `article.json` files downloaded from the Control Panel now contain pretty-formatted JSON.
 
+### Fixed
+- Fixed a PHP error that could occur when deleting an entry that didn’t have an Apple News article ID yet. ([#11](https://github.com/craftcms/apple-news/issues/11))
+
 ## 2.0.0 - 2019-09-20
 
 ### Added
