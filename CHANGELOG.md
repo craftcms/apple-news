@@ -1,5 +1,10 @@
 # Release Notes for Apple News for Craft CMS
 
+## Unreleased
+
+### Fixed
+- Fixed a bug where translation messages weren’t getting registered for JavaScript properly.
+
 ## 2.0.1 - 2021-04-21
 
 ### Changed

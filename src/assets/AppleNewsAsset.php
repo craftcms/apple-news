@@ -34,7 +34,7 @@ class AppleNewsAsset extends AssetBundle
         parent::registerAssetFiles($view);
 
         if ($view instanceof View) {
-            $view->registerTranslations('app', [
+            $view->registerTranslations('apple-news', [
                 'A previous version of the article has been published, and an update is currently in the queue to be published.',
                 'A previous version of the article is visible in the News app, and an update is currently in processing.',
                 'A previous version of the article is visible in the News app, but an update failed during processing.',
