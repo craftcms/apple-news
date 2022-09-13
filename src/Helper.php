@@ -53,7 +53,7 @@ abstract class Helper
         // Find the fields
         /** @var FieldInterface[] $fields */
         $fields = [];
-        foreach ($entry->getFieldLayout()->getFields() as $field) {
+        foreach ($entry->getFieldLayout()->getCustomFields() as $field) {
             /** @var Field $field */
             $fieldHandle = $field->handle;
             if (in_array($fieldHandle, $fieldHandles, true)) {

@@ -29,7 +29,7 @@ class PublishArticle extends BaseJob
     /**
      * @inheritdoc
      */
-    public function execute($queue)
+    public function execute($queue): void
     {
         // Make sure the article is still queued
         $queued = Article::find()
@@ -61,7 +61,7 @@ class PublishArticle extends BaseJob
     /**
      * @inheritdoc
      */
-    protected function defaultDescription()
+    protected function defaultDescription(): ?string
     {
         return Craft::t('apple-news', 'Publishing to Apple News');
     }

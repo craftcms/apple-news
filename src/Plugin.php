@@ -103,7 +103,7 @@ class Plugin extends \craft\base\Plugin
         /** @var Entry $entry */
         $entry = $context['entry'];
 
-        if ($entry->getIsUnsavedDraft()) {
+        if ($entry->getIsUnpublishedDraft()) {
             return '';
         }
 
@@ -246,7 +246,7 @@ EOT;
     /**
      * @return Settings
      */
-    protected function createSettingsModel()
+    protected function createSettingsModel(): ?\craft\base\Model
     {
         return new Settings();
     }

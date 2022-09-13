@@ -56,5 +56,7 @@
       "yiisoft/yii2-composer": true,
       "craftcms/plugin-installer": true
     }
-  }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }
