@@ -17,7 +17,7 @@ class PublishArticle extends BaseJob
     public $entryId;
 
     /**
-     * @var @var int
+     * @var int
      */
     public $siteId;
 

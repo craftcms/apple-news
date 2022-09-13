@@ -137,6 +137,7 @@ class ArticleManager extends Component
 
         $queue = Craft::$app->getQueue();
 
+        /** @var ArticleRecord $articles */
         $articles = ArticleRecord::find()
             ->where([
                 'entryId' => $entry->id,

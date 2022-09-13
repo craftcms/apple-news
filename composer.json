@@ -32,7 +32,8 @@
   "require-dev": {
     "craftcms/ecs": "dev-main",
     "craftcms/phpstan": "dev-main",
-    "craftcms/rector": "dev-main"
+    "craftcms/rector": "dev-main",
+    "craftcms/redactor": "*"
   },
   "autoload": {
     "psr-4": {
