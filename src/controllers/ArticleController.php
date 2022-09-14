@@ -126,8 +126,10 @@ class ArticleController extends Controller
             $query->id($entryId);
         }
 
+        /** @var Entry $entry */
         $entry = $query->one();
 
+        /** @phpstan-ignore-next-line */
         if (!$entry) {
             throw new BadRequestHttpException();
         }

@@ -73,7 +73,7 @@ class Article extends BaseObject implements ArticleInterface
     {
         if ($file instanceof Asset) {
             // Get the local path to the file (and copy it from its remote source if need be)
-            $file = $file->getTransformSource();
+            $file = $file->getImageTransformSourcePath();
         }
 
         // Get a unique filename for the article
