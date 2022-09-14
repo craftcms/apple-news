@@ -25,7 +25,7 @@ class Article extends ActiveRecord
     /**
      * @inherit
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return '{{%applenews_articles}}';
     }

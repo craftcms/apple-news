@@ -16,24 +16,24 @@ use yii\base\BaseObject;
 class Article extends BaseObject implements ArticleInterface
 {
     /**
-     * @var Entry The associated entry
+     * @var Entry|null The associated entry
      */
-    protected $entry;
+    protected ?Entry $entry;
 
     /**
      * @var array The files that should be included in the article (uri => path)
      */
-    protected $files = [];
+    protected array $files = [];
 
     /**
      * @var array The metadata that should be included with the request
      */
-    protected $metadata = [];
+    protected array $metadata = [];
 
     /**
      * @var array The article content, described in Apple News Format
      */
-    protected $content;
+    protected array $content;
 
     /**
      * Constructor
@@ -58,7 +58,7 @@ class Article extends BaseObject implements ArticleInterface
     /**
      * @param array $files The files that should be included in the article (uri => path)
      */
-    public function setFiles(array $files)
+    public function setFiles(array $files): void
     {
         $this->files = $files;
     }
@@ -66,10 +66,10 @@ class Article extends BaseObject implements ArticleInterface
     /**
      * Adds a new file to the article and returns its URL.
      *
-     * @param Asset|string $file An asset or a path to a file
+     * @param string|Asset $file An asset or a path to a file
      * @return string The URL that the article should use to reference the file
      */
-    public function addFile($file)
+    public function addFile(Asset|string $file): string
     {
         if ($file instanceof Asset) {
             // Get the local path to the file (and copy it from its remote source if need be)
@@ -82,10 +82,10 @@ class Article extends BaseObject implements ArticleInterface
             'separator' => '-',
         ]);
         $ext = pathinfo($file, PATHINFO_EXTENSION);
-        $filename = "{$basename}.{$ext}";
+        $filename = "$basename.$ext";
         $i = 0;
         while (isset($this->files[$filename])) {
-            $filename = "{$basename}_" . ++$i . ".{$ext}";
+            $filename = "{$basename}_" . ++$i . ".$ext";
         }
 
         $this->files[$filename] = $file;
@@ -103,7 +103,7 @@ class Article extends BaseObject implements ArticleInterface
     /**
      * @param array $metadata The metadata that should be included with the request
      */
-    public function setMetadata(array $metadata)
+    public function setMetadata(array $metadata): void
     {
         $this->metadata = $metadata;
     }
@@ -114,11 +114,11 @@ class Article extends BaseObject implements ArticleInterface
      * @param string $name The metadata property name. Can be a dot-delimited path for defining nested array properties (e.g. `links.sections`)
      * @param mixed $value The metadata property value
      */
-    public function addMetadata(string $name, $value)
+    public function addMetadata(string $name, mixed $value): void
     {
         $arr = &$this->metadata;
 
-        if (strpos($name, '.') !== false) {
+        if (str_contains($name, '.')) {
             $path = explode('.', $name);
             $name = array_pop($path);
 
@@ -144,7 +144,7 @@ class Article extends BaseObject implements ArticleInterface
     /**
      * @param array $content The article content, described in Apple News Format
      */
-    public function setContent(array $content)
+    public function setContent(array $content): void
     {
         $this->content = $content;
     }

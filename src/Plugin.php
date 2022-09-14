@@ -7,6 +7,7 @@ use craft\applenews\assets\AppleNewsAsset;
 use craft\applenews\elementactions\PublishArticles;
 use craft\applenews\utilities\AppleNewsInfo;
 use craft\base\Element;
+use craft\base\Model;
 use craft\elements\Entry;
 use craft\events\ModelEvent;
 use craft\events\RegisterComponentTypesEvent;
@@ -19,6 +20,7 @@ use craft\services\Utilities;
 use craft\web\UrlManager;
 use craft\web\View;
 use yii\base\Event;
+use yii\base\InvalidConfigException;
 
 /**
  * Apple News plugin.
@@ -36,7 +38,7 @@ class Plugin extends \craft\base\Plugin
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -71,7 +73,7 @@ class Plugin extends \craft\base\Plugin
                     $userSession->getIsAdmin() ||
                     (
                         preg_match('/^section:(.+)/', $e->source, $matches) &&
-                        $userSession->checkPermission("publishEntries:{$matches[1]}")
+                        $userSession->checkPermission("publishEntries:$matches[1]")
                     )
                 ) {
                     $e->actions[] = PublishArticles::class;
@@ -89,16 +91,17 @@ class Plugin extends \craft\base\Plugin
      *
      * @param RegisterUrlRulesEvent $event
      */
-    public function registerUrlRules(RegisterUrlRulesEvent $event)
+    public function registerUrlRules(RegisterUrlRulesEvent $event): void
     {
         $event->rules['apple-news'] = 'apple-news/settings';
     }
 
     /**
-     * @param array &$context
+     * @param array $context
      * @return string
+     * @throws InvalidConfigException
      */
-    public function addEditEntryPagePane(array &$context): string
+    public function addEditEntryPagePane(array $context): string
     {
         /** @var Entry $entry */
         $entry = $context['entry'];
@@ -174,7 +177,7 @@ class Plugin extends \craft\base\Plugin
 
             $html .= '<div class="data" data-channel-id="' . $channelId . '">' .
                 '<h5 class="heading">' .
-                "<div class=\"status {$statusColor}\" title=\"{$statusMessage}\"></div>" .
+                "<div class=\"status $statusColor\" title=\"$statusMessage\"></div>" .
                 $channelManager->getChannelName($channelId) .
                 '</h5>' .
                 '<div class="value"><a class="btn menubtn" data-icon="settings" title="' . Craft::t('apple-news', 'Actions') . '"></a>' .
@@ -191,10 +194,10 @@ class Plugin extends \craft\base\Plugin
                 $html .= '<li><a data-action="copy-share-url" data-url="' . $shareUrl . '">' . Craft::t('apple-news', 'Copy share URL') . '</a></li>';
             }
 
-            if (!in_array($state, [
+            if (!$isRevision && !$isDraft && !in_array($state, [
                     ArticleManager::STATE_QUEUED,
                     ArticleManager::STATE_QUEUED_UPDATE,
-                ]) && !$isRevision && !$isDraft && $channel->canPublish($entry)
+                ]) && $channel->canPublish($entry)
             ) {
                 $html .= '<li><a data-action="publish-article">' . Craft::t('apple-news', 'Publish to Apple News') . '</a></li>';
             }
@@ -218,7 +221,7 @@ class Plugin extends \craft\base\Plugin
                 '</div>' .
                 '</div>' .
                 '</div>';
-        };
+        }
 
         $html .= '</div>';
 
@@ -231,11 +234,11 @@ class Plugin extends \craft\base\Plugin
 
         $js = <<<EOT
 new Craft.AppleNews.ArticlePane(
-    {$entry->id},
-    {$entry->siteId},
-    {$draftIdJs},
-    {$revisionIdJs},
-    {$infosJs}
+    $entry->id,
+    $entry->siteId,
+    $draftIdJs,
+    $revisionIdJs,
+    $infosJs
 );
 EOT;
         $view->registerJs($js, View::POS_READY);
@@ -244,9 +247,9 @@ EOT;
     }
 
     /**
-     * @return Settings
+     * @return Model|null
      */
-    protected function createSettingsModel(): ?\craft\base\Model
+    protected function createSettingsModel(): ?Model
     {
         return new Settings();
     }

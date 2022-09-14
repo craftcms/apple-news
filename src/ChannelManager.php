@@ -12,13 +12,15 @@ use yii\base\InvalidConfigException;
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 2.0
+ *
+ * @property-read ChannelInterface[] $channels
  */
 class ChannelManager extends Component
 {
     /**
      * @var ChannelInterface[] The channels
      */
-    private $_channels;
+    private array $_channels;
 
     /**
      * Returns all the channels.
@@ -74,7 +76,7 @@ class ChannelManager extends Component
      */
     public function getChannelName(string $channelId): string
     {
-        return Craft::$app->cache->getOrSet("apple-news:channel-name:{$channelId}", function() use ($channelId) {
+        return Craft::$app->cache->getOrSet("apple-news:channel-name:$channelId", function() use ($channelId) {
             return Plugin::getInstance()->api->channel($channelId)->data->name;
         });
     }

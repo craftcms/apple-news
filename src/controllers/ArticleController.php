@@ -10,6 +10,7 @@ use craft\helpers\Json;
 use craft\helpers\StringHelper;
 use craft\web\Controller;
 use yii\base\Exception;
+use yii\base\InvalidConfigException;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
@@ -28,6 +29,9 @@ class ArticleController extends Controller
      *
      * @return Response
      * @throws BadRequestHttpException
+     * @throws Exception
+     * @throws ForbiddenHttpException
+     * @throws InvalidConfigException
      */
     public function actionDownload(): Response
     {
@@ -44,7 +48,7 @@ class ArticleController extends Controller
         // Prep the zip staging folder
         $zipDir = Craft::$app->getPath()->getTempPath() . '/apple-news-articles';
         FileHelper::createDirectory($zipDir);
-        $zipPath = "{$zipDir}/{$entry->slug}-" . StringHelper::UUID() . '.zip';
+        $zipPath = "$zipDir/$entry->slug-" . StringHelper::UUID() . '.zip';
 
         // Create the zip
         $zip = new ZipArchive();
@@ -63,7 +67,7 @@ class ArticleController extends Controller
 
         // Close and send the zip
         $zip->close();
-        $response = Craft::$app->getResponse()->sendFile($zipPath, "{$entry->slug}.zip");
+        $response = Craft::$app->getResponse()->sendFile($zipPath, "$entry->slug.zip");
         FileHelper::unlink($zipPath);
         return $response;
     }
@@ -72,6 +76,9 @@ class ArticleController extends Controller
      * Returns the latest info about an entry's articles
      *
      * @return Response
+     * @throws ForbiddenHttpException
+     * @throws InvalidConfigException
+     * @throws BadRequestHttpException
      */
     public function actionGetInfo(): Response
     {
@@ -87,6 +94,9 @@ class ArticleController extends Controller
      * Publishes an entry to Apple News.
      *
      * @return Response
+     * @throws BadRequestHttpException
+     * @throws ForbiddenHttpException
+     * @throws InvalidConfigException
      */
     public function actionPublish(): Response
     {
@@ -116,7 +126,7 @@ class ArticleController extends Controller
 
         $query = Entry::find()
             ->siteId($siteId)
-            ->anyStatus();
+            ->status(null);
 
         if ($draftId) {
             $query->draftId($draftId);
@@ -145,8 +155,9 @@ class ArticleController extends Controller
      * @param string|string[]|null $channelId
      * @param bool $refresh
      * @return array
+     * @throws InvalidConfigException
      */
-    protected function getArticleInfo(Entry $entry, $channelId, bool $refresh = false): array
+    protected function getArticleInfo(Entry $entry, array|string|null $channelId, bool $refresh = false): array
     {
         $infos = Plugin::getInstance()->articleManager->getArticleInfo($entry, $channelId, $refresh);
 

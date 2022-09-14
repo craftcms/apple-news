@@ -14,17 +14,17 @@ class PublishArticle extends BaseJob
     /**
      * @var int
      */
-    public $entryId;
+    public int $entryId;
 
     /**
      * @var int
      */
-    public $siteId;
+    public int $siteId;
 
     /**
      * @var string
      */
-    public $channelId;
+    public string $channelId;
 
     /**
      * @inheritdoc
@@ -47,7 +47,7 @@ class PublishArticle extends BaseJob
         $entry = Entry::find()
             ->id($this->entryId)
             ->siteId($this->siteId)
-            ->anyStatus()
+            ->status(null)
             ->one();
 
         if (!$entry) {

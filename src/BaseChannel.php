@@ -15,17 +15,17 @@ abstract class BaseChannel implements ChannelInterface
     /**
      * @var string The channel ID
      */
-    public $channelId;
+    public string $channelId;
 
     /**
      * @var string The channel API key ID
      */
-    public $apiKeyId;
+    public string $apiKeyId;
 
     /**
      * @var string The channel API shared secret
      */
-    public $apiSecret;
+    public string $apiSecret;
 
     /**
      * @inheritdoc

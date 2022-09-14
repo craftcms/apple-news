@@ -10,7 +10,9 @@ use craft\helpers\ArrayHelper;
 use craft\helpers\Json;
 use stdClass;
 use yii\base\Component;
+use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;
+use yii\db\StaleObjectException;
 
 /**
  * Article manager
@@ -20,24 +22,24 @@ use yii\db\ActiveQuery;
  */
 class ArticleManager extends Component
 {
-    const STATE_PROCESSING = 'PROCESSING';
-    const STATE_PROCESSING_UPDATE = 'PROCESSING_UPDATE';
-    const STATE_QUEUED = 'QUEUED';
-    const STATE_QUEUED_UPDATE = 'QUEUED_UPDATE';
-    const STATE_LIVE = 'LIVE';
-    const STATE_FAILED_PROCESSING = 'FAILED_PROCESSING';
-    const STATE_FAILED_PROCESSING_UPDATE = 'FAILED_PROCESSING_UPDATE';
-    const STATE_TAKEN_DOWN = 'TAKEN_DOWN';
+    public const STATE_PROCESSING = 'PROCESSING';
+    public const STATE_PROCESSING_UPDATE = 'PROCESSING_UPDATE';
+    public const STATE_QUEUED = 'QUEUED';
+    public const STATE_QUEUED_UPDATE = 'QUEUED_UPDATE';
+    public const STATE_LIVE = 'LIVE';
+    public const STATE_FAILED_PROCESSING = 'FAILED_PROCESSING';
+    public const STATE_FAILED_PROCESSING_UPDATE = 'FAILED_PROCESSING_UPDATE';
+    public const STATE_TAKEN_DOWN = 'TAKEN_DOWN';
 
     /**
      * @var array The generator metadata
      */
-    public $generator;
+    public array $generator;
 
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -45,7 +47,7 @@ class ArticleManager extends Component
         $this->generator = [
             'generatorIdentifier' => 'CraftCMS',
             'generatorName' => 'Craft CMS',
-            'generatorVersion' => Craft::$app->getVersion() . " ({$plugin->name} {$plugin->version})"
+            'generatorVersion' => Craft::$app->getVersion() . " ($plugin->name $plugin->version)"
         ];
     }
 
@@ -57,7 +59,7 @@ class ArticleManager extends Component
      * @param bool $refresh Whether the info should be refreshed for articles that are processing
      * @return array[] The info, indexed by channel ID
      */
-    public function getArticleInfo(Entry $entry, $channelId = null, bool $refresh = false)
+    public function getArticleInfo(Entry $entry, array|string $channelId = null, bool $refresh = false): array
     {
         $query = ArticleRecord::find()
             ->where(['entryId' => $entry->id]);
@@ -98,6 +100,7 @@ class ArticleManager extends Component
      *
      * @param Entry $entry The entry to check
      * @return bool Whether the entry can be published to any channels
+     * @throws InvalidConfigException
      */
     public function canPublishEntry(Entry $entry): bool
     {
@@ -116,8 +119,9 @@ class ArticleManager extends Component
      *
      * @param Entry $entry The entry to be published
      * @param string|string[]|null $channelIds The Apple News channel ID(s) that the entry should be published to
+     * @throws InvalidConfigException
      */
-    public function queue(Entry $entry, $channelIds = null)
+    public function queue(Entry $entry, array|string $channelIds = null): void
     {
         if ($channelIds === null) {
             // Queue all of them
@@ -167,8 +171,9 @@ class ArticleManager extends Component
      *
      * @param Entry $entry The entry to be published
      * @param string|string[]|null $channelIds The Apple News channel ID(s) to publish the entry to
+     * @throws InvalidConfigException
      */
-    public function publish(Entry $entry, $channelIds = null)
+    public function publish(Entry $entry, array|string $channelIds = null): void
     {
         if (is_string($channelIds)) {
             $channelIds = [$channelIds];
@@ -246,8 +251,9 @@ class ArticleManager extends Component
      *
      * @param Entry $entry
      * @param string|string[]|null $channelIds The Apple News channel ID(s) to delete the entry from
+     * @throws StaleObjectException
      */
-    public function delete(Entry $entry, $channelIds = null)
+    public function delete(Entry $entry, array|string $channelIds = null): void
     {
         /** @var ArticleRecord[] $records */
         $records = $this->createArticleQuery($entry->id, $channelIds)
@@ -268,7 +274,7 @@ class ArticleManager extends Component
      * @param string[]|null $channelIds
      * @return ActiveQuery
      */
-    protected function createArticleQuery(int $entryId, $channelIds = null): ActiveQuery
+    protected function createArticleQuery(int $entryId, array $channelIds = null): ActiveQuery
     {
         $query = ArticleRecord::find()
             ->where(['entryId' => $entryId])
@@ -287,7 +293,7 @@ class ArticleManager extends Component
      * @param ArticleRecord $record
      * @param stdClass $response
      */
-    protected function updateArticleRecord(ArticleRecord $record, stdClass $response)
+    protected function updateArticleRecord(ArticleRecord $record, stdClass $response): void
     {
         $record->revisionId = $response->data->revision;
         $record->isSponsored = $response->data->isSponsored;

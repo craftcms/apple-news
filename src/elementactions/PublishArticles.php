@@ -13,6 +13,8 @@ use craft\elements\Entry;
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 2.0
+ *
+ * @property-read string $triggerLabel
  */
 class PublishArticles extends ElementAction
 {

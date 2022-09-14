@@ -15,10 +15,10 @@ class Settings extends Model
     /**
      * @var array
      */
-    public $channels = [];
+    public array $channels = [];
 
     /**
      * @var bool
      */
-    public $autoPublishOnSave = true;
+    public bool $autoPublishOnSave = true;
 }

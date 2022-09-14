@@ -5,6 +5,8 @@ namespace craft\applenews;
 use craft\base\Field;
 use craft\base\FieldInterface;
 use craft\elements\Entry;
+use craft\errors\InvalidFieldException;
+use craft\helpers\Html;
 use craft\helpers\Search;
 use craft\redactor\FieldData;
 use DOMDocument;
@@ -25,7 +27,7 @@ abstract class Helper
      * @var HtmlConverter
      * @see htmlConverter()
      */
-    private static $_htmlConverter;
+    private static HtmlConverter $_htmlConverter;
 
     /**
      * Formats a language ID into the format required by the Apple News API (e.g. "en" or "en_US").
@@ -45,6 +47,7 @@ abstract class Helper
      * @param Entry $entry The entry
      * @param string[] $fieldHandles The field handles that the keywords should be extracted from
      * @return string[] List of keywords for the article
+     * @throws InvalidFieldException
      */
     public static function createKeywords(Entry $entry, array $fieldHandles): array
     {
@@ -86,7 +89,7 @@ abstract class Helper
      * @param string|FieldData $html HTML-formatted text, or a FieldData object
      * @return string Text without HTML tags
      */
-    public static function stripHtml($html): string
+    public static function stripHtml(FieldData|string $html): string
     {
         if ($html instanceof FieldData) {
             $html = $html->getParsedContent();
@@ -94,7 +97,7 @@ abstract class Helper
 
         // Replace block-level tags with newlines
         $blockTags = 'h1|h2|h3|h4|h5|h6|p|ul|ol|li|div';
-        $html = preg_replace("/<\\/(?:{$blockTags})>/i", "\n\n", $html);
+        $html = preg_replace("/<\\/(?:$blockTags)>/i", "\n\n", $html);
 
         // Remove <script> tags, including their contents
         $html = preg_replace('/<script.*>.*<\/script>/isU', '', $html);
@@ -116,15 +119,15 @@ abstract class Helper
      * @param string|FieldData $html HTML-formatted text, or a FieldData object
      * @return string Markdown-formatted text
      */
-    public static function html2Markdown($html): string
+    public static function html2Markdown(FieldData|string $html): string
     {
         if ($html instanceof FieldData) {
             $html = $html->getParsedContent();
         }
 
-        // Trim unwanted whitespace within within block tags
+        // Trim unwanted whitespace within block tags
         $blockTags = 'h1|h2|h3|h4|h5|h6|p|ul|ol|li|div';
-        $html = preg_replace("/(<(?:{$blockTags}).*?>)\s*/is", "$1", $html);
+        $html = preg_replace("/(<(?:$blockTags).*?>)\s*/is", "$1", $html);
         $html = trim($html, chr(0xC2) . chr(0xA0));
 
         // Remove comments
@@ -144,13 +147,13 @@ abstract class Helper
      * - everything else => role=body with `body` properties
      *
      * @param string|FieldData $html HTML-formatted text, or a FieldData object
-     * @param array|callable $properties An array defining the component properties that should be applied to each component type,
-     *                                        or a function that returns the full component definition, given the type and Markdown text.
+     * @param callable|array $properties An array defining the component properties that should be applied to each component type,
+     *                                   or a function that returns the full component definition, given the type and Markdown text.
      *
      * @return array Component definitions
      * @todo Add support for images + captions and videos
      */
-    public static function html2Components($html, $properties = []): array
+    public static function html2Components(FieldData|string $html, callable|array $properties = []): array
     {
         if ($html instanceof FieldData) {
             $html = $html->getParsedContent();
@@ -178,7 +181,7 @@ abstract class Helper
             /** @var DOMNode $node */
 
             // <pre><code> => <code>
-            if ($node->nodeName == 'pre' && $node->childNodes->length == 1 && $node->firstChild->nodeName == 'code') {
+            if ($node->nodeName === 'pre' && $node->childNodes->length == 1 && $node->firstChild->nodeName === 'code') {
                 $node = $node->firstChild;
             }
 
@@ -316,11 +319,11 @@ abstract class Helper
      * Converts Markdown-formatted text into component definitions.
      *
      * @param string $text Markdown-formatted text
-     * @param array|callable $properties An array defining the component properties that should be applied to each component type,
+     * @param callable|array $properties An array defining the component properties that should be applied to each component type,
      *                                        or a function that returns the full component definition, given the type and Markdown text.
      * @return array Component definitions
      */
-    public static function markdown2Components(string $text, $properties = []): array
+    public static function markdown2Components(string $text, callable|array $properties = []): array
     {
         // Convert Markdown to HTML and run through html2Components()
         $html = Markdown::process($text);
@@ -332,7 +335,7 @@ abstract class Helper
      *
      * @return HtmlConverter
      */
-    protected static function htmlConverter()
+    protected static function htmlConverter(): HtmlConverter
     {
         if (self::$_htmlConverter !== null) {
             return self::$_htmlConverter;

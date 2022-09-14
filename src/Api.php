@@ -5,6 +5,7 @@ namespace craft\applenews;
 use ChapterThree\AppleNewsAPI\PublisherAPI;
 use stdClass;
 use yii\base\Component;
+use yii\base\InvalidConfigException;
 
 /**
  * API
@@ -20,7 +21,7 @@ class Api extends Component
      * @param string $channelId
      * @return stdClass
      */
-    public function channel($channelId): stdClass
+    public function channel(string $channelId): stdClass
     {
         return $this->get($channelId, '/channels/{channel_id}', [
             'channel_id' => $channelId,
@@ -46,6 +47,7 @@ class Api extends Component
      * @param string $channelId
      * @param string $sectionId
      * @return stdClass
+     * @throws InvalidConfigException
      */
     public function section(string $channelId, string $sectionId): stdClass
     {
@@ -72,6 +74,7 @@ class Api extends Component
      * @param string $channelId
      * @param array $params
      * @return stdClass[]
+     * @throws InvalidConfigException
      */
     public function search(string $channelId, array $params = []): array
     {
@@ -130,9 +133,10 @@ class Api extends Component
      * @param string $path
      * @param array $pathArgs
      * @param array $data
-     * @return mixed
+     * @return object
+     * @throws InvalidConfigException
      */
-    protected function get(string $channelId, string $path, array $pathArgs = [], array $data = [])
+    protected function get(string $channelId, string $path, array $pathArgs = [], array $data = []): object
     {
         return $this->api($channelId)->get($path, $pathArgs, $data);
     }
@@ -144,9 +148,10 @@ class Api extends Component
      * @param string $path
      * @param array $pathArgs
      * @param array $data
-     * @return mixed
+     * @return object
+     * @throws InvalidConfigException
      */
-    protected function post(string $channelId, string $path, array $pathArgs = [], array $data = [])
+    protected function post(string $channelId, string $path, array $pathArgs = [], array $data = []): object
     {
         return $this->api($channelId)->post($path, $pathArgs, $data);
     }
@@ -158,9 +163,10 @@ class Api extends Component
      * @param string $path
      * @param array $pathArgs
      * @param array $data
-     * @return mixed
+     * @return object
+     * @throws InvalidConfigException
      */
-    protected function delete(string $channelId, string $path, array $pathArgs = [], array $data = [])
+    protected function delete(string $channelId, string $path, array $pathArgs = [], array $data = []): object
     {
         return $this->api($channelId)->delete($path, $pathArgs, $data);
     }
@@ -170,6 +176,7 @@ class Api extends Component
      *
      * @param string $channelId
      * @return PublisherAPI
+     * @throws InvalidConfigException
      */
     protected function api(string $channelId): PublisherAPI
     {
