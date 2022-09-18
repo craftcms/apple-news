@@ -9,6 +9,7 @@ use craft\applenews\utilities\AppleNewsInfo;
 use craft\base\Element;
 use craft\base\Model;
 use craft\elements\Entry;
+use craft\events\DefineHtmlEvent;
 use craft\events\ModelEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterElementActionsEvent;
@@ -65,7 +66,7 @@ class Plugin extends \craft\base\Plugin
         });
 
         if (Craft::$app->getRequest()->getIsCpRequest()) {
-            Craft::$app->getView()->hook('cp.entries.edit.details', [$this, 'addEditEntryPagePane']);
+            Event::on(Entry::class, Entry::EVENT_DEFINE_SIDEBAR_HTML, [$this, 'addEditEntryPagePane']);
 
             Event::on(Entry::class, Element::EVENT_REGISTER_ACTIONS, function(RegisterElementActionsEvent $e) {
                 $userSession = Craft::$app->getUser();
@@ -97,17 +98,16 @@ class Plugin extends \craft\base\Plugin
     }
 
     /**
-     * @param array $context
-     * @return string
+     * @param DefineHtmlEvent $event
      * @throws InvalidConfigException
      */
-    public function addEditEntryPagePane(array $context): string
+    public function addEditEntryPagePane(DefineHtmlEvent $event): void
     {
         /** @var Entry $entry */
-        $entry = $context['entry'];
+        $entry = $event->sender;
 
         if ($entry->getIsUnpublishedDraft()) {
-            return '';
+            return;
         }
 
         $channelManager = $this->channelManager;
@@ -122,7 +122,7 @@ class Plugin extends \craft\base\Plugin
         }
 
         if (!$channels) {
-            return '';
+            return;
         }
 
         $isDraft = $entry->getIsDraft();
@@ -131,8 +131,9 @@ class Plugin extends \craft\base\Plugin
         // Get any existing records for these channels.
         $infos = $this->articleManager->getArticleInfo($entry, array_keys($channels));
 
-        $html = '<hr><div class="meta" id="apple-news-pane">' .
-            '<h4 class="heading">' . Craft::t('apple-news', 'Apple News Channels') . '</h4>' .
+        $html = '<fieldset>' .
+            '<legend class="h6">' . Craft::t('apple-news', 'Apple News Channels') . '</legend>' .
+            '<div class="meta" id="apple-news-pane">' .
             '<div class="spinner hidden"></div>';
 
         foreach ($channels as $channelId => $channel) {
@@ -223,7 +224,7 @@ class Plugin extends \craft\base\Plugin
                 '</div>';
         }
 
-        $html .= '</div>';
+        $html .= '</div></fieldset>';
 
         $view = Craft::$app->getView();
         $view->registerAssetBundle(AppleNewsAsset::class);
@@ -243,7 +244,7 @@ new Craft.AppleNews.ArticlePane(
 EOT;
         $view->registerJs($js, View::POS_READY);
 
-        return $html;
+        $event->html .= $html;
     }
 
     /**
