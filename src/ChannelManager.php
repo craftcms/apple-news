@@ -20,7 +20,7 @@ class ChannelManager extends Component
     /**
      * @var ChannelInterface[] The channels
      */
-    private array $_channels;
+    private array $_channels = [];
 
     /**
      * Returns all the channels.
@@ -30,7 +30,7 @@ class ChannelManager extends Component
      */
     public function getChannels(): array
     {
-        if ($this->_channels !== null) {
+        if (!empty($this->_channels)) {
             return $this->_channels;
         }
 
