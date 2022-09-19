@@ -24,10 +24,10 @@ use yii\helpers\Markdown;
 abstract class Helper
 {
     /**
-     * @var HtmlConverter
+     * @var HtmlConverter|null $_htmlConverter
      * @see htmlConverter()
      */
-    private static HtmlConverter $_htmlConverter;
+    private static HtmlConverter|null $_htmlConverter = null;
 
     /**
      * Formats a language ID into the format required by the Apple News API (e.g. "en" or "en_US").
