@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+- Added Craft 4 compatibility.
+
 ### Fixed
 - Fixed a bug where translation messages weren’t getting registered for JavaScript properly.
 
