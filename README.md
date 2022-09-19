@@ -12,7 +12,7 @@ Once you’ve created a channel, you’ll need to write down its Channel ID and 
 
 ## Requirements
 
-This plugin requires Craft CMS 3.3.0 or later.
+This plugin requires Craft CMS 4.2.0 or later.
 
 ## Installation
 
@@ -36,65 +36,6 @@ composer require craftcms/apple-news
 # tell Craft to install the plugin
 ./craft install/plugin apple-news
 ```
-
-## Upgrading from Craft 2
-
-If you’re in the process of upgrading a Craft 2 project to Craft 3, follow these instructions to get Apple News back up and running:
-
-1. [Install Apple News 2.x](#installation).
-2. Move your old `craft/config/applenews.php` file to `config/`, and rename it to `apple-news.php`.
-3. Move your old `craft/applenewschannels/` folder to `config/`, and rename it to `apple-news-channels/`.
-4. Update your channel and article classes within `craft/apple-news-channels/` to follow Craft 3 plugin standards (see [Updating Plugins for Craft 3](https://docs.craftcms.com/v3/extend/updating-plugins.html)) and comply with the new `craft\applenews\ArticleInterface`.
-   - Give your classes an `applenewschannels` PHP namespace.
-     ```php
-     <?php
-     namespace applenewschannels;
-     // ...
-     ```
-   - Update class names:
-
-     | Old                          | New                                |
-     | ---------------------------- | ---------------------------------- |
-     | `Craft\AppleNewsArticle`     | `craft\applenews\Article`          |
-     | `Craft\AppleNewsHelper`      | `craft\applenews\Helper`           |
-     | `Craft\AssetFileModel`       | `craft\elements\Asset`             |
-     | `Craft\BaseAppleNewsChannel` | `craft\applenews\BaseChannel`      |
-     | `Craft\DateTimeHelper`       | `craft\helpers\DateTimeHelper`     |
-     | `Craft\EntryModel`           | `craft\elements\Entry`             |
-     | `Craft\IAppleNewsArticle`    | `craft\applenews\ArticleInterface` |
-     | `Craft\MatrixBlockModel`     | `craft\elements\MatrixBlock`       |
-     | `Craft\RichTextData`         | `craft\redactor\FieldData`         |
-
-   - Add `->all()` calls to any element queries before looping through the results, and replace `->first()` calls with `->one()`.
-   - Replace any `locale` checks with `site->handle` checks.
-     ```php
-     // Old
-     if ($entry->locale === 'en') {
-
-     // New
-     if ($entry->site->handle === 'default') {
-     ```
-   - Add `STATUS_` to the beginning of entry status constant names.
-   - Update the method signatures in your channel classes to match `craft\applenews\ArticleInterface`.
-     ```php
-     public function matchEntry(\craft\elements\Entry $entry): bool
-
-     public function canPublish(\craft\elements\Entry $entry): bool
-
-     public function createArticle(\craft\elements\Entry $entry): \craft\applenews\ArticleInterface
-     ```
-5. Add a new [autoload root](https://getcomposer.org/doc/04-schema.md#autoload)  to `composer.json` for your channel and article classes, and then run `composer dump-autoload`.
-   ```json
-   {
-       "autoload": {
-           "psr-4": {
-               "applenewschannels\\": "config/apple-news-channels/"
-           }
-       }
-   }
-   ```
-
-
 ## Configuration
 
 Publish to Apple News gets its own configuration file, located at `config/apple-news.php`. It can have the following config settings:
@@ -111,9 +52,9 @@ return [
     'channels' => [
         [
             'class' => applenewschannels\MyNewsChannel::class,
-            'channelId' => getenv('NEWS_CHANNEL_ID'), // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-            'apiKeyId' => getenv('NEWS_API_KEY'),     // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-            'apiSecret' => getenv('NEWS_API_SECRET'), // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            'channelId' => craft\helpers\App::env('NEWS_CHANNEL_ID'), // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+            'apiKeyId' => craft\helpers\App::env('NEWS_API_KEY'),     // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+            'apiSecret' => craft\helpers\App::env('NEWS_API_SECRET'), // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         ],
     ],
 ];
@@ -135,7 +76,7 @@ An example channel class is provided at [apple-news-channels/MyNewsChannel.php](
 
 ### Autoloading your Channel Classes
 
-To make your channel classes autoloadable, add a new [autoload root](https://getcomposer.org/doc/04-schema.md#autoload)  to `composer.json` for your channel and article classes, and then run `composer dump-autoload`.
+To make your channel classes auto-loadable, add a new [autoload root](https://getcomposer.org/doc/04-schema.md#autoload)  to `composer.json` for your channel and article classes, and then run `composer dump-autoload`.
 
 ```json
 {
