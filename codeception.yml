@@ -1,0 +1,36 @@
+actor: Tester
+paths:
+  tests: tests
+  log: tests/_output
+  data: tests/_data
+  support: tests/_support
+  envs: tests/_envs
+bootstrap: _bootstrap.php
+coverage:
+  enabled: true
+  include:
+    - src/*
+  exclude:
+    - src/assets/*
+    - src/migrations/*
+    - src/templates/*
+    - tests/*
+    - vendor/*
+params:
+  - env
+  - tests/.env
+modules:
+  config:
+    \craft\test\Craft:
+      configFile: 'tests/_craft/config/test.php'
+      entryUrl: 'http://test.craftcms.test/index.php'
+      projectConfig: {}
+      migrations: []
+      plugins:
+        commerce:
+          class: '\craft\applenews\Plugin'
+          handle: apple-news
+      cleanup: true
+      transaction: true
+      dbSetup: {clean: true, setupCraft: true}
+      fullMock: false

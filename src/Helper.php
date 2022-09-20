@@ -6,7 +6,6 @@ use craft\base\Field;
 use craft\base\FieldInterface;
 use craft\elements\Entry;
 use craft\errors\InvalidFieldException;
-use craft\helpers\Html;
 use craft\helpers\Search;
 use craft\redactor\FieldData;
 use DOMDocument;
