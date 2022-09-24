@@ -37,7 +37,7 @@ jobs:
     strategy:
       matrix:
         operating-system: [ 'ubuntu-latest' ]
-        php_versions: [ "8.0", "8.1" ]
+        php-versions: [ "8.0", "8.1" ]
         db: [ 'mysql', 'pgsql' ]
 
     name: PHP ${{ matrix.php-versions }} on ${{ matrix.db }}
