@@ -1,0 +1,33 @@
+name: ci
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --no-ansi --no-progress
+
+      - name: Run ECS checks
+        run: composer run check-cs
+
+      - name: PHPStan
+        run: composer run phpstan
+
+      - name: Notify
+        if: ${{ failure() }}
+        uses: appleboy/discord-action@0.0.3
+        with:
+          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+          message: Build failed for ${{ github.repository }}
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
