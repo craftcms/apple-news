@@ -24,11 +24,11 @@ jobs:
       - name: PHPStan
         run: composer run phpstan
 
-      - name: Notify
-        if: ${{ failure() }}
+      - name: Discord Notification
+        if: ${{ always() }}
         uses: appleboy/discord-action@0.0.3
         with:
           webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
           webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
-          message: Build failed for ${{ github.repository }}
+          message: ${{ job.name }} ${{ job.status }}
             ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
