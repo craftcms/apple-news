@@ -22,14 +22,27 @@ jobs:
       - name: PHPStan
         run: composer run phpstan
 
-      - name: Discord Notification
-        if: ${{ always() }}
+      - name: Discord Success
+        if: ${{ success() }}
+        uses: appleboy/discord-action@0.0.3
+        with:
+          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+          color: "#00ff00"
+          message: |
+            Job Succeeded 🧘
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      - name: Discord Failure
+        if: ${{ failure() }}
         uses: appleboy/discord-action@0.0.3
         with:
           webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
           webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
           color: "#FF0000"
-          message: "[Job status](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}): **${{ job.status }}**"
+          message: |
+            Job Failed 🫠
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
   tests:
     runs-on: ${{ matrix.operating-system }}
