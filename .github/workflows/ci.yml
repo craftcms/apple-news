@@ -29,8 +29,7 @@ jobs:
           webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
           webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
           color: "#FF0000"
-          message: "Job status: **${{ job.status }}**"
-            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          message: "[Job status](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}): **${{ job.status }}**"
 
   tests:
     runs-on: ${{ matrix.operating-system }}
