@@ -73,10 +73,10 @@ class Api extends Component
      *
      * @param string $channelId
      * @param array $params
-     * @return stdClass[]
+     * @return stdClass
      * @throws InvalidConfigException
      */
-    public function search(string $channelId, array $params = []): array
+    public function search(string $channelId, array $params = []): stdClass
     {
         return $this->get($channelId, '/channels/{channel_id}/articles', [
             'channel_id' => $channelId,
