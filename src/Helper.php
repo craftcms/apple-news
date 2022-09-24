@@ -341,7 +341,7 @@ abstract class Helper
         }
 
         return self::$_htmlConverter = new HtmlConverter([
-            'strip_tags' => true
+            'strip_tags' => true,
         ]);
     }
 }

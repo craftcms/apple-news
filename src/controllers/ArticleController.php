@@ -130,7 +130,7 @@ class ArticleController extends Controller
 
         if ($draftId) {
             $query->draftId($draftId);
-        } else if ($revisionId) {
+        } elseif ($revisionId) {
             $query->revisionId($revisionId);
         } else {
             $query->id($entryId);

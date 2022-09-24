@@ -211,7 +211,7 @@ class Plugin extends \craft\base\Plugin
 
             if ($isDraft) {
                 $downloadUrlParams['draftId'] = $entry->draftId;
-            } else if ($isRevision) {
+            } elseif ($isRevision) {
                 $downloadUrlParams['revisionId'] = $entry->revisionId;
             }
 

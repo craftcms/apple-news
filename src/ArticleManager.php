@@ -47,7 +47,7 @@ class ArticleManager extends Component
         $this->generator = [
             'generatorIdentifier' => 'CraftCMS',
             'generatorName' => 'Craft CMS',
-            'generatorVersion' => Craft::$app->getVersion() . " ($plugin->name $plugin->version)"
+            'generatorVersion' => Craft::$app->getVersion() . " ($plugin->name $plugin->version)",
         ];
     }
 
@@ -131,7 +131,7 @@ class ArticleManager extends Component
                     $channelIds[] = $channel->getChannelId();
                 }
             }
-        } else if (!is_array($channelIds)) {
+        } elseif (!is_array($channelIds)) {
             $channelIds = [$channelIds];
         }
 
@@ -219,7 +219,7 @@ class ArticleManager extends Component
             $data = [
                 'files' => $article->getFiles(),
                 'metadata' => !empty($metadata) ? Json::encode(['data' => $metadata]) : null,
-                'json' => Json::encode($content)
+                'json' => Json::encode($content),
             ];
 
             // Publish the article
@@ -238,7 +238,7 @@ class ArticleManager extends Component
                         'channelId' => $channelId,
                         'articleId' => $response->data->id,
                     ]);
-                } else if (!$articleRecord->articleId) {
+                } elseif (!$articleRecord->articleId) {
                     $articleRecord->articleId = $response->data->id;
                 }
                 $this->updateArticleRecord($articleRecord, $response);
