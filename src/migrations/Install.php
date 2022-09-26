@@ -16,7 +16,7 @@ class Install extends Migration
     /**
      * @inheritdoc
      */
-    public function safeUp()
+    public function safeUp(): bool
     {
         $this->createTable('{{%applenews_articles}}', [
             'id' => $this->primaryKey(),
@@ -37,13 +37,16 @@ class Install extends Migration
         $this->createIndex(null, '{{%applenews_articles}}', ['entryId', 'channelId'], true);
         $this->createIndex(null, '{{%applenews_articles}}', ['entryId', 'channelId', 'state']);
         $this->addForeignKey(null, '{{%applenews_articles}}', ['entryId'], Table::ENTRIES, ['id'], 'CASCADE');
+
+        return true;
     }
 
     /**
      * @inheritdoc
      */
-    public function safeDown()
+    public function safeDown(): bool
     {
         $this->dropTableIfExists('{{%applenews_articles}}');
+        return true;
     }
 }

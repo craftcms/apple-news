@@ -76,6 +76,7 @@ class ArticleController extends Controller
      * Returns the latest info about an entry's articles
      *
      * @return Response
+     * @throws BadRequestHttpException
      * @throws ForbiddenHttpException
      * @throws InvalidConfigException
      * @throws BadRequestHttpException
@@ -136,7 +137,7 @@ class ArticleController extends Controller
             $query->id($entryId);
         }
 
-        /** @var Entry $entry */
+        /** @var ?Entry $entry */
         $entry = $query->one();
 
         /** @phpstan-ignore-next-line */

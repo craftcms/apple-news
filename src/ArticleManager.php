@@ -58,6 +58,7 @@ class ArticleManager extends Component
      * @param string|string[]|null $channelId The channel ID(s) to limit the query to
      * @param bool $refresh Whether the info should be refreshed for articles that are processing
      * @return array[] The info, indexed by channel ID
+     * @throws InvalidConfigException
      */
     public function getArticleInfo(Entry $entry, array|string $channelId = null, bool $refresh = false): array
     {
@@ -85,8 +86,8 @@ class ArticleManager extends Component
             $infos[$record->channelId] = [
                 'articleId' => $record->articleId,
                 'revisionId' => $record->revisionId,
-                'isSponsored' => (bool)$record->isSponsored,
-                'isPreview' => (bool)$record->isPreview,
+                'isSponsored' => $record->isSponsored,
+                'isPreview' => $record->isPreview,
                 'state' => $record->state,
                 'shareUrl' => $record->shareUrl,
             ];
@@ -118,7 +119,7 @@ class ArticleManager extends Component
      * Queues an entry up to be published on Apple News
      *
      * @param Entry $entry The entry to be published
-     * @param string|string[]|null $channelIds The Apple News channel ID(s) that the entry should be published to
+     * @param array|null $channelIds The Apple News channel ID(s) that the entry should be published to
      * @throws InvalidConfigException
      */
     public function queue(Entry $entry, array|string $channelIds = null): void
@@ -170,12 +171,12 @@ class ArticleManager extends Component
      * Publishes an article to Apple News.
      *
      * @param Entry $entry The entry to be published
-     * @param string|string[]|null $channelIds The Apple News channel ID(s) to publish the entry to
+     * @param array|string|null $channelIds The Apple News channel ID(s) to publish the entry to
      * @throws InvalidConfigException
      */
     public function publish(Entry $entry, array|string $channelIds = null): void
     {
-        if (is_string($channelIds)) {
+        if ($channelIds && is_string($channelIds)) {
             $channelIds = [$channelIds];
         }
 
@@ -250,8 +251,10 @@ class ArticleManager extends Component
      * Deletes an article on Apple News.
      *
      * @param Entry $entry
-     * @param string|string[]|null $channelIds The Apple News channel ID(s) to delete the entry from
+     * @param null $channelIds The Apple News channel ID(s) to delete the entry from
+     * @throws InvalidConfigException
      * @throws StaleObjectException
+     * @throws \Throwable
      */
     public function delete(Entry $entry, array|string $channelIds = null): void
     {

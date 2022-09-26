@@ -23,6 +23,8 @@ class m190917_173453_v2_upgrade extends Migration
         $this->alterColumn('{{%applenews_articles}}', 'revisionId', $this->integer());
         $this->alterColumn('{{%applenews_articles}}', 'state', $this->string()->notNull());
         $this->createIndex(null, '{{%applenews_articles}}', ['entryId', 'channelId', 'state']);
+
+        return true;
     }
 
     /**

@@ -19,7 +19,6 @@ use craft\helpers\Json;
 use craft\helpers\UrlHelper;
 use craft\services\Utilities;
 use craft\web\UrlManager;
-use craft\web\View;
 use yii\base\Event;
 use yii\base\InvalidConfigException;
 
@@ -100,6 +99,7 @@ class Plugin extends \craft\base\Plugin
     /**
      * @param DefineHtmlEvent $event
      * @throws InvalidConfigException
+	 * @return void
      */
     public function addEditEntryPagePane(DefineHtmlEvent $event): void
     {
@@ -242,7 +242,7 @@ new Craft.AppleNews.ArticlePane(
     $infosJs
 );
 EOT;
-        $view->registerJs($js, View::POS_READY);
+        $view->registerJs($js);
 
         $event->html .= $html;
     }

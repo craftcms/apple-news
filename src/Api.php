@@ -20,6 +20,7 @@ class Api extends Component
      *
      * @param string $channelId
      * @return stdClass
+     * @throws InvalidConfigException
      */
     public function channel(string $channelId): stdClass
     {
@@ -33,6 +34,7 @@ class Api extends Component
      *
      * @param string $channelId
      * @return stdClass
+     * @throws InvalidConfigException
      */
     public function sections(string $channelId): stdClass
     {
@@ -62,6 +64,7 @@ class Api extends Component
      * @param string $channelId
      * @param string $articleId
      * @return stdClass
+     * @throws InvalidConfigException
      */
     public function article(string $channelId, string $articleId): stdClass
     {
@@ -89,6 +92,7 @@ class Api extends Component
      * @param string $channelId
      * @param array $data
      * @return stdClass
+     * @throws InvalidConfigException
      */
     public function createArticle(string $channelId, array $data): stdClass
     {
@@ -104,6 +108,7 @@ class Api extends Component
      * @param string $articleId
      * @param array $data
      * @return stdClass
+     * @throws InvalidConfigException
      */
     public function updateArticle(string $channelId, string $articleId, array $data): stdClass
     {
@@ -118,6 +123,7 @@ class Api extends Component
      * @param string $channelId
      * @param string $articleId
      * @return stdClass
+     * @throws InvalidConfigException
      */
     public function deleteArticle(string $channelId, string $articleId): stdClass
     {
