@@ -21,4 +21,9 @@ class Settings extends Model
      * @var bool
      */
     public bool $autoPublishOnSave = true;
+
+    /**
+     * @var int
+     */
+    public int $httpClientTimeout = 30;
 }

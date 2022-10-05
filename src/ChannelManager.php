@@ -18,9 +18,9 @@ use yii\base\InvalidConfigException;
 class ChannelManager extends Component
 {
     /**
-     * @var ChannelInterface[] The channels
+     * @var ChannelInterface[]|null The channels
      */
-    private array $_channels = [];
+    private ?array $_channels;
 
     /**
      * Returns all the channels.
@@ -30,7 +30,7 @@ class ChannelManager extends Component
      */
     public function getChannels(): array
     {
-        if (!empty($this->_channels)) {
+        if ($this->_channels !== null) {
             return $this->_channels;
         }
 

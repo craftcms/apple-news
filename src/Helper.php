@@ -26,7 +26,7 @@ abstract class Helper
      * @var HtmlConverter|null $_htmlConverter
      * @see htmlConverter()
      */
-    private static HtmlConverter|null $_htmlConverter = null;
+    private static ?HtmlConverter $_htmlConverter;
 
     /**
      * Formats a language ID into the format required by the Apple News API (e.g. "en" or "en_US").

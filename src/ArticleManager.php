@@ -251,8 +251,8 @@ class ArticleManager extends Component
      * Deletes an article on Apple News.
      *
      * @param Entry $entry
-     * @param null $channelIds The Apple News channel ID(s) to delete the entry from
-     * @throws InvalidConfigException
+     * @param string|string[]|null $channelIds The Apple News channel ID(s) to delete the entry from
+     * @throws StaleObjectException|InvalidConfigException
      * @throws StaleObjectException
      * @throws \Throwable
      */

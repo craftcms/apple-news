@@ -3,6 +3,7 @@
 namespace craft\applenews;
 
 use ChapterThree\AppleNewsAPI\PublisherAPI;
+use Curl\Curl;
 use stdClass;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -76,10 +77,10 @@ class Api extends Component
      *
      * @param string $channelId
      * @param array $params
-     * @return stdClass
+     * @return object
      * @throws InvalidConfigException
      */
-    public function search(string $channelId, array $params = []): stdClass
+    public function search(string $channelId, array $params = []): object
     {
         return $this->get($channelId, '/channels/{channel_id}/articles', [
             'channel_id' => $channelId,
@@ -91,10 +92,10 @@ class Api extends Component
      *
      * @param string $channelId
      * @param array $data
-     * @return stdClass
+     * @return object
      * @throws InvalidConfigException
      */
-    public function createArticle(string $channelId, array $data): stdClass
+    public function createArticle(string $channelId, array $data): object
     {
         return $this->post($channelId, '/channels/{channel_id}/articles', [
             'channel_id' => $channelId,
@@ -107,10 +108,10 @@ class Api extends Component
      * @param string $channelId
      * @param string $articleId
      * @param array $data
-     * @return stdClass
+     * @return object
      * @throws InvalidConfigException
      */
-    public function updateArticle(string $channelId, string $articleId, array $data): stdClass
+    public function updateArticle(string $channelId, string $articleId, array $data): object
     {
         return $this->post($channelId, '/articles/{article_id}', [
             'article_id' => $articleId,
@@ -122,10 +123,10 @@ class Api extends Component
      *
      * @param string $channelId
      * @param string $articleId
-     * @return stdClass
+     * @return object
      * @throws InvalidConfigException
      */
-    public function deleteArticle(string $channelId, string $articleId): stdClass
+    public function deleteArticle(string $channelId, string $articleId): object
     {
         return $this->delete($channelId, '/articles/{article_id}', [
             'article_id' => $articleId,
@@ -187,6 +188,11 @@ class Api extends Component
     protected function api(string $channelId): PublisherAPI
     {
         $channel = Plugin::getInstance()->channelManager->getChannelById($channelId);
-        return new PublisherAPI($channel->getApiKeyId(), $channel->getApiSecret(), 'https://news-api.apple.com');
+        $publisherApi = new PublisherAPI($channel->getApiKeyId(), $channel->getApiSecret(), 'https://news-api.apple.com');
+
+        $client = new Curl;
+        $client->setTimeout(Plugin::getInstance()->getSettings()->httpClientTimeout);
+        $publisherApi->client = $client;
+        return $publisherApi;
     }
 }

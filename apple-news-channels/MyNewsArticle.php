@@ -28,7 +28,7 @@ class MyNewsArticle extends Article
     /**
      * Initializes the article
      */
-    public function init()
+    public function init(): void
     {
         // Assign some commonly-used properties
         // ---------------------------------------------------------------------
@@ -52,7 +52,6 @@ class MyNewsArticle extends Article
             'version' => '1.1',
             'identifier' => $this->entry->id,
             'title' => $this->entry->title,
-            //'subtitle' => 'Non occidere quae cumque vi ventia',
             'language' => Helper::formatLanguage($this->entry->site->language),
             'layout' => [
                 'columns' => 12,
@@ -85,7 +84,7 @@ class MyNewsArticle extends Article
     /**
      * @return array
      */
-    protected function getComponents()
+    protected function getComponents(): array
     {
         $components = [];
 
@@ -260,7 +259,7 @@ class MyNewsArticle extends Article
      *
      * @return array
      */
-    protected function getHeaderWithFeaturedImage()
+    protected function getHeaderWithFeaturedImage(): array
     {
         return [
             'role' => 'section',
@@ -343,7 +342,7 @@ class MyNewsArticle extends Article
      *
      * @return array
      */
-    protected function getPlainTextHeader()
+    protected function getPlainTextHeader(): array
     {
         return [
             'role' => 'section',
@@ -371,7 +370,7 @@ class MyNewsArticle extends Article
     /**
      * @return array
      */
-    protected function getComponentLayouts()
+    protected function getComponentLayouts(): array
     {
         return [
             'headerLayout' => [
@@ -447,7 +446,7 @@ class MyNewsArticle extends Article
     /**
      * @return array
      */
-    protected function getComponentStyles()
+    protected function getComponentStyles(): array
     {
         return [
             'captionContainerStyle' => ['backgroundColor' => '#EEEEEE'],
@@ -458,7 +457,7 @@ class MyNewsArticle extends Article
     /**
      * @return array
      */
-    protected function getComponentTextStyles()
+    protected function getComponentTextStyles(): array
     {
         if ($this->featuredImageUrl) {
             $titleTextColor = '#FFF';
