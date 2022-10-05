@@ -4,6 +4,7 @@
 
 ### Added
 - Added Craft 4 compatibility.
+- Added the `httpClientTimeout` setting to configure how long API requests would wait before timing out. ([#13](https://github.com/craftcms/apple-news/issues/13))
 
 ### Fixed
 - Fixed a bug where translation messages weren’t getting registered for JavaScript properly.
