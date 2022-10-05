@@ -99,7 +99,7 @@ class Plugin extends \craft\base\Plugin
     /**
      * @param DefineHtmlEvent $event
      * @throws InvalidConfigException
-	 * @return void
+     * @return void
      */
     public function addEditEntryPagePane(DefineHtmlEvent $event): void
     {

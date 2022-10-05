@@ -190,7 +190,7 @@ class Api extends Component
         $channel = Plugin::getInstance()->channelManager->getChannelById($channelId);
         $publisherApi = new PublisherAPI($channel->getApiKeyId(), $channel->getApiSecret(), 'https://news-api.apple.com');
 
-        $client = new Curl;
+        $client = new Curl();
         $client->setTimeout(Plugin::getInstance()->getSettings()->httpClientTimeout);
         $publisherApi->client = $client;
         return $publisherApi;

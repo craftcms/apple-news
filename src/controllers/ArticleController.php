@@ -140,7 +140,6 @@ class ArticleController extends Controller
         /** @var ?Entry $entry */
         $entry = $query->one();
 
-        /** @phpstan-ignore-next-line */
         if (!$entry) {
             throw new BadRequestHttpException();
         }
