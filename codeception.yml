@@ -22,8 +22,8 @@ params:
 modules:
   config:
     \craft\test\Craft:
-      configFile: 'tests/_craft/config/test.php'
-      entryUrl: 'http://test.craftcms.test/index.php'
+      configFile: "tests/_craft/config/test.php"
+      entryUrl: "http://test.craftcms.test/index.php"
       projectConfig: {}
       migrations: []
       plugins:
@@ -32,5 +32,5 @@ modules:
           handle: apple-news
       cleanup: true
       transaction: true
-      dbSetup: {clean: true, setupCraft: true}
+      dbSetup: { clean: true, setupCraft: true }
       fullMock: false

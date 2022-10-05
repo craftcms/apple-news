@@ -38,6 +38,7 @@ composer require craftcms/apple-news
 # tell Craft to install the plugin
 ./craft install/plugin apple-news
 ```
+
 ## Configuration
 
 Publish to Apple News gets its own configuration file, located at `config/apple-news.php`. It can have the following config settings:
@@ -78,15 +79,15 @@ An example channel class is provided at [apple-news-channels/MyNewsChannel.php](
 
 ### Autoloading your Channel Classes
 
-To make your channel classes auto-loadable, add a new [autoload root](https://getcomposer.org/doc/04-schema.md#autoload)  to `composer.json` for your channel and article classes, and then run `composer dump-autoload`.
+To make your channel classes auto-loadable, add a new [autoload root](https://getcomposer.org/doc/04-schema.md#autoload) to `composer.json` for your channel and article classes, and then run `composer dump-autoload`.
 
 ```json
 {
-   "autoload": {
-       "psr-4": {
-           "applenewschannels\\": "config/apple-news-channels/"
-       }
-   }
+  "autoload": {
+    "psr-4": {
+      "applenewschannels\\": "config/apple-news-channels/"
+    }
+  }
 }
 ```
 
