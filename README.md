@@ -1,5 +1,3 @@
-[![codecov](https://codecov.io/gh/craftcms/apple-news/branch/3.0/graph/badge.svg?token=InfTCEvnQt)](https://codecov.io/gh/craftcms/apple-news)
-
 <p align="center"><img src="./src/icon.svg" width="100" height="100" alt="Apple News icon"></p>
 
 <h1 align="center">Apple News</h1>
@@ -14,7 +12,7 @@ Once you’ve created a channel, you’ll need to write down its Channel ID and 
 
 ## Requirements
 
-This plugin requires Craft CMS 4.2.0 or later.
+This plugin requires Craft CMS 4.0.0 or later.
 
 ## Installation
 
