@@ -1,155 +1,44 @@
 name: ci
-
 on:
   workflow_dispatch:
   pull_request:
   push:
     branches:
       - main
-
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Install Composer dependencies
-        run: composer install --no-interaction --no-ansi --no-progress
-
-      - name: Run ECS checks
-        run: composer run check-cs
-
-      - name: PHPStan
-        run: composer run phpstan
-
-      - name: Notify
-        if: ${{ success() }}
-        uses: appleboy/discord-action@0.0.3
-        with:
-          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
-          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
-          color: "#00ff00"
-          message: |
-            Job Succeeded 🧘
-            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-      - name: Discord Failure
-        if: ${{ failure() }}
-        uses: appleboy/discord-action@0.0.3
-        with:
-          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
-          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
-          message: Build failed for ${{ github.repository }}
-          message: |
-            Job Failed 🫠
-            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-  tests:
-    runs-on: ${{ matrix.operating-system }}
-
-    strategy:
-      matrix:
-        operating-system: [ 'ubuntu-latest' ]
-        php-versions: [ "8.0", "8.1" ]
-        db: [ 'mysql', 'pgsql' ]
-
-    name: PHP ${{ matrix.php-versions }} on ${{ matrix.db }}
-    env:
-      PHP_EXTENSIONS: ctype,curl,dom,iconv,imagick,intl,json,mbstring,openssl,pcre,pdo,reflection,spl,zip
-
-    services:
-
-      # Install Postgres
-      pgsql:
-        image: postgres:latest
-        env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: mysecretpassword
-          POSTGRES_DB: craft_test
-        ports:
-          - 5432:5432
-        # Set health checks to wait until Postgres has started
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
-
-      # Install MySQL
-      mysql:
-        image: bitnami/mysql:latest
-        env:
-          MYSQL_ROOT_PASSWORD: mysecretpassword
-          MYSQL_DATABASE: craft_test
-          MYSQL_AUTHENTICATION_PLUGIN: mysql_native_password
-        # Set health checks to wait until mysql has started
-        options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 5
-        ports:
-          - 3306:3306
-
-    steps:
-
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Set default test command environment variable
-        run: |
-          echo "TEST_COMMAND=./vendor/bin/codecept run unit --fail-fast" >> $GITHUB_ENV
-      - name: Set test command for the code coverage environment
-        run: |
-          echo "TEST_COMMAND=./vendor/bin/codecept run unit --fail-fast --coverage-xml coverage.xml;" >> $GITHUB_ENV
-        if: ${{ matrix.php-versions == '8.0' && matrix.db == 'mysql' }}
-
-      - name: Setup cache environment
-        id: extcache
-        uses: shivammathur/cache-extensions@257e3c93fb0a7d302495902b976b1d0245123b59
-        with:
-          php-version: ${{ matrix.php-versions }}
-          extensions: ${{ env.PHP_EXTENSIONS }}
-          key: extension-cache-v4 # change to clear the extension cache.
-
-      - name: Cache extensions
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.extcache.outputs.dir }}
-          key: ${{ steps.extcache.outputs.key }}
-          restore-keys: ${{ steps.extcache.outputs.key }}
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@verbose
-        with:
-          php-version: ${{ matrix.php-versions }}
-          extensions: ${{ env.PHP_EXTENSIONS }}
-          ini-values: post_max_size=256M, max_execution_time=180, memory_limit=512M
-          tools: composer:v2
-        env:
-          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Print PHP version
-        run: echo ${{ steps.setup-php.outputs.php-version }}
-
-      - name: Setup problem matchers for PHP
-        run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
-
-      - name: Copy tests .env
-        run: cp ./tests/.env.example.${{ matrix.db }} ./tests/.env
-
-      - name: Update .env creds
-        run: sed -i 's/DB_PASSWORD=/DB_PASSWORD=mysecretpassword/' tests/.env
-
-      - name: Cache Composer dependencies
-        id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-      - uses: actions/cache@v3
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-
-
-      - name: Install Composer dependencies
-        run: composer install --no-interaction --no-ansi --no-progress
-
-      - name: Run tests
-        run: ${{ env.TEST_COMMAND }}
-
-      # Only upload code coverage if PHP 8.0 and MySQL are selected
-      - name: Upload coverage to Codecov
-        if: ${{ matrix.php-versions == '8.0' && matrix.db == 'mysql' }}
-        uses: codecov/codecov-action@v2
+  ecs:
+    name: ECS
+    uses: craftcms/.github/.github/workflows/ecs.yml@v2
+    with:
+      php_version: '8.0'
+  phpstan:
+    name: PHPStan
+    uses: craftcms/.github/.github/workflows/phpstan.yml@v2
+    with:
+      php_version: '8.0'
+  prettier:
+    name: Prettier
+    uses: craftcms/.github/.github/workflows/prettier.yml@v2
+  codecept:
+    name: Codeception
+    needs: [ ecs, phpstan, prettier ]
+    uses: craftcms/.github/.github/workflows/codecept.yml@v2
+    with:
+      php_versions: '["8.0", "8.1"]'
+  notify-slack:
+    name: Notify Slack
+    needs: [ ecs, phpstan, prettier, codecept ]
+    if: ${{ always() }}
+    uses: craftcms/.github/.github/workflows/notify-slack.yml@v2
+    with:
+      success: ${{ needs.ecs.result == 'success' && needs.phpstan.result == 'success' && needs.prettier.result == 'success' && needs.codecept.result == 'success' }}
+      failure: ${{ needs.ecs.result == 'failure' || needs.phpstan.result == 'failure' || needs.prettier.result == 'failure' || needs.codecept.result == 'failure' }}
+      failure_text_prefix: <!subteam^S01CWPYH9D5>
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+      slack_webhook_url: ${{ secrets.SLACK_COMMERCE_WEBHOOK_URL }}
