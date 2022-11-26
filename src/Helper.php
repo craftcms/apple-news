@@ -71,7 +71,6 @@ abstract class Helper
                 $keywords = array_merge($keywords, array_filter(preg_split('/[\s\n\r]/', $fieldKeywords)));
 
                 // Out of room?
-                /** @phpstan-ignore-next-line */
                 if (count($keywords) >= 50) {
                     array_splice($keywords, 50);
                     break;
