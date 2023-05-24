@@ -20,7 +20,7 @@ class ChannelManager extends Component
     /**
      * @var ChannelInterface[]|null The channels
      */
-    private ?array $_channels;
+    private ?array $_channels = null;
 
     /**
      * Returns all the channels.
