@@ -1,6 +1,6 @@
 # Release Notes for Apple News for Craft CMS
 
-## Unreleased
+## 3.0.1 - 2023-05-26
 
 ### Fixed
 
