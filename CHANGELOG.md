@@ -1,5 +1,11 @@
 # Release Notes for Apple News for Craft CMS
 
+## Unreleased
+
+### Fixed
+
+- Fixed a PHP 8 compatibility error. ([#22](https://github.com/craftcms/apple-news/pull/22))
+
 ## 3.0.0.1 - 2022-10-04
 
 ### Fixed
