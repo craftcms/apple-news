@@ -335,7 +335,7 @@ abstract class Helper
      */
     protected static function htmlConverter(): HtmlConverter
     {
-        if (self::$_htmlConverter !== null) {
+        if (!empty(self::$_htmlConverter)) {
             return self::$_htmlConverter;
         }
 
