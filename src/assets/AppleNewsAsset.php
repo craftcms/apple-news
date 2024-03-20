@@ -3,6 +3,7 @@
 namespace craft\applenews\assets;
 
 use craft\web\AssetBundle;
+use craft\web\assets\cp\CpAsset;
 use craft\web\View;
 
 class AppleNewsAsset extends AssetBundle
@@ -10,7 +11,14 @@ class AppleNewsAsset extends AssetBundle
     /**
      * @inheritdoc
      */
-    public $sourcePath = __DIR__ . '/dist';
+    public $sourcePath = '@craft/applenews/assets/dist';
+
+    /**
+     * @inheritdoc
+     */
+    public $depends = [
+        CpAsset::class,
+    ];
 
     /**
      * @inheritdoc

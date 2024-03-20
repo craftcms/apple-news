@@ -12,7 +12,7 @@ Once you’ve created a channel, you’ll need to write down its Channel ID and 
 
 ## Requirements
 
-This plugin requires Craft CMS 4.0.0 or later.
+This plugin requires Craft CMS 5.0.0+.
 
 ## Installation
 

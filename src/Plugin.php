@@ -80,9 +80,13 @@ class Plugin extends \craft\base\Plugin
                 }
             });
 
-            Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES, function(RegisterComponentTypesEvent $e) {
-                $e->types[] = AppleNewsInfo::class;
-            });
+            Event::on(
+                Utilities::class,
+                Utilities::EVENT_REGISTER_UTILITIES,
+                function(RegisterComponentTypesEvent $e) {
+                    $e->types[] = AppleNewsInfo::class;
+                }
+            );
         }
     }
 

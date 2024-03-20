@@ -24,22 +24,23 @@
     "rss": "https://github.com/craftcms/apple-news/commits/master.atom"
   },
   "require": {
-    "php": "^8.0.2",
-    "craftcms/cms": "^4.2.0",
+    "php": "^8.2.0",
+    "craftcms/cms": "^5.0.0-beta.1",
     "chapter-three/apple-news-api": "^0.3.9",
-    "league/html-to-markdown": "^4.2"
+    "league/html-to-markdown": "^5.0"
   },
   "require-dev": {
     "craftcms/ecs": "dev-main",
     "craftcms/phpstan": "dev-main",
     "craftcms/rector": "dev-main",
     "craftcms/redactor": "*",
-    "codeception/codeception": "^4.0.0",
-    "codeception/module-asserts": "^1.0.0",
-    "codeception/module-datafactory": "^1.0.0",
-    "codeception/module-phpbrowser": "^1.0.0",
-    "codeception/module-rest": "^1.0.0",
-    "codeception/module-yii2": "^1.0.0",
+    "codeception/codeception": "^5.0.11",
+    "codeception/module-asserts": "^3.0.0",
+    "codeception/module-datafactory": "^3.0.0",
+    "codeception/module-phpbrowser": "^3.0.0",
+    "symfony/browser-kit": "^6.4.0",
+    "codeception/module-rest": "^3.3.2",
+    "codeception/module-yii2": "^1.1.9",
     "vlucas/phpdotenv": "^5.4"
   },
   "autoload": {
@@ -63,6 +64,9 @@
     "documentationUrl": "https://github.com/craftcms/apple-news/blob/master/README.md"
   },
   "config": {
+    "platform": {
+      "php": "8.2"
+    },
     "allow-plugins": {
       "yiisoft/yii2-composer": true,
       "craftcms/plugin-installer": true
