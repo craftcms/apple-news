@@ -33,7 +33,7 @@
     "craftcms/ecs": "dev-main",
     "craftcms/phpstan": "dev-main",
     "craftcms/rector": "dev-main",
-    "craftcms/redactor": "*",
+    "craftcms/ckeditor": "*",
     "codeception/codeception": "^5.0.11",
     "codeception/module-asserts": "^3.0.0",
     "codeception/module-datafactory": "^3.0.0",

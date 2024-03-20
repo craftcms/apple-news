@@ -7,7 +7,7 @@ use craft\base\FieldInterface;
 use craft\elements\Entry;
 use craft\errors\InvalidFieldException;
 use craft\helpers\Search;
-use craft\redactor\FieldData;
+use craft\htmlfield\HtmlFieldData as FieldData;
 use DOMDocument;
 use DOMNode;
 use InvalidArgumentException;

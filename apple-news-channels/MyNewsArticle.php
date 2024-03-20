@@ -8,7 +8,7 @@ use craft\applenews\Helper;
 use craft\elements\Asset;
 use craft\elements\MatrixBlock;
 use craft\helpers\DateTimeHelper;
-use craft\redactor\FieldData as RedactorFieldData;
+use craft\htmlfield\HtmlFieldData;
 
 /**
  * Class MyNewsArticle
@@ -175,7 +175,7 @@ class MyNewsArticle extends Article
                     $image = $block->image->one();
                     if ($image) {
                         $imageUrl = $this->addFile($image);
-                        /** @var RedactorFieldData|null $caption */
+                        /** @var HtmlFieldData|null $caption */
                         $layout = $block->caption ? 'photoWithCaptionLayout' : 'photoLayout';
                         $photoComponents = [
                             [
