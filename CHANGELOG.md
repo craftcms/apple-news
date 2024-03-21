@@ -1,5 +1,9 @@
 # Release Notes for Apple News for Craft CMS
 
+## 4.0.0 - 2024-03-21
+
+- Apple News now requires Craft CMS 5.0.0-beta.1 or later.
+
 ## 3.0.2 - 2023-05-26
 
 - Fixed a PHP 8 compatibility error. ([#24](https://github.com/craftcms/apple-news/pull/24))
