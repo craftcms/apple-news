@@ -1,5 +1,9 @@
 # Release Notes for Apple News for Craft CMS
 
+## 4.0.1 - 2026-03-23
+
+- Fixed a bug where remote assets in an Apple News article might not be able to be downloaded.
+
 ## 4.0.0 - 2024-03-21
 
 - Apple News now requires Craft CMS 5.0.0-beta.1 or later.
