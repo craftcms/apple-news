@@ -32,8 +32,6 @@
   "require-dev": {
     "craftcms/ecs": "dev-main",
     "craftcms/phpstan": "dev-main",
-    "codeception/codeception": "^4.0.0",
-    "codeception/module-asserts": "^1.3",
     "craftcms/rector": "dev-main",
     "craftcms/redactor": "*",
     "vlucas/phpdotenv": "^5.4"
