@@ -1,6 +1,6 @@
 # Release Notes for Apple News for Craft CMS
 
-## 4.0.1 - 2026-03-23
+## Unreleased
 
 - Fixed a bug where remote assets in an Apple News article might not be able to be downloaded.
 
