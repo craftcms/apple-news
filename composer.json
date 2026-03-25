@@ -35,8 +35,9 @@
     "codeception/codeception": "^4.0.0",
     "codeception/module-asserts": "^1.3",
     "craftcms/rector": "dev-main",
-    "craftcms/redactor": "*"
-     },
+    "craftcms/redactor": "*",
+    "vlucas/phpdotenv": "^5.4"
+  },
   "autoload": {
     "psr-4": {
       "craft\\applenews\\": "src/"
