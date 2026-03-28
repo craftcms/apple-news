@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Fixed a bug where remote assets in an Apple News article might not downloaded.
+- Fixed a bug where remote assets in an Apple News article might not download.
 
 ## 3.0.2 - 2023-05-26
 
