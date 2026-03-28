@@ -18,6 +18,7 @@ class Install extends Migration
      */
     public function safeUp(): bool
     {
+        $this->archiveTableIfExists('{{%applenews_articles}}');
         $this->createTable('{{%applenews_articles}}', [
             'id' => $this->primaryKey(),
             'entryId' => $this->integer()->notNull(),
