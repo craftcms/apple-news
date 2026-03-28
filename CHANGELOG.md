@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-- Fixed a bug where remote assets in an Apple News article might not downloaded.
+- Fixed a bug where remote assets in an Apple News article might not download.
+- Fixed a SQL error that could occur during installation.
 
 ## 3.0.2 - 2023-05-26
 
