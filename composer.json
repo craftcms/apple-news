@@ -19,12 +19,12 @@
     "email": "support@craftcms.com",
     "issues": "https://github.com/craftcms/apple-news/issues?state=open",
     "source": "https://github.com/craftcms/apple-news",
-    "docs": "https://github.com/craftcms/apple-news/blob/master/README.md",
-    "rss": "https://github.com/craftcms/apple-news/commits/master.atom"
+    "docs": "https://github.com/craftcms/apple-news/blob/4.x/README.md",
+    "rss": "https://github.com/craftcms/apple-news/commits/4.x.atom"
   },
   "require": {
     "php": "^8.2.0",
-    "craftcms/cms": "^5.0.0-beta.1",
+    "craftcms/cms": "^5.0.0-beta.1|^6.0.0-alpha.1",
     "chapter-three/apple-news-api": "^0.3.9",
     "league/html-to-markdown": "^5.0"
   },
@@ -53,7 +53,7 @@
     "name": "Apple News",
     "handle": "apple-news",
     "description": "Publish entries to Apple News",
-    "documentationUrl": "https://github.com/craftcms/apple-news/blob/master/README.md"
+    "documentationUrl": "https://github.com/craftcms/apple-news/blob/4.x/README.md"
   },
   "config": {
     "platform": {

@@ -12,7 +12,7 @@ Once you’ve created a channel, you’ll need to write down its Channel ID and 
 
 ## Requirements
 
-This plugin requires Craft CMS 5.0.0+.
+This plugin requires Craft CMS 5.0.0+ or 6.0.0-alpha.1+ with the `craftcms/yii2-adapter` package.
 
 ## Installation
 
@@ -39,7 +39,7 @@ composer require craftcms/apple-news
 
 ## Configuration
 
-Publish to Apple News gets its own configuration file, located at `config/apple-news.php`. It can have the following config settings:
+Publish to Apple News gets its own configuration file, located at `config/apple-news.php` (or `config/craft/apple-news.php` if you’re using Craft CMS v6). It can have the following config settings:
 
 - `channels` _(array)_ – List of [channel class](#channel-classes) configs
 - `autoPublishOnSave` _(bool)_ – Whether entries should be automatically published to Apple News whenever they are saved (`true` by default)
@@ -63,7 +63,7 @@ return [
 
 ## Channel Classes
 
-Channel classes tell the plugin everything it needs to know to start publishing content Apple News. They should should extend [craft\applenews\BaseChannel](https://github.com/craftcms/apple-news/blob/master/src/BaseChannel.php).
+Channel classes tell the plugin everything it needs to know to start publishing content Apple News. They should extend [craft\applenews\BaseChannel](https://github.com/craftcms/apple-news/blob/master/src/BaseChannel.php).
 
 We recommend that you save your channel classes in `config/apple-news-channels` and use an `applenewschannels` namespace.
 
