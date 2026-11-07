@@ -81,7 +81,7 @@ Plugin::getInstance()->articleManager->queue($entry);
 app(\CraftCms\AppleNews\ArticleManager::class)->queue($entry);
 ```
 
-`ArticleManager::$generator` is now the `generator()` method. Methods that threw `yii\base\InvalidConfigException` for an invalid channel config now throw `UnexpectedValueException`.
+`ArticleManager::$generator` is now the `generator()` method. `ArticleManager::createArticleQuery()` was removed; use `Models\Article::query()->forEntry($entryId)->inChannels($channelIds)`. Methods that threw `yii\base\InvalidConfigException` for an invalid channel config now throw `UnexpectedValueException`.
 
 ### Apple News API client
 

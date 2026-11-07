@@ -11,7 +11,6 @@ use CraftCms\Cms\Cms;
 use CraftCms\Cms\Entry\Elements\Entry;
 use CraftCms\Cms\Support\Json;
 use Illuminate\Container\Attributes\Singleton;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use RuntimeException;
 use stdClass;
@@ -53,7 +52,7 @@ class ArticleManager
      */
     public function getArticleInfo(Entry $entry, array|string|null $channelId = null, bool $refresh = false): array
     {
-        $records = $this->createArticleQuery($entry->id, $channelId)->get();
+        $records = ArticleRecord::query()->forEntry($entry->id)->inChannels($channelId)->get();
         $infos = [];
 
         foreach ($records as $record) {
@@ -108,7 +107,7 @@ class ArticleManager
             return;
         }
 
-        $articles = $this->createArticleQuery($entry->id, $channelIds)->get()->keyBy('channelId');
+        $articles = ArticleRecord::query()->forEntry($entry->id)->inChannels($channelIds)->get()->keyBy('channelId');
 
         foreach ($channelIds as $channelId) {
             $article = $articles[$channelId] ?? new ArticleRecord([
@@ -135,7 +134,7 @@ class ArticleManager
     {
         $channels = $this->publishableChannels($entry, $channelIds);
 
-        $articleRecords = $this->createArticleQuery($entry->id, $channelIds)->get()->keyBy('channelId');
+        $articleRecords = ArticleRecord::query()->forEntry($entry->id)->inChannels($channelIds)->get()->keyBy('channelId');
 
         foreach ($articleRecords as $channelId => $articleRecord) {
             if (!isset($channels[$channelId]) && $articleRecord->state->isQueued()) {
@@ -177,7 +176,7 @@ class ArticleManager
      */
     public function delete(Entry $entry, array|string|null $channelIds = null): void
     {
-        foreach ($this->createArticleQuery($entry->id, $channelIds)->get() as $record) {
+        foreach (ArticleRecord::query()->forEntry($entry->id)->inChannels($channelIds)->get() as $record) {
             // Queued articles may not be on Apple News yet
             if ($record->articleId) {
                 $this->api->deleteArticle($record->channelId, $record->articleId);
@@ -249,23 +248,6 @@ class ArticleManager
                 $channel->canPublish($entry)
             ),
         );
-    }
-
-    /**
-     * Creates an article record query for the given entry ID and channel IDs.
-     *
-     * @param  string|string[]|null  $channelIds
-     * @return Builder<ArticleRecord>
-     */
-    protected function createArticleQuery(int $entryId, array|string|null $channelIds = null): Builder
-    {
-        $query = ArticleRecord::query()->where('entryId', $entryId);
-
-        if ($channelIds !== null) {
-            $query->whereIn('channelId', Arr::wrap($channelIds));
-        }
-
-        return $query;
     }
 
     /**

@@ -7,6 +7,9 @@ namespace CraftCms\AppleNews\Models;
 use CraftCms\AppleNews\Enums\ArticleState;
 use CraftCms\Cms\Shared\BaseModel;
 use CraftCms\Cms\Shared\Concerns\HasUid;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Arr;
 
 /**
  * An entry’s article in one Apple News channel.
@@ -22,6 +25,9 @@ use CraftCms\Cms\Shared\Concerns\HasUid;
  * @property string|null $shareUrl
  * @property string|null $response
  *
+ * @method static Builder<self> forEntry(int $entryId)
+ * @method static Builder<self> inChannels(string|string[]|null $channelIds)
+ *
  * @since 2.0
  */
 class Article extends BaseModel
@@ -30,10 +36,38 @@ class Article extends BaseModel
 
     protected $table = 'applenews_articles';
 
-    protected $casts = [
-        'entryId' => 'integer',
-        'isSponsored' => 'boolean',
-        'isPreview' => 'boolean',
-        'state' => ArticleState::class,
-    ];
+    protected function casts(): array
+    {
+        return [
+            'entryId' => 'integer',
+            'isSponsored' => 'boolean',
+            'isPreview' => 'boolean',
+            'state' => ArticleState::class,
+        ];
+    }
+
+    /**
+     * Limits the query to an entry’s articles.
+     *
+     * @param  Builder<self>  $query
+     * @return Builder<self>
+     */
+    #[Scope]
+    protected function forEntry(Builder $query, int $entryId): Builder
+    {
+        return $query->where('entryId', $entryId);
+    }
+
+    /**
+     * Limits the query to articles in the given channels. `null` means all channels.
+     *
+     * @param  Builder<self>  $query
+     * @param  string|string[]|null  $channelIds
+     * @return Builder<self>
+     */
+    #[Scope]
+    protected function inChannels(Builder $query, array|string|null $channelIds): Builder
+    {
+        return $channelIds === null ? $query : $query->whereIn('channelId', Arr::wrap($channelIds));
+    }
 }
