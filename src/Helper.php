@@ -121,7 +121,7 @@ abstract class Helper
         $html = trim($html, chr(0xC2) . chr(0xA0));
 
         // Remove comments
-        $html = preg_replace('<!--.*?-->', '', $html);
+        $html = preg_replace('/<!--.*?-->/s', '', $html);
         return static::htmlConverter()->convert($html);
     }
 
@@ -148,7 +148,7 @@ abstract class Helper
         $html = static::htmlString($html);
 
         // Remove comments
-        $html = preg_replace('<!--.*?-->', '', $html);
+        $html = preg_replace('/<!--.*?-->/s', '', $html);
 
         // Create a DOMDocument object for the HTML
         // (from HtmlConverter::convert)

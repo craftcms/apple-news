@@ -8,6 +8,7 @@
 - The “Publish to Apple News” bulk action requires the “Save entries” permission for the section.
 - Plugin settings are now read from `config/craft/apple-news.php`.
 - Article publishing now uses Laravel queue jobs (`CraftCms\AppleNews\Jobs\PublishArticleJob`).
+- Fixed a bug where HTML comments weren’t removed from HTML converted to Markdown or article components.
 
 ## 4.1.0 - 2026-03-27
 
