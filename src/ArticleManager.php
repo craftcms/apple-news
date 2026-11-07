@@ -224,7 +224,7 @@ class ArticleManager
             $response = $this->api->createArticle($channelId, $data);
         }
 
-        if (!$response instanceof stdClass || !isset($response->data)) {
+        if (!isset($response->data)) {
             throw new RuntimeException("Apple News didn’t return the article for entry $entry->id in channel $channelId.");
         }
 

@@ -4,15 +4,35 @@ declare(strict_types=1);
 
 namespace CraftCms\AppleNews;
 
-use ChapterThree\AppleNewsAPI\PublisherAPI;
-use Curl\Curl;
+use CraftCms\Cms\Asset\Elements\Asset;
 use Illuminate\Container\Attributes\Singleton;
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Http\Client\Response;
+use Illuminate\Support\Facades\Http;
+use Psr\Http\Message\RequestInterface;
 use stdClass;
+use UnexpectedValueException;
 
-/** @since 2.0 */
+/**
+ * Sends requests to the Apple News API.
+ *
+ * Every method throws {@see RequestException} when Apple News returns an error. Its response holds Apple’s error
+ * codes.
+ *
+ * @see https://developer.apple.com/documentation/applenewsapi
+ * @since 2.0
+ */
 #[Singleton]
 class Api
 {
+    public const string BASE_URL = 'https://news-api.apple.com';
+
+    /**
+     * The file types Apple News accepts in an article bundle, besides JSON.
+     */
+    private const array FILE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'application/octet-stream'];
+
     public function __construct(
         private readonly ChannelManager $channelManager,
         private readonly Settings $settings,
@@ -21,169 +41,177 @@ class Api
 
     /**
      * Returns information about a channel.
-     *
-     * @param string $channelId
-     * @return stdClass
      */
     public function channel(string $channelId): stdClass
     {
-        return $this->get($channelId, '/channels/{channel_id}', [
-            'channel_id' => $channelId,
-        ]);
+        return $this->get($channelId, "/channels/$channelId");
     }
 
     /**
      * Returns information about a channel’s sections.
-     *
-     * @param string $channelId
-     * @return stdClass
      */
     public function sections(string $channelId): stdClass
     {
-        return $this->get($channelId, '/channels/{channel_id}/sections', [
-            'channel_id' => $channelId,
-        ]);
+        return $this->get($channelId, "/channels/$channelId/sections");
     }
 
     /**
      * Returns information about a section.
-     *
-     * @param string $channelId
-     * @param string $sectionId
-     * @return stdClass
      */
     public function section(string $channelId, string $sectionId): stdClass
     {
-        return $this->get($channelId, '/sections/{section_id}', [
-            'section_id' => $sectionId,
-        ]);
+        return $this->get($channelId, "/sections/$sectionId");
     }
 
     /**
      * Returns information about an article.
-     *
-     * @param string $channelId
-     * @param string $articleId
-     * @return stdClass
      */
     public function article(string $channelId, string $articleId): stdClass
     {
-        return $this->get($channelId, '/articles/{article_id}', ['article_id' => $articleId]);
+        return $this->get($channelId, "/articles/$articleId");
     }
 
     /**
      * Searches for articles in a channel.
      *
-     * @param string $channelId
-     * @param array $params
-     * @return object
+     * @param  array<string, mixed>  $params  Query parameters
      */
-    public function search(string $channelId, array $params = []): object
+    public function search(string $channelId, array $params = []): stdClass
     {
-        return $this->get($channelId, '/channels/{channel_id}/articles', [
-            'channel_id' => $channelId,
-        ], $params);
+        return $this->get($channelId, "/channels/$channelId/articles", $params);
     }
 
     /**
      * Creates a new article.
      *
-     * @param string $channelId
-     * @param array $data
-     * @return object
+     * @param  array{json: string, metadata?: string|null, files?: array<string, string|Asset>}  $data
      */
-    public function createArticle(string $channelId, array $data): object
+    public function createArticle(string $channelId, array $data): stdClass
     {
-        return $this->post($channelId, '/channels/{channel_id}/articles', [
-            'channel_id' => $channelId,
-        ], $data);
+        return $this->post($channelId, "/channels/$channelId/articles", $data);
     }
 
     /**
      * Updates an article.
      *
-     * @param string $channelId
-     * @param string $articleId
-     * @param array $data
-     * @return object
+     * @param  array{json: string, metadata?: string|null, files?: array<string, string|Asset>}  $data
      */
-    public function updateArticle(string $channelId, string $articleId, array $data): object
+    public function updateArticle(string $channelId, string $articleId, array $data): stdClass
     {
-        return $this->post($channelId, '/articles/{article_id}', [
-            'article_id' => $articleId,
-        ], $data);
+        return $this->post($channelId, "/articles/$articleId", $data);
     }
 
     /**
      * Deletes an article.
-     *
-     * @param string $channelId
-     * @param string $articleId
-     * @return object
      */
-    public function deleteArticle(string $channelId, string $articleId): object
+    public function deleteArticle(string $channelId, string $articleId): stdClass
     {
-        return $this->delete($channelId, '/articles/{article_id}', [
-            'article_id' => $articleId,
+        return $this->decode($this->request($channelId)->delete("/articles/$articleId"));
+    }
+
+    /**
+     * Sends a GET request.
+     *
+     * @param  array<string, mixed>  $query
+     */
+    protected function get(string $channelId, string $path, array $query = []): stdClass
+    {
+        return $this->decode($this->request($channelId)->get($path, $query));
+    }
+
+    /**
+     * Sends an article as a multipart POST request: its Apple News Format JSON, its metadata, and its files.
+     *
+     * @param  array{json: string, metadata?: string|null, files?: array<string, string|Asset>}  $data
+     */
+    protected function post(string $channelId, string $path, array $data): stdClass
+    {
+        $request = $this->request($channelId)->asMultipart();
+
+        $this->attach($request, 'article', $data['json'], 'application/json', 'article.json');
+
+        if (!empty($data['metadata'])) {
+            $this->attach($request, 'metadata', $data['metadata'], 'application/json');
+        }
+
+        foreach ($data['files'] ?? [] as $uri => $file) {
+            $filePath = $file instanceof Asset ? $file->getCopyOfFile() : $file;
+            $this->attach($request, pathinfo($uri, PATHINFO_FILENAME), file_get_contents($filePath), $this->fileMimeType($filePath), basename($uri));
+        }
+
+        return $this->decode($request->post($path));
+    }
+
+    /**
+     * Returns a request for a channel, signed with its API key.
+     */
+    protected function request(string $channelId): PendingRequest
+    {
+        $channel = $this->channelManager->getChannelById($channelId);
+
+        return Http::baseUrl(self::BASE_URL)
+            ->acceptJson()
+            ->timeout($this->settings->httpClientTimeout)
+            ->withRequestMiddleware(fn(RequestInterface $request) => $this->sign($request, $channel))
+            ->throw();
+    }
+
+    /**
+     * Adds an `Authorization` header with the request’s HHMAC signature.
+     *
+     * The signature covers the method, full URL and date, plus the content type and body of POST requests.
+     *
+     * @see https://developer.apple.com/documentation/applenews/about-the-apple-news-security-model
+     */
+    protected function sign(RequestInterface $request, ChannelInterface $channel): RequestInterface
+    {
+        $date = gmdate('Y-m-d\TH:i:s\Z');
+        $canonical = $request->getMethod() . $request->getUri() . $date;
+
+        if ($request->getMethod() === 'POST') {
+            $canonical .= $request->getHeaderLine('Content-Type') . $request->getBody();
+            $request->getBody()->rewind();
+        }
+
+        $signature = base64_encode(hash_hmac('sha256', $canonical, base64_decode($channel->getApiSecret()), true));
+
+        return $request->withHeader(
+            'Authorization',
+            sprintf('HHMAC; key=%s; signature=%s; date=%s', $channel->getApiKeyId(), $signature, $date),
+        );
+    }
+
+    private function attach(PendingRequest $request, string $name, string $contents, string $mimeType, ?string $filename = null): void
+    {
+        $disposition = "form-data; name=$name" . ($filename !== null ? "; filename=$filename" : '') . '; size=' . strlen($contents);
+
+        $request->attach($name, $contents, $filename, [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => $disposition,
         ]);
     }
 
-    /**
-     * Sends a GET request to the Apple News API.
-     *
-     * @param string $channelId
-     * @param string $path
-     * @param array $pathArgs
-     * @param array $data
-     * @return object
-     */
-    protected function get(string $channelId, string $path, array $pathArgs = [], array $data = []): object
+    private function fileMimeType(string $path): string
     {
-        return $this->api($channelId)->get($path, $pathArgs, $data);
+        if (strtolower(pathinfo($path, PATHINFO_EXTENSION)) === 'json') {
+            return 'application/json';
+        }
+
+        $mimeType = mime_content_type($path) ?: 'application/octet-stream';
+
+        if ($mimeType === 'text/plain') {
+            return 'application/octet-stream';
+        }
+
+        if (!in_array($mimeType, self::FILE_MIME_TYPES, true)) {
+            throw new UnexpectedValueException("Apple News doesn’t accept $mimeType files ($path).");
+        }
+
+        return $mimeType;
     }
 
-    /**
-     * Sends a POST request to the Apple News API.
-     *
-     * @param string $channelId
-     * @param string $path
-     * @param array $pathArgs
-     * @param array $data
-     * @return object
-     */
-    protected function post(string $channelId, string $path, array $pathArgs = [], array $data = []): object
+    private function decode(Response $response): stdClass
     {
-        return $this->api($channelId)->post($path, $pathArgs, $data);
-    }
-
-    /**
-     * Sends a DELETE request to the Apple News API.
-     *
-     * @param string $channelId
-     * @param string $path
-     * @param array $pathArgs
-     * @param array $data
-     * @return object
-     */
-    protected function delete(string $channelId, string $path, array $pathArgs = [], array $data = []): object
-    {
-        return $this->api($channelId)->delete($path, $pathArgs, $data);
-    }
-
-    /**
-     * Returns a publisher API configured for a given channel ID.
-     *
-     * @param string $channelId
-     * @return PublisherAPI
-     */
-    protected function api(string $channelId): PublisherAPI
-    {
-        $channel = $this->channelManager->getChannelById($channelId);
-        $publisherApi = new PublisherAPI($channel->getApiKeyId(), $channel->getApiSecret(), 'https://news-api.apple.com');
-
-        $client = new Curl();
-        $client->setTimeout($this->settings->httpClientTimeout);
-        $publisherApi->client = $client;
-        return $publisherApi;
+        return $response->object() ?? new stdClass();
     }
 }

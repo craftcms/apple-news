@@ -83,6 +83,15 @@ app(\CraftCms\AppleNews\ArticleManager::class)->queue($entry);
 
 `ArticleManager::$generator` is now the `generator()` method. Methods that threw `yii\base\InvalidConfigException` for an invalid channel config now throw `UnexpectedValueException`.
 
+### Apple News API client
+
+`Api` now sends requests with Laravel’s HTTP client. The `chapter-three/apple-news-api` and `php-curl-class/php-curl-class` packages are no longer installed, so require them yourself if your code uses them.
+
+- When Apple News returns an error, `Api` methods throw `Illuminate\Http\Client\RequestException`, whose response holds Apple’s error codes. Before, the library raised a PHP notice, which Craft turned into an `ErrorException`.
+- All public `Api` methods return `stdClass`. `deleteArticle()` returns an empty object.
+- If you extend `Api`, its protected methods changed: `get($channelId, $path, $query)`, `post($channelId, $path, $data)`, and `request($channelId)`, which returns the signed `PendingRequest`. Paths no longer take `{placeholder}` arguments. `api()` was removed.
+- To fake the API in tests, use `Http::fake(['news-api.apple.com/*' => ...])`.
+
 ### Article states
 
 The `ArticleManager::STATE_*` constants were removed. Use the `CraftCms\AppleNews\Enums\ArticleState` enum instead, which has the same values plus `DUPLICATE`:

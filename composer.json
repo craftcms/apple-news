@@ -25,7 +25,7 @@
   "require": {
     "php": "^8.5",
     "craftcms/cms": "^6.0.0",
-    "chapter-three/apple-news-api": "^0.3.9",
+    "guzzlehttp/guzzle": "^7.2",
     "league/html-to-markdown": "^5.0"
   },
   "require-dev": {

@@ -126,7 +126,3 @@ You can learn more about publishing on Apple News at the following resources:
 Please be aware of the following caveats:
 
 - Entries with a Post Date set in the future won’t be automatically published to Apple News when they go live.
-
-## Thanks
-
-Many thanks to [Chapter Three](https://www.chapterthree.com/) for their excellent [AppleNewsAPI](https://github.com/chapter-three/AppleNewsAPI) library.
