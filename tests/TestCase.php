@@ -24,7 +24,7 @@ abstract class TestCase extends PluginTestCase
 
         // Use Craft’s model factories, as core’s tests do
         Factory::guessFactoryNamesUsing(
-            fn(string $modelName) => 'CraftCms\\Cms\\Database\\Factories\\' . class_basename($modelName) . 'Factory',
+            fn (string $modelName) => 'CraftCms\\Cms\\Database\\Factories\\'.class_basename($modelName).'Factory',
         );
     }
 

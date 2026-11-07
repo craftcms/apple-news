@@ -16,7 +16,7 @@ jobs:
     uses: craftcms/.github/.github/workflows/ci.yml@v3
     with:
       craft_version: '6'
-      jobs: '["ecs", "phpstan", "prettier"]'
+      jobs: '["phpstan", "prettier"]'
       notify_slack: true
       slack_subteam: <!subteam^SGFL9NKNZ>
     secrets:
@@ -34,5 +34,7 @@ jobs:
           coverage: none
       - name: Install dependencies
         run: composer install --no-interaction --no-progress --prefer-dist
+      - name: Check code style
+        run: composer check-cs
       - name: Run tests
         run: composer test

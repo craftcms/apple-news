@@ -17,8 +17,7 @@ class DeleteArticles
 {
     public function __construct(
         private readonly ArticleManager $articleManager,
-    ) {
-    }
+    ) {}
 
     public function handle(ElementDeleting $event): void
     {

@@ -19,6 +19,6 @@ class TestArticle extends Article
             'components' => Helper::markdown2Components("# Hello\n\nSome *text*."),
         ]);
         $this->addMetadata('links.sections', ['https://news-api.apple.com/sections/abc']);
-        $this->addFile(__DIR__ . '/photo.png');
+        $this->addFile(__DIR__.'/photo.png');
     }
 }

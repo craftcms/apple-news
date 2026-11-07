@@ -12,7 +12,7 @@
 /README.md export-ignore
 /SECURITY.md export-ignore
 /composer.lock export-ignore
-/ecs.php export-ignore
+/pint.json export-ignore
 /phpstan.neon export-ignore
 /phpunit.xml export-ignore
 /.prettierrc.json export-ignore

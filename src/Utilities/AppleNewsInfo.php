@@ -35,7 +35,7 @@ class AppleNewsInfo extends Utility
     #[Override]
     public static function icon(): ?string
     {
-        return dirname(__DIR__, 2) . '/resources/icon-mask.svg';
+        return dirname(__DIR__, 2).'/resources/icon-mask.svg';
     }
 
     #[Override]

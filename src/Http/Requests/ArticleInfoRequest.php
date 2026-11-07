@@ -9,6 +9,4 @@ namespace CraftCms\AppleNews\Http\Requests;
  *
  * @since 5.0.0
  */
-class ArticleInfoRequest extends ArticleRequest
-{
-}
+class ArticleInfoRequest extends ArticleRequest {}

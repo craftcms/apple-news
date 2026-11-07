@@ -22,8 +22,7 @@ class ArticleManager
     public function __construct(
         private readonly ChannelManager $channelManager,
         private readonly Api $api,
-    ) {
-    }
+    ) {}
 
     /**
      * Returns the generator metadata that is included in each article’s content.
@@ -37,7 +36,7 @@ class ArticleManager
         return [
             'generatorIdentifier' => 'CraftCMS',
             'generatorName' => 'Craft CMS',
-            'generatorVersion' => Cms::version() . " ($plugin->name $plugin->version)",
+            'generatorVersion' => Cms::version()." ($plugin->name $plugin->version)",
         ];
     }
 
@@ -137,7 +136,7 @@ class ArticleManager
         $articleRecords = ArticleRecord::query()->forEntry($entry->id)->inChannels($channelIds)->get()->keyBy('channelId');
 
         foreach ($articleRecords as $channelId => $articleRecord) {
-            if (!isset($channels[$channelId]) && $articleRecord->state->isQueued()) {
+            if (! isset($channels[$channelId]) && $articleRecord->state->isQueued()) {
                 $this->unqueueRecord($articleRecord);
             }
         }
@@ -154,7 +153,7 @@ class ArticleManager
                     'channelId' => $channelId,
                     'articleId' => $response->data->id,
                 ]);
-            } elseif (!$articleRecord->articleId) {
+            } elseif (! $articleRecord->articleId) {
                 $articleRecord->articleId = $response->data->id;
             }
             $this->updateArticleRecord($articleRecord, $response);
@@ -204,7 +203,7 @@ class ArticleManager
         // Prepare the data and send the request
         $data = [
             'files' => $article->getFiles(),
-            'metadata' => !empty($metadata) ? Json::encode(['data' => $metadata]) : null,
+            'metadata' => ! empty($metadata) ? Json::encode(['data' => $metadata]) : null,
             'json' => Json::encode($content),
         ];
 
@@ -215,7 +214,7 @@ class ArticleManager
             $response = $this->api->createArticle($channelId, $data);
         }
 
-        if (!isset($response->data)) {
+        if (! isset($response->data)) {
             throw new RuntimeException("Apple News didn’t return the article for entry $entry->id in channel $channelId.");
         }
 
@@ -234,7 +233,7 @@ class ArticleManager
 
         return array_filter(
             $this->channelManager->getChannels(),
-            fn(ChannelInterface $channel) => (
+            fn (ChannelInterface $channel) => (
                 ($channelIds === null || in_array($channel->getChannelId(), $channelIds, true)) &&
                 $channel->matchEntry($entry) &&
                 $channel->canPublish($entry)

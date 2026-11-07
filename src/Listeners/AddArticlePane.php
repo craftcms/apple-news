@@ -24,23 +24,22 @@ class AddArticlePane
     public function __construct(
         private readonly ChannelManager $channelManager,
         private readonly ArticleManager $articleManager,
-    ) {
-    }
+    ) {}
 
     public function handle(ElementEditorPayloadResolving $event): void
     {
         $entry = $event->element;
 
-        if (!$entry instanceof Entry || !$entry->id || $entry->getIsUnpublishedDraft()) {
+        if (! $entry instanceof Entry || ! $entry->id || $entry->getIsUnpublishedDraft()) {
             return;
         }
 
         $channels = array_filter(
             $this->channelManager->getChannels(),
-            fn($channel) => $channel->matchEntry($entry),
+            fn ($channel) => $channel->matchEntry($entry),
         );
 
-        if (!$channels) {
+        if (! $channels) {
             return;
         }
 
@@ -57,7 +56,7 @@ class AddArticlePane
             'entryId' => $entry->getCanonicalId(),
             'siteId' => $entry->siteId,
             'isDraftOrRevision' => $isDraftOrRevision,
-            'channels' => array_values(array_map(fn($channel) => [
+            'channels' => array_values(array_map(fn ($channel) => [
                 'id' => $channel->getChannelId(),
                 'name' => $this->channelManager->getChannelName($channel->getChannelId()),
                 'state' => null,
@@ -66,11 +65,11 @@ class AddArticlePane
                 'isProcessing' => false,
                 'isShareable' => false,
                 ...Arr::only($infos[$channel->getChannelId()] ?? [], ['state', 'shareUrl', 'isQueued', 'isProcessing', 'isShareable']),
-                'canPublish' => !$isDraftOrRevision && $channel->canPublish($entry),
+                'canPublish' => ! $isDraftOrRevision && $channel->canPublish($entry),
                 'downloadUrl' => Url::actionUrl('apple-news/article/download', array_filter([
                     ...$downloadParams,
                     'channelId' => $channel->getChannelId(),
-                ], fn($value) => $value !== null)),
+                ], fn ($value) => $value !== null)),
             ], $channels)),
         ];
     }

@@ -20,14 +20,13 @@ class QueueSavedEntry
     public function __construct(
         private readonly Settings $settings,
         private readonly ArticleManager $articleManager,
-    ) {
-    }
+    ) {}
 
     public function handle(ElementSaved $event): void
     {
         if (
-            !$this->settings->autoPublishOnSave ||
-            !$event->element instanceof Entry ||
+            ! $this->settings->autoPublishOnSave ||
+            ! $event->element instanceof Entry ||
             ElementHelper::isDraftOrRevision($event->element)
         ) {
             return;

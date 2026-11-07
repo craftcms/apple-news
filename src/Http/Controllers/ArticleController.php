@@ -25,8 +25,7 @@ class ArticleController
     public function __construct(
         private readonly ArticleManager $articleManager,
         private readonly ChannelManager $channelManager,
-    ) {
-    }
+    ) {}
 
     /**
      * Downloads a bundle for Apple News Preview.
@@ -43,12 +42,12 @@ class ArticleController
         // Prep the zip staging folder
         $zipDir = Path::temp('apple-news-articles');
         File::ensureDirectoryExists($zipDir);
-        $zipPath = "$zipDir/$entry->slug-" . Str::uuid()->toString() . '.zip';
+        $zipPath = "$zipDir/$entry->slug-".Str::uuid()->toString().'.zip';
 
         // Create the zip
-        $zip = new ZipArchive();
+        $zip = new ZipArchive;
         if ($zip->open($zipPath, ZipArchive::CREATE) !== true) {
-            throw new RuntimeException('Cannot create zip at ' . $zipPath);
+            throw new RuntimeException('Cannot create zip at '.$zipPath);
         }
 
         // Add article.json

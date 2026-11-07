@@ -23,8 +23,7 @@ class ChannelManager
 
     public function __construct(
         private readonly Settings $settings,
-    ) {
-    }
+    ) {}
 
     /**
      * Returns all the channels.
@@ -59,8 +58,8 @@ class ChannelManager
     public function getChannelById(string $channelId): ChannelInterface
     {
         $channels = $this->getChannels();
-        if (!isset($channels[$channelId])) {
-            throw new InvalidArgumentException('No channel exists with the ID ' . $channelId);
+        if (! isset($channels[$channelId])) {
+            throw new InvalidArgumentException('No channel exists with the ID '.$channelId);
         }
 
         return $channels[$channelId];
@@ -79,7 +78,7 @@ class ChannelManager
         return Cache::remember(
             "apple-news:channel-name:$channelId",
             Config::durationInSeconds(Cms::config()->cacheDuration) ?: null,
-            fn() => app(Api::class)->channel($channelId)->data->name,
+            fn () => app(Api::class)->channel($channelId)->data->name,
         );
     }
 
@@ -95,8 +94,8 @@ class ChannelManager
         $class = $config['class'] ?? null;
         unset($config['class']);
 
-        if (!is_string($class) || !is_subclass_of($class, ChannelInterface::class)) {
-            throw new UnexpectedValueException('Channels must implement ' . ChannelInterface::class . '.');
+        if (! is_string($class) || ! is_subclass_of($class, ChannelInterface::class)) {
+            throw new UnexpectedValueException('Channels must implement '.ChannelInterface::class.'.');
         }
 
         /** @var ChannelInterface */

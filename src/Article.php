@@ -48,12 +48,10 @@ class Article implements ArticleInterface
      *
      * Subclasses can override this to define the article content, files, and metadata.
      */
-    public function init(): void
-    {
-    }
+    public function init(): void {}
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getFiles(): array
     {
@@ -61,7 +59,7 @@ class Article implements ArticleInterface
     }
 
     /**
-     * @param array $files The files that should be included in the article (uri => path)
+     * @param  array  $files  The files that should be included in the article (uri => path)
      */
     public function setFiles(array $files): void
     {
@@ -71,7 +69,7 @@ class Article implements ArticleInterface
     /**
      * Adds a new file to the article and returns its URL.
      *
-     * @param string|Asset $file An asset or a path to a file
+     * @param  string|Asset  $file  An asset or a path to a file
      * @return string The URL that the article should use to reference the file
      */
     public function addFile(Asset|string $file): string
@@ -90,15 +88,16 @@ class Article implements ArticleInterface
         $filename = "$basename.$ext";
         $i = 0;
         while (isset($this->files[$filename])) {
-            $filename = "{$basename}_" . ++$i . ".$ext";
+            $filename = "{$basename}_".++$i.".$ext";
         }
 
         $this->files[$filename] = $file;
-        return 'bundle://' . $filename;
+
+        return 'bundle://'.$filename;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getMetadata(): array
     {
@@ -106,7 +105,7 @@ class Article implements ArticleInterface
     }
 
     /**
-     * @param array $metadata The metadata that should be included with the request
+     * @param  array  $metadata  The metadata that should be included with the request
      */
     public function setMetadata(array $metadata): void
     {
@@ -116,8 +115,8 @@ class Article implements ArticleInterface
     /**
      * Adds a new metadata property to the article.
      *
-     * @param string $name The metadata property name. Can be a dot-delimited path for defining nested array properties (e.g. `links.sections`)
-     * @param mixed $value The metadata property value
+     * @param  string  $name  The metadata property name. Can be a dot-delimited path for defining nested array properties (e.g. `links.sections`)
+     * @param  mixed  $value  The metadata property value
      */
     public function addMetadata(string $name, mixed $value): void
     {
@@ -125,7 +124,7 @@ class Article implements ArticleInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getContent(): array
     {
@@ -133,7 +132,7 @@ class Article implements ArticleInterface
     }
 
     /**
-     * @param array $content The article content, described in Apple News Format
+     * @param  array  $content  The article content, described in Apple News Format
      */
     public function setContent(array $content): void
     {

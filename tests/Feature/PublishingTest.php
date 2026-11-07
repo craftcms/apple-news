@@ -41,13 +41,13 @@ function publishedArticle(Entry $entry, string $state = 'LIVE'): Article
 
 function postedArticles(): array
 {
-    return Http::recorded(fn(Request $request) => $request->method() === 'POST')
-        ->map(fn($pair) => parse_url($pair[0]->url(), PHP_URL_PATH))
+    return Http::recorded(fn (Request $request) => $request->method() === 'POST')
+        ->map(fn ($pair) => parse_url($pair[0]->url(), PHP_URL_PATH))
         ->values()
         ->all();
 }
 
-it('creates the article, then updates it with the latest revision', function() {
+it('creates the article, then updates it with the latest revision', function () {
     fakeAppleNews();
     $entry = newsEntry();
     $manager = app(ArticleManager::class);
@@ -70,12 +70,12 @@ it('creates the article, then updates it with the latest revision', function() {
 
     $manager->queue($entry);
 
-    expect(postedArticles())->toBe(['/channels/' . TestCase::CHANNEL_ID . '/articles', '/articles/article-1']);
-    Http::assertSent(fn(Request $request) => $request->method() === 'POST'
+    expect(postedArticles())->toBe(['/channels/'.TestCase::CHANNEL_ID.'/articles', '/articles/article-1']);
+    Http::assertSent(fn (Request $request) => $request->method() === 'POST'
         && str_contains((string) $request->toPsrRequest()->getBody(), '"revision":"rev2"'));
 });
 
-it('marks articles as queued until their job runs', function() {
+it('marks articles as queued until their job runs', function () {
     Queue::fake();
     $entry = newsEntry();
     publishedArticle($entry);
@@ -90,7 +90,7 @@ it('marks articles as queued until their job runs', function() {
         ->toMatchArray(['isQueued' => true, 'isShareable' => true]);
 });
 
-it('only queues one job per article', function() {
+it('only queues one job per article', function () {
     Queue::fake();
     $entry = newsEntry();
 
@@ -100,7 +100,7 @@ it('only queues one job per article', function() {
     Queue::assertPushed(PublishArticleJob::class, 1);
 });
 
-it('publishes the entry’s current content even if its article isn’t queued anymore', function() {
+it('publishes the entry’s current content even if its article isn’t queued anymore', function () {
     fakeAppleNews();
     $entry = newsEntry();
     publishedArticle($entry);
@@ -111,7 +111,7 @@ it('publishes the entry’s current content even if its article isn’t queued a
     expect(postedArticles())->toBe(['/articles/article-1']);
 });
 
-it('doesn’t queue entries for channels that don’t match them', function() {
+it('doesn’t queue entries for channels that don’t match them', function () {
     Queue::fake();
     $entry = newsEntry(section: 'pages');
 
@@ -121,8 +121,8 @@ it('doesn’t queue entries for channels that don’t match them', function() {
     Queue::assertNothingPushed();
 });
 
-it('restores the previous state when Apple rejects an update', function() {
-    fakeAppleNews(fn() => Http::response(['errors' => [['code' => 'INVALID_DOCUMENT']]], 400));
+it('restores the previous state when Apple rejects an update', function () {
+    fakeAppleNews(fn () => Http::response(['errors' => [['code' => 'INVALID_DOCUMENT']]], 400));
     $entry = newsEntry();
     publishedArticle($entry);
 
@@ -132,8 +132,8 @@ it('restores the previous state when Apple rejects an update', function() {
         ->and(postedArticles())->toHaveCount(1);
 });
 
-it('removes the record when a new article is rejected', function() {
-    fakeAppleNews(fn() => Http::response(['errors' => [['code' => 'INVALID_DOCUMENT']]], 400));
+it('removes the record when a new article is rejected', function () {
+    fakeAppleNews(fn () => Http::response(['errors' => [['code' => 'INVALID_DOCUMENT']]], 400));
     $entry = newsEntry();
 
     app(ArticleManager::class)->queue($entry);
@@ -141,8 +141,8 @@ it('removes the record when a new article is rejected', function() {
     expect(article($entry))->toBeNull();
 });
 
-it('fails the job right away when Apple rejects the article', function() {
-    fakeAppleNews(fn() => Http::response(['errors' => [['code' => 'INVALID_DOCUMENT']]], 400));
+it('fails the job right away when Apple rejects the article', function () {
+    fakeAppleNews(fn () => Http::response(['errors' => [['code' => 'INVALID_DOCUMENT']]], 400));
     $entry = newsEntry();
     $job = (new PublishArticleJob($entry->id, $entry->siteId, TestCase::CHANNEL_ID))->withFakeQueueInteractions();
 
@@ -151,15 +151,15 @@ it('fails the job right away when Apple rejects the article', function() {
     $job->assertFailed();
 });
 
-it('leaves the article queued for a retry after a server error', function(int $status) {
-    fakeAppleNews(fn() => Http::response(null, $status));
+it('leaves the article queued for a retry after a server error', function (int $status) {
+    fakeAppleNews(fn () => Http::response(null, $status));
     Queue::fake();
     $entry = newsEntry();
     publishedArticle($entry);
     app(ArticleManager::class)->queue($entry);
     $job = (new PublishArticleJob($entry->id, $entry->siteId, TestCase::CHANNEL_ID))->withFakeQueueInteractions();
 
-    expect(fn() => $job->handle(app(ArticleManager::class)))->toThrow(RequestException::class);
+    expect(fn () => $job->handle(app(ArticleManager::class)))->toThrow(RequestException::class);
 
     $job->assertNotFailed();
     expect(article($entry)->state)->toBe(ArticleState::QueuedUpdate);
@@ -169,7 +169,7 @@ it('leaves the article queued for a retry after a server error', function(int $s
     expect(article($entry)->state)->toBe(ArticleState::Live);
 })->with([503, 429]);
 
-it('unqueues the article if the entry can’t be published anymore when the job runs', function() {
+it('unqueues the article if the entry can’t be published anymore when the job runs', function () {
     Queue::fake();
     $entry = newsEntry();
     publishedArticle($entry);
@@ -189,7 +189,7 @@ it('unqueues the article if the entry can’t be published anymore when the job 
     Http::assertNothingSent();
 });
 
-it('publishes entries when they’re saved, if autoPublishOnSave is enabled', function(bool $autoPublish) {
+it('publishes entries when they’re saved, if autoPublishOnSave is enabled', function (bool $autoPublish) {
     fakeAppleNews();
     app(Settings::class)->autoPublishOnSave = $autoPublish;
     $entry = newsEntry();
@@ -200,7 +200,7 @@ it('publishes entries when they’re saved, if autoPublishOnSave is enabled', fu
     expect(postedArticles())->toHaveCount($autoPublish ? 1 : 0);
 })->with([true, false]);
 
-it('deletes articles from Apple News when the entry is deleted', function() {
+it('deletes articles from Apple News when the entry is deleted', function () {
     Queue::fake();
     fakeAppleNews();
     $entry = newsEntry();
@@ -212,7 +212,7 @@ it('deletes articles from Apple News when the entry is deleted', function() {
     Elements::deleteElement($queuedEntry, hardDelete: true);
 
     Http::assertSentCount(1);
-    Http::assertSent(fn(Request $request) => $request->method() === 'DELETE'
+    Http::assertSent(fn (Request $request) => $request->method() === 'DELETE'
         && $request->url() === 'https://news-api.apple.com/articles/article-1');
     expect(Article::query()->count())->toBe(0);
 });

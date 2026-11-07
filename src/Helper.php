@@ -24,21 +24,23 @@ abstract class Helper
     /**
      * Formats a language ID into the format required by the Apple News API (e.g. "en" or "en_US").
      *
-     * @param string $language The language ID
+     * @param  string  $language  The language ID
      * @return string The formatted language ID
      */
     public static function formatLanguage(string $language): string
     {
         $parts = preg_split('/[\-_]/', $language);
-        return strtolower($parts[0]) . (!empty($parts[1]) ? '_' . strtoupper($parts[1]) : '');
+
+        return strtolower($parts[0]).(! empty($parts[1]) ? '_'.strtoupper($parts[1]) : '');
     }
 
     /**
      * Creates a list of keywords for an article.
      *
-     * @param Entry $entry The entry
-     * @param string[] $fieldHandles The field handles that the keywords should be extracted from
+     * @param  Entry  $entry  The entry
+     * @param  string[]  $fieldHandles  The field handles that the keywords should be extracted from
      * @return string[] List of keywords for the article
+     *
      * @throws InvalidFieldException
      */
     public static function createKeywords(Entry $entry, array $fieldHandles): array
@@ -113,11 +115,12 @@ abstract class Helper
 
         // Trim unwanted whitespace within block tags
         $blockTags = 'h1|h2|h3|h4|h5|h6|p|ul|ol|li|div';
-        $html = preg_replace("/(<(?:$blockTags).*?>)\s*/is", "$1", $html);
-        $html = trim($html, chr(0xC2) . chr(0xA0));
+        $html = preg_replace("/(<(?:$blockTags).*?>)\s*/is", '$1', $html);
+        $html = trim($html, chr(0xC2).chr(0xA0));
 
         // Remove comments
         $html = preg_replace('/<!--.*?-->/s', '', $html);
+
         return static::htmlConverter()->convert($html);
     }
 
@@ -133,10 +136,10 @@ abstract class Helper
      * - everything else => role=body with `body` properties
      *
      * @param  string|Stringable  $html  HTML-formatted text, or an HTML field value (such as a CKEditor field’s)
-     * @param callable|array $properties An array defining the component properties that should be applied to each component type,
-     *                                   or a function that returns the full component definition, given the type and Markdown text.
-     *
+     * @param  callable|array  $properties  An array defining the component properties that should be applied to each component type,
+     *                                      or a function that returns the full component definition, given the type and Markdown text.
      * @return array Component definitions
+     *
      * @todo Add support for images + captions and videos
      */
     public static function html2Components(Stringable|string $html, callable|array $properties = []): array
@@ -148,12 +151,12 @@ abstract class Helper
 
         // Create a DOMDocument object for the HTML
         // (from HtmlConverter::convert)
-        $document = new DOMDocument();
+        $document = new DOMDocument;
         libxml_use_internal_errors(true);
-        $document->loadHTML('<?xml encoding="UTF-8">' . $html);
+        $document->loadHTML('<?xml encoding="UTF-8">'.$html);
         $document->encoding = 'UTF-8';
         libxml_clear_errors();
-        if (!($body = $document->getElementsByTagName('body')->item(0))) {
+        if (! ($body = $document->getElementsByTagName('body')->item(0))) {
             throw new InvalidArgumentException('Invalid HTML was provided');
         }
 
@@ -171,23 +174,22 @@ abstract class Helper
 
             switch ($node->nodeName) {
                 case 'blockquote':
-                {
+
                     $role = 'quote';
                     $types = ['quote'];
                     $isBody = false;
                     $captureText = true;
                     $captureOuterHtml = false;
                     break;
-                }
+
                 case 'code':
-                {
+
                     $role = 'body';
                     $types = ['code', 'body'];
                     $isBody = false;
                     $captureText = true;
                     $captureOuterHtml = false;
                     break;
-                }
 
                 case 'h1':
                 case 'h2':
@@ -195,34 +197,33 @@ abstract class Helper
                 case 'h4':
                 case 'h5':
                 case 'h6':
-                {
+
                     $level = substr($node->nodeName, 1);
-                    $role = 'heading' . $level;
-                    $types = ['heading' . $level, 'heading'];
+                    $role = 'heading'.$level;
+                    $types = ['heading'.$level, 'heading'];
                     $isBody = false;
                     $captureText = true;
                     $captureOuterHtml = false;
                     break;
-                }
 
                 case 'hr':
-                {
+
                     $role = 'divider';
                     $types = ['divider'];
                     $isBody = false;
                     $captureText = false;
                     $captureOuterHtml = false;
                     break;
-                }
+
                 default:
-                {
+
                     // div, p, ol, ul, #text, etc.
                     $role = 'body';
                     $types = ['body'];
                     $isBody = true;
                     $captureText = true;
                     $captureOuterHtml = true;
-                }
+
             }
 
             // Do we care about the text value?
@@ -237,7 +238,7 @@ abstract class Helper
                     }
                 }
                 $nodeHtml = trim($nodeHtml, "\n\r ");
-                if (!$nodeHtml) {
+                if (! $nodeHtml) {
                     continue;
                 }
                 $text = static::html2Markdown($nodeHtml);
@@ -248,7 +249,7 @@ abstract class Helper
             // If this is a body component and the last one was as well, append the text to the last one
             if ($isBody && $lastWasBody) {
                 $lastComponentIndex = count($componentInfos) - 1;
-                $componentInfos[$lastComponentIndex]['text'] .= "\n\n" . $text;
+                $componentInfos[$lastComponentIndex]['text'] .= "\n\n".$text;
             } else {
                 $componentInfos[] = [
                     'types' => $types,
@@ -272,7 +273,7 @@ abstract class Helper
                     }
                 }
             }
-            if (!$component) {
+            if (! $component) {
                 $component = [
                     'role' => $componentInfo['role'],
                 ];
@@ -302,15 +303,16 @@ abstract class Helper
     /**
      * Converts Markdown-formatted text into component definitions.
      *
-     * @param string $text Markdown-formatted text
-     * @param callable|array $properties An array defining the component properties that should be applied to each component type,
-     *                                        or a function that returns the full component definition, given the type and Markdown text.
+     * @param  string  $text  Markdown-formatted text
+     * @param  callable|array  $properties  An array defining the component properties that should be applied to each component type,
+     *                                      or a function that returns the full component definition, given the type and Markdown text.
      * @return array Component definitions
      */
     public static function markdown2Components(string $text, callable|array $properties = []): array
     {
         // Convert Markdown to HTML and run through html2Components()
         $html = Markdown::parse($text, MarkdownParser::FLAVOR_ORIGINAL);
+
         return static::html2Components($html, $properties);
     }
 

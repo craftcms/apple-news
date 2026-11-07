@@ -25,7 +25,7 @@ abstract class BaseChannel implements ChannelInterface
     public string $apiSecret;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getChannelId(): string
     {
@@ -33,7 +33,7 @@ abstract class BaseChannel implements ChannelInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getApiKeyId(): string
     {
@@ -41,7 +41,7 @@ abstract class BaseChannel implements ChannelInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getApiSecret(): string
     {
@@ -49,7 +49,7 @@ abstract class BaseChannel implements ChannelInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function matchEntry(Entry $entry): bool
     {
@@ -57,7 +57,7 @@ abstract class BaseChannel implements ChannelInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function canPublish(Entry $entry): bool
     {

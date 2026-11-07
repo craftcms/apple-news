@@ -15,13 +15,13 @@ function hasValidSignature(Request $request): bool
 {
     $psr = $request->toPsrRequest();
 
-    if (!preg_match('/^HHMAC; key=([^;]+); signature=([^;]+); date=(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ)$/', $psr->getHeaderLine('Authorization'), $m)) {
+    if (! preg_match('/^HHMAC; key=([^;]+); signature=([^;]+); date=(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ)$/', $psr->getHeaderLine('Authorization'), $m)) {
         return false;
     }
 
-    $canonical = $psr->getMethod() . $psr->getUri() . $m[3];
+    $canonical = $psr->getMethod().$psr->getUri().$m[3];
     if ($psr->getMethod() === 'POST') {
-        $canonical .= $psr->getHeaderLine('Content-Type') . $psr->getBody();
+        $canonical .= $psr->getHeaderLine('Content-Type').$psr->getBody();
     }
 
     $expected = base64_encode(hash_hmac('sha256', $canonical, base64_decode(TestCase::API_SECRET), true));
@@ -53,28 +53,28 @@ function multipartParts(Request $request): array
     return $parts;
 }
 
-it('signs GET requests, including the query string', function() {
+it('signs GET requests, including the query string', function () {
     fakeAppleNews();
 
     app(Api::class)->search(TestCase::CHANNEL_ID, ['pageSize' => 5]);
 
-    Http::assertSent(fn(Request $request) => $request->method() === 'GET'
-        && $request->url() === 'https://news-api.apple.com/channels/' . TestCase::CHANNEL_ID . '/articles?pageSize=5'
+    Http::assertSent(fn (Request $request) => $request->method() === 'GET'
+        && $request->url() === 'https://news-api.apple.com/channels/'.TestCase::CHANNEL_ID.'/articles?pageSize=5'
         && hasValidSignature($request));
 });
 
-it('sends an article as signed multipart parts', function() {
+it('sends an article as signed multipart parts', function () {
     fakeAppleNews();
 
     $response = app(Api::class)->updateArticle(TestCase::CHANNEL_ID, 'article-1', [
         'json' => '{"title":"Hi"}',
         'metadata' => '{"data":{"revision":"rev1"}}',
-        'files' => ['image.png' => dirname(__DIR__) . '/Fixtures/photo.png'],
+        'files' => ['image.png' => dirname(__DIR__).'/Fixtures/photo.png'],
     ]);
 
     expect($response->data->state)->toBe('PROCESSING');
 
-    Http::assertSent(fn(Request $request) => $request->method() === 'POST'
+    Http::assertSent(fn (Request $request) => $request->method() === 'POST'
         && $request->url() === 'https://news-api.apple.com/articles/article-1'
         && hasValidSignature($request));
 
@@ -93,20 +93,20 @@ it('sends an article as signed multipart parts', function() {
         ])
         ->and($parts['image']['disposition'])->toBe('form-data; name=image; filename=image.png; size=94')
         ->and($parts['image']['type'])->toBe('image/png')
-        ->and($parts['image']['content'])->toBe(file_get_contents(dirname(__DIR__) . '/Fixtures/photo.png'));
+        ->and($parts['image']['content'])->toBe(file_get_contents(dirname(__DIR__).'/Fixtures/photo.png'));
 });
 
-it('throws Apple’s errors', function() {
-    fakeAppleNews(fn() => Http::response(['errors' => [['code' => 'INVALID_DOCUMENT']]], 400));
+it('throws Apple’s errors', function () {
+    fakeAppleNews(fn () => Http::response(['errors' => [['code' => 'INVALID_DOCUMENT']]], 400));
 
-    expect(fn() => app(Api::class)->createArticle(TestCase::CHANNEL_ID, ['json' => '{}']))
-        ->toThrow(fn(RequestException $e) => expect($e->response->json('errors.0.code'))->toBe('INVALID_DOCUMENT'));
+    expect(fn () => app(Api::class)->createArticle(TestCase::CHANNEL_ID, ['json' => '{}']))
+        ->toThrow(fn (RequestException $e) => expect($e->response->json('errors.0.code'))->toBe('INVALID_DOCUMENT'));
 });
 
-it('rejects files Apple News doesn’t accept', function() {
+it('rejects files Apple News doesn’t accept', function () {
     fakeAppleNews();
 
-    expect(fn() => app(Api::class)->createArticle(TestCase::CHANNEL_ID, [
+    expect(fn () => app(Api::class)->createArticle(TestCase::CHANNEL_ID, [
         'json' => '{}',
         'files' => ['script.php' => __FILE__],
     ]))->toThrow(UnexpectedValueException::class);

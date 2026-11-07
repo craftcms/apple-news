@@ -36,8 +36,7 @@ class Api
     public function __construct(
         private readonly ChannelManager $channelManager,
         private readonly Settings $settings,
-    ) {
-    }
+    ) {}
 
     /**
      * Returns information about a channel.
@@ -130,7 +129,7 @@ class Api
 
         $this->attach($request, 'article', $data['json'], 'application/json', 'article.json');
 
-        if (!empty($data['metadata'])) {
+        if (! empty($data['metadata'])) {
             $this->attach($request, 'metadata', $data['metadata'], 'application/json');
         }
 
@@ -152,7 +151,7 @@ class Api
         return Http::baseUrl(self::BASE_URL)
             ->acceptJson()
             ->timeout($this->settings->httpClientTimeout)
-            ->withRequestMiddleware(fn(RequestInterface $request) => $this->sign($request, $channel))
+            ->withRequestMiddleware(fn (RequestInterface $request) => $this->sign($request, $channel))
             ->throw();
     }
 
@@ -166,10 +165,10 @@ class Api
     protected function sign(RequestInterface $request, ChannelInterface $channel): RequestInterface
     {
         $date = gmdate('Y-m-d\TH:i:s\Z');
-        $canonical = $request->getMethod() . $request->getUri() . $date;
+        $canonical = $request->getMethod().$request->getUri().$date;
 
         if ($request->getMethod() === 'POST') {
-            $canonical .= $request->getHeaderLine('Content-Type') . $request->getBody();
+            $canonical .= $request->getHeaderLine('Content-Type').$request->getBody();
             $request->getBody()->rewind();
         }
 
@@ -183,7 +182,7 @@ class Api
 
     private function attach(PendingRequest $request, string $name, string $contents, string $mimeType, ?string $filename = null): void
     {
-        $disposition = "form-data; name=$name" . ($filename !== null ? "; filename=$filename" : '') . '; size=' . strlen($contents);
+        $disposition = "form-data; name=$name".($filename !== null ? "; filename=$filename" : '').'; size='.strlen($contents);
 
         $request->attach($name, $contents, $filename, [
             'Content-Type' => $mimeType,
@@ -203,7 +202,7 @@ class Api
             return 'application/octet-stream';
         }
 
-        if (!in_array($mimeType, self::FILE_MIME_TYPES, true)) {
+        if (! in_array($mimeType, self::FILE_MIME_TYPES, true)) {
             throw new UnexpectedValueException("Apple News doesn’t accept $mimeType files ($path).");
         }
 
@@ -212,6 +211,6 @@ class Api
 
     private function decode(Response $response): stdClass
     {
-        return $response->object() ?? new stdClass();
+        return $response->object() ?? new stdClass;
     }
 }

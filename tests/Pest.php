@@ -50,7 +50,7 @@ function appleArticle(string $state = 'PROCESSING', string $revision = 'rev1', s
  */
 function fakeAppleNews(?Closure $post = null): void
 {
-    Http::fake(['news-api.apple.com/*' => function(Request $request) use ($post) {
+    Http::fake(['news-api.apple.com/*' => function (Request $request) use ($post) {
         $path = parse_url($request->url(), PHP_URL_PATH);
 
         return match ($request->method()) {

@@ -38,7 +38,7 @@ class MyNewsArticle extends Article
         $this->byline = $this->entry->author->name;
 
         if ($this->entry->postDate) {
-            $this->byline .= ' | ' . app(Formatter::class)->asDate($this->entry->postDate, 'short');
+            $this->byline .= ' | '.app(Formatter::class)->asDate($this->entry->postDate, 'short');
         }
 
         // Article content
@@ -77,9 +77,6 @@ class MyNewsArticle extends Article
         $this->addMetadata('isPreview', false);
     }
 
-    /**
-     * @return array
-     */
     protected function getComponents(): array
     {
         $components = [];
@@ -198,7 +195,7 @@ class MyNewsArticle extends Article
                         }
                         $components[] = [
                             'role' => 'container',
-                            'layout' => ['ignoreDocumentMargin' => true,],
+                            'layout' => ['ignoreDocumentMargin' => true],
                             'components' => $photoComponents,
                         ];
                     }
@@ -251,8 +248,6 @@ class MyNewsArticle extends Article
      *             - Container (anchored to bottom)
      *                 - Title
      *                 - Byline
-     *
-     * @return array
      */
     protected function getHeaderWithFeaturedImage(): array
     {
@@ -264,7 +259,7 @@ class MyNewsArticle extends Article
                 'ignoreDocumentMargin' => true,
             ],
             'scene' => [
-                'type' => 'parallax_scale'
+                'type' => 'parallax_scale',
             ],
             'components' => [
                 [
@@ -334,8 +329,6 @@ class MyNewsArticle extends Article
      * - Section
      *     - Title
      *     - Byline
-     *
-     * @return array
      */
     protected function getPlainTextHeader(): array
     {
@@ -362,9 +355,6 @@ class MyNewsArticle extends Article
         ];
     }
 
-    /**
-     * @return array
-     */
     protected function getComponentLayouts(): array
     {
         return [
@@ -438,9 +428,6 @@ class MyNewsArticle extends Article
         ];
     }
 
-    /**
-     * @return array
-     */
     protected function getComponentStyles(): array
     {
         return [
@@ -449,9 +436,6 @@ class MyNewsArticle extends Article
         ];
     }
 
-    /**
-     * @return array
-     */
     protected function getComponentTextStyles(): array
     {
         if ($this->featuredImageUrl) {

@@ -29,12 +29,12 @@
     "league/html-to-markdown": "^5.0"
   },
   "require-dev": {
-    "craftcms/ecs": "dev-main",
     "phpstan/phpstan": "^2.1",
     "larastan/larastan": "^3.13",
     "orchestra/testbench": "^11.0",
     "pestphp/pest": "^5.0",
-    "pestphp/pest-plugin-laravel": "^5.0"
+    "pestphp/pest-plugin-laravel": "^5.0",
+    "laravel/pint": "^1.22"
   },
   "autoload": {
     "psr-4": {
@@ -48,8 +48,8 @@
     }
   },
   "scripts": {
-    "check-cs": "ecs check --ansi",
-    "fix-cs": "ecs check --ansi --fix",
+    "check-cs": "pint --test",
+    "fix-cs": "pint",
     "phpstan": "phpstan --memory-limit=1G",
     "test": "pest"
   },

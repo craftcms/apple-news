@@ -49,12 +49,12 @@ class Plugin extends BasePlugin
 
     public function boot(): void
     {
-        $this->app->singleton(Settings::class, fn() => $this->getSettings());
+        $this->app->singleton(Settings::class, fn () => $this->getSettings());
     }
 
     #[Override]
     protected static function createSettings(): ?PluginSettings
     {
-        return new Settings();
+        return new Settings;
     }
 }

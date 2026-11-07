@@ -83,7 +83,7 @@ class PublishArticleJob extends Job implements ShouldBeUniqueUntilProcessing
             ->status(null)
             ->one();
 
-        if (!$entry) {
+        if (! $entry) {
             return;
         }
 
