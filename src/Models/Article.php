@@ -7,9 +7,9 @@ namespace CraftCms\AppleNews\Models;
 use CraftCms\AppleNews\Enums\ArticleState;
 use CraftCms\Cms\Shared\BaseModel;
 use CraftCms\Cms\Shared\Concerns\HasUid;
+use CraftCms\Cms\Support\Arr;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Arr;
 
 /**
  * An entry’s article in one Apple News channel.

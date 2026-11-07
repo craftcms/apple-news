@@ -6,6 +6,7 @@ namespace CraftCms\AppleNews;
 
 use CraftCms\Cms\Asset\Elements\Asset;
 use CraftCms\Cms\Entry\Elements\Entry;
+use CraftCms\Cms\Support\Arr;
 use CraftCms\Cms\Support\File;
 use CraftCms\Cms\Support\Typecast;
 
@@ -120,21 +121,7 @@ class Article implements ArticleInterface
      */
     public function addMetadata(string $name, mixed $value): void
     {
-        $arr = &$this->metadata;
-
-        if (str_contains($name, '.')) {
-            $path = explode('.', $name);
-            $name = array_pop($path);
-
-            foreach ($path as $step) {
-                if (!isset($arr[$step])) {
-                    $arr[$step] = [];
-                }
-                $arr = &$arr[$step];
-            }
-        }
-
-        $arr[$name] = $value;
+        Arr::set($this->metadata, $name, $value);
     }
 
     /**

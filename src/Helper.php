@@ -19,11 +19,7 @@ use Stringable;
 /** @since 2.0 */
 abstract class Helper
 {
-    /**
-     * @var HtmlConverter|null $_htmlConverter
-     * @see htmlConverter()
-     */
-    private static ?HtmlConverter $_htmlConverter = null;
+    private static ?HtmlConverter $htmlConverter = null;
 
     /**
      * Formats a language ID into the format required by the Apple News API (e.g. "en" or "en_US").
@@ -333,19 +329,8 @@ abstract class Helper
         return (string) $html;
     }
 
-    /**
-     * Returns an instance of HtmlConverter.
-     *
-     * @return HtmlConverter
-     */
     protected static function htmlConverter(): HtmlConverter
     {
-        if (self::$_htmlConverter !== null) {
-            return self::$_htmlConverter;
-        }
-
-        return self::$_htmlConverter = new HtmlConverter([
-            'strip_tags' => true,
-        ]);
+        return self::$htmlConverter ??= new HtmlConverter(['strip_tags' => true]);
     }
 }

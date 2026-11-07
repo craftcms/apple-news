@@ -12,6 +12,7 @@ use function CraftCms\Cms\currentUser;
 
 /**
  * Adds the “Publish to Apple News” bulk action to entry indexes, for people who can save entries in the section.
+ * The action itself checks each entry’s `save` policy.
  *
  * @since 5.0.0
  */
@@ -26,13 +27,9 @@ class AddPublishAction
         $user = currentUser();
 
         if (
-            $user !== null && (
-                $user->isAdmin() ||
-                (
-                    preg_match('/^section:(.+)/', $event->source, $matches) &&
-                    $user->can("saveEntries:$matches[1]")
-                )
-            )
+            $user !== null &&
+            preg_match('/^section:(.+)/', $event->source, $matches) &&
+            $user->can("saveEntries:$matches[1]")
         ) {
             $event->actions[] = PublishArticles::class;
         }
