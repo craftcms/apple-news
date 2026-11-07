@@ -14,7 +14,6 @@ use CraftCms\Cms\Support\Json;
 use Illuminate\Container\Attributes\Singleton;
 use RuntimeException;
 use stdClass;
-use Throwable;
 
 /** @since 2.0 */
 #[Singleton]
@@ -124,8 +123,9 @@ class ArticleManager
     /**
      * Publishes an article to Apple News.
      *
-     * If the entry can’t be published to a channel it was queued for, or publishing to it fails, the article goes
-     * back to the state it had before it was queued.
+     * If the entry can’t be published to a channel it was queued for anymore, the article goes back to the state it
+     * had before it was queued. If publishing fails, the exception is thrown and the article stays queued, so
+     * {@see PublishArticleJob} can retry it.
      *
      * @param  Entry  $entry  The entry to be published
      * @param  string|string[]|null  $channelIds  The Apple News channel ID(s) to publish the entry to
@@ -138,22 +138,14 @@ class ArticleManager
 
         foreach ($articleRecords as $channelId => $articleRecord) {
             if (!isset($channels[$channelId]) && $articleRecord->state->isQueued()) {
-                $this->unqueue($articleRecord);
+                $this->unqueueRecord($articleRecord);
             }
         }
 
         foreach ($channels as $channelId => $channel) {
             $articleRecord = $articleRecords[$channelId] ?? null;
 
-            try {
-                $response = $this->sendArticle($entry, $channel, $articleRecord);
-            } catch (Throwable $e) {
-                if ($articleRecord?->state->isQueued()) {
-                    $this->unqueue($articleRecord);
-                }
-
-                throw $e;
-            }
+            $response = $this->sendArticle($entry, $channel, $articleRecord);
 
             // Save a record of the article
             if ($articleRecord === null) {
@@ -265,10 +257,19 @@ class ArticleManager
     }
 
     /**
-     * Returns a queued article to the state Apple News last reported for it, or removes it if it never reached Apple
-     * News.
+     * Returns an entry’s queued article in a channel to the state Apple News last reported for it, or removes it if it
+     * never reached Apple News. Articles that aren’t queued are left alone.
      */
-    protected function unqueue(ArticleRecord $record): void
+    public function unqueue(int $entryId, string $channelId): void
+    {
+        $record = ArticleRecord::query()->forEntry($entryId)->inChannels($channelId)->first();
+
+        if ($record?->state->isQueued()) {
+            $this->unqueueRecord($record);
+        }
+    }
+
+    protected function unqueueRecord(ArticleRecord $record): void
     {
         $previousState = ArticleState::tryFrom(Json::decode($record->response)['data']['state'] ?? '');
 
