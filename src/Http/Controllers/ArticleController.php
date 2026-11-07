@@ -14,6 +14,7 @@ use CraftCms\Cms\Support\Str;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use ZipArchive;
@@ -33,7 +34,7 @@ class ArticleController
     public function download(Request $request): BinaryFileResponse
     {
         $entry = $this->entry($request, 'view', acceptRevision: true);
-        $request->validate(['channelId' => ['required', 'string']]);
+        $request->validate(['channelId' => ['required', ...$this->channelRules()]]);
         $channel = $this->channelManager->getChannelById($request->input('channelId'));
 
         abort_unless($channel->matchEntry($entry), 400, 'This channel does not want anything to do with this entry.');
@@ -70,6 +71,7 @@ class ArticleController
     public function getInfo(Request $request): JsonResponse
     {
         $entry = $this->entry($request, 'view');
+        $request->validate(['channelId' => ['nullable', ...$this->channelRules()]]);
 
         return response()->json([
             'infos' => $this->getArticleInfo($entry, $request->input('channelId'), true),
@@ -82,6 +84,7 @@ class ArticleController
     public function publish(Request $request): JsonResponse
     {
         $entry = $this->entry($request, 'save');
+        $request->validate(['channelId' => ['nullable', ...$this->channelRules()]]);
         $channelId = $request->input('channelId');
         $this->articleManager->queue($entry, $channelId);
 
@@ -126,6 +129,16 @@ class ArticleController
     }
 
     /**
+     * Validation rules for a `channelId` param, which must be one of the configured channels.
+     *
+     * @return array<mixed>
+     */
+    private function channelRules(): array
+    {
+        return ['string', Rule::in(array_keys($this->channelManager->getChannels()))];
+    }
+
+    /**
      * @param  string|string[]|null  $channelId
      * @return array<string, array<string, mixed>>
      */
@@ -134,8 +147,10 @@ class ArticleController
         $infos = $this->articleManager->getArticleInfo($entry, $channelId, $refresh);
 
         // Add canPublish keys
+        $channels = $this->channelManager->getChannels();
+
         foreach ($infos as $id => $channelInfo) {
-            $infos[$id]['canPublish'] = $this->channelManager->getChannelById($id)->canPublish($entry);
+            $infos[$id]['canPublish'] = isset($channels[$id]) && $channels[$id]->canPublish($entry);
         }
 
         return $infos;

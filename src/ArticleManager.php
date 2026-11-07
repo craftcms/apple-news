@@ -89,34 +89,20 @@ class ArticleManager
      */
     public function canPublishEntry(Entry $entry): bool
     {
-        foreach ($this->channelManager->getChannels() as $channel) {
-            if ($channel->matchEntry($entry) && $channel->canPublish($entry)) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->publishableChannels($entry) !== [];
     }
 
     /**
-     * Queues an entry up to be published on Apple News
+     * Queues an entry up to be published on Apple News.
+     *
+     * Channels that don’t exist, don’t match the entry, or can’t publish it are skipped.
      *
      * @param  Entry  $entry  The entry to be published
      * @param  string|string[]|null  $channelIds  The Apple News channel ID(s) that the entry should be published to
      */
     public function queue(Entry $entry, array|string|null $channelIds = null): void
     {
-        if ($channelIds === null) {
-            // Queue all of them
-            $channelIds = [];
-            foreach ($this->channelManager->getChannels() as $channel) {
-                if ($channel->matchEntry($entry) && $channel->canPublish($entry)) {
-                    $channelIds[] = $channel->getChannelId();
-                }
-            }
-        } else {
-            $channelIds = Arr::wrap($channelIds);
-        }
+        $channelIds = array_keys($this->publishableChannels($entry, $channelIds));
 
         if (empty($channelIds)) {
             return;
@@ -147,18 +133,7 @@ class ArticleManager
      */
     public function publish(Entry $entry, array|string|null $channelIds = null): void
     {
-        if ($channelIds !== null) {
-            $channelIds = Arr::wrap($channelIds);
-        }
-
-        $channels = array_filter(
-            $this->channelManager->getChannels(),
-            fn(ChannelInterface $channel) => (
-                ($channelIds === null || in_array($channel->getChannelId(), $channelIds, true)) &&
-                $channel->matchEntry($entry) &&
-                $channel->canPublish($entry)
-            ),
-        );
+        $channels = $this->publishableChannels($entry, $channelIds);
 
         $articleRecords = $this->createArticleQuery($entry->id, $channelIds)->get()->keyBy('channelId');
 
@@ -254,6 +229,26 @@ class ArticleManager
         }
 
         return $response;
+    }
+
+    /**
+     * Returns the channels that the entry can be published to, limited to the given channel IDs.
+     *
+     * @param  string|string[]|null  $channelIds
+     * @return array<string, ChannelInterface> The channels, indexed by channel ID
+     */
+    protected function publishableChannels(Entry $entry, array|string|null $channelIds = null): array
+    {
+        $channelIds = $channelIds !== null ? Arr::wrap($channelIds) : null;
+
+        return array_filter(
+            $this->channelManager->getChannels(),
+            fn(ChannelInterface $channel) => (
+                ($channelIds === null || in_array($channel->getChannelId(), $channelIds, true)) &&
+                $channel->matchEntry($entry) &&
+                $channel->canPublish($entry)
+            ),
+        );
     }
 
     /**

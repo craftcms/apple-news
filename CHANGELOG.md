@@ -12,6 +12,8 @@
 - Fixed a bug where an article stayed queued if publishing it failed, or if the entry could no longer be published by the time the queue job ran. The article now goes back to its previous state.
 - Fixed a bug where articles that Apple News marked as duplicates were shown as not published yet.
 - Fixed a bug where the “Publish to Apple News” bulk action published entries that the user wasn’t allowed to save, such as other authors’ entries.
+- Fixed a bug where an unknown channel ID sent to the `apple-news/article/*` actions caused a server error, and `publish` queued the entry for it anyway. The actions now return a validation error.
+- Fixed a bug where `ArticleManager::queue()` queued entries for the given channels even if the channel didn’t match the entry or couldn’t publish it.
 - Fixed a bug where HTML comments weren’t removed from HTML converted to Markdown or article components.
 
 ## 4.1.0 - 2026-03-27
