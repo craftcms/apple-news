@@ -8,6 +8,7 @@ use CraftCms\AppleNews\ArticleManager;
 use CraftCms\Cms\Element\Actions\ElementAction;
 use CraftCms\Cms\Element\Queries\Contracts\ElementQueryInterface;
 use CraftCms\Cms\Entry\Elements\Entry;
+use Illuminate\Support\Facades\Gate;
 use Override;
 
 use function CraftCms\Cms\t;
@@ -25,10 +26,20 @@ class PublishArticles extends ElementAction
     public function performAction(ElementQueryInterface $query): bool
     {
         $articleManager = app(ArticleManager::class);
+        $queued = 0;
 
-        foreach ($query->all() as $entry) {
+        foreach ($query->cursor() as $entry) {
             /** @var Entry $entry */
-            $articleManager->queue($entry);
+            if (Gate::check('save', $entry)) {
+                $articleManager->queue($entry);
+                $queued++;
+            }
+        }
+
+        if ($queued === 0) {
+            $this->setMessage(t('You don’t have permission to publish the selected entries.', category: 'apple-news'));
+
+            return false;
         }
 
         return true;
