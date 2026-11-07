@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace CraftCms\AppleNews\Listeners;
 
 use CraftCms\AppleNews\ArticleManager;
-use CraftCms\AppleNews\ChannelManager;
+use CraftCms\AppleNews\Channels;
 use CraftCms\Cms\Element\Events\ElementEditorPayloadResolving;
 use CraftCms\Cms\Entry\Elements\Entry;
 use CraftCms\Cms\Support\Arr;
@@ -22,7 +22,7 @@ use CraftCms\Cms\Support\Url;
 class AddArticlePane
 {
     public function __construct(
-        private readonly ChannelManager $channelManager,
+        private readonly Channels $channels,
         private readonly ArticleManager $articleManager,
     ) {}
 
@@ -35,7 +35,7 @@ class AddArticlePane
         }
 
         $channels = array_filter(
-            $this->channelManager->getChannels(),
+            $this->channels->all(),
             fn ($channel) => $channel->matchEntry($entry),
         );
 
@@ -58,7 +58,7 @@ class AddArticlePane
             'isDraftOrRevision' => $isDraftOrRevision,
             'channels' => array_values(array_map(fn ($channel) => [
                 'id' => $channel->getChannelId(),
-                'name' => $this->channelManager->getChannelName($channel->getChannelId()),
+                'name' => $this->channels->name($channel->getChannelId()),
                 'state' => null,
                 'shareUrl' => null,
                 'isQueued' => false,

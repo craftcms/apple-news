@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace CraftCms\AppleNews\Utilities;
 
 use CraftCms\AppleNews\Api;
-use CraftCms\AppleNews\ChannelManager;
+use CraftCms\AppleNews\Channels;
 use CraftCms\Cms\Utility\Utility;
 use CraftCms\Cms\View\TemplateMode;
 use Override;
@@ -41,21 +41,20 @@ class AppleNewsInfo extends Utility
     #[Override]
     public static function contentHtml(): string
     {
-        $channelManager = app(ChannelManager::class);
+        $channels = app(Channels::class);
         $api = app(Api::class);
 
         // Load the channel info
-        $channels = $channelManager->getChannels();
         $channelNames = [];
         $sections = [];
 
-        foreach ($channels as $channelId => $channel) {
-            $channelNames[$channelId] = $channelManager->getChannelName($channelId);
+        foreach ($channels->all() as $channelId => $channel) {
+            $channelNames[$channelId] = $channels->name($channelId);
             $sections[$channelId] = $api->sections($channelId)->data;
         }
 
         return template('apple-news/_info', [
-            'channels' => $channels,
+            'channels' => $channels->all(),
             'channelNames' => $channelNames,
             'sections' => $sections,
         ], TemplateMode::Cp);

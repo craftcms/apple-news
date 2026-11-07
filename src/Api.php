@@ -34,7 +34,7 @@ class Api
     private const array FILE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'application/octet-stream'];
 
     public function __construct(
-        private readonly ChannelManager $channelManager,
+        private readonly Channels $channels,
         private readonly Settings $settings,
     ) {}
 
@@ -146,7 +146,7 @@ class Api
      */
     protected function request(string $channelId): PendingRequest
     {
-        $channel = $this->channelManager->getChannelById($channelId);
+        $channel = $this->channels->get($channelId);
 
         return Http::baseUrl(self::BASE_URL)
             ->acceptJson()

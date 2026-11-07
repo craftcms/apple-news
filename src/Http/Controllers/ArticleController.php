@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace CraftCms\AppleNews\Http\Controllers;
 
 use CraftCms\AppleNews\ArticleManager;
-use CraftCms\AppleNews\ChannelManager;
+use CraftCms\AppleNews\Channels;
 use CraftCms\AppleNews\Http\Requests\ArticleInfoRequest;
 use CraftCms\AppleNews\Http\Requests\DownloadArticleRequest;
 use CraftCms\AppleNews\Http\Requests\PublishArticleRequest;
@@ -24,7 +24,7 @@ class ArticleController
 {
     public function __construct(
         private readonly ArticleManager $articleManager,
-        private readonly ChannelManager $channelManager,
+        private readonly Channels $channels,
     ) {}
 
     /**
@@ -97,7 +97,7 @@ class ArticleController
         $infos = $this->articleManager->getArticleInfo($entry, $channelId, $refresh);
 
         // Add canPublish keys
-        $channels = $this->channelManager->getChannels();
+        $channels = $this->channels->all();
 
         foreach ($infos as $id => $channelInfo) {
             $infos[$id]['canPublish'] = isset($channels[$id]) && $channels[$id]->canPublish($entry);

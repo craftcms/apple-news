@@ -31,7 +31,7 @@ Your existing `applenews_articles` table and its records are kept.
 | `craft\applenews\ArticleManager` | `CraftCms\AppleNews\ArticleManager` |
 | `craft\applenews\BaseChannel` | `CraftCms\AppleNews\BaseChannel` |
 | `craft\applenews\ChannelInterface` | `CraftCms\AppleNews\ChannelInterface` |
-| `craft\applenews\ChannelManager` | `CraftCms\AppleNews\ChannelManager` |
+| `craft\applenews\ChannelManager` | `CraftCms\AppleNews\Channels` |
 | `craft\applenews\Helper` | `CraftCms\AppleNews\Helper` |
 | `craft\applenews\Settings` | `CraftCms\AppleNews\Settings` |
 | `craft\applenews\controllers\ArticleController` | `CraftCms\AppleNews\Http\Controllers\ArticleController` |
@@ -81,7 +81,7 @@ Plugin::getInstance()->articleManager->queue($entry);
 app(\CraftCms\AppleNews\ArticleManager::class)->queue($entry);
 ```
 
-`ArticleManager::$generator` is now the `generator()` method. `ArticleManager::createArticleQuery()` was removed; use `Models\Article::query()->forEntry($entryId)->inChannels($channelIds)`. Methods that threw `yii\base\InvalidConfigException` for an invalid channel config now throw `UnexpectedValueException`.
+`ChannelManager` is now `Channels`, and its methods are shorter: `getChannels()` is `all()`, `getChannelById()` is `get()`, and `getChannelName()` is `name()`. `ArticleManager::$generator` is now the `generator()` method. `ArticleManager::createArticleQuery()` was removed; use `Models\Article::query()->forEntry($entryId)->inChannels($channelIds)`. Methods that threw `yii\base\InvalidConfigException` for an invalid channel config now throw `UnexpectedValueException`.
 
 ### Apple News API client
 

@@ -20,7 +20,7 @@ use stdClass;
 class ArticleManager
 {
     public function __construct(
-        private readonly ChannelManager $channelManager,
+        private readonly Channels $channels,
         private readonly Api $api,
     ) {}
 
@@ -232,7 +232,7 @@ class ArticleManager
         $channelIds = $channelIds !== null ? Arr::wrap($channelIds) : null;
 
         return array_filter(
-            $this->channelManager->getChannels(),
+            $this->channels->all(),
             fn (ChannelInterface $channel) => (
                 ($channelIds === null || in_array($channel->getChannelId(), $channelIds, true)) &&
                 $channel->matchEntry($entry) &&

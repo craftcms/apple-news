@@ -14,7 +14,7 @@ use UnexpectedValueException;
 
 /** @since 2.0 */
 #[Singleton]
-class ChannelManager
+class Channels
 {
     /**
      * @var ChannelInterface[]|null The channels, indexed by channel ID
@@ -32,7 +32,7 @@ class ChannelManager
      *
      * @throws UnexpectedValueException if a channel config is invalid
      */
-    public function getChannels(): array
+    public function all(): array
     {
         if ($this->channels !== null) {
             return $this->channels;
@@ -55,9 +55,9 @@ class ChannelManager
      *
      * @throws InvalidArgumentException if no channel exists with that ID
      */
-    public function getChannelById(string $channelId): ChannelInterface
+    public function get(string $channelId): ChannelInterface
     {
-        $channels = $this->getChannels();
+        $channels = $this->all();
         if (! isset($channels[$channelId])) {
             throw new InvalidArgumentException('No channel exists with the ID '.$channelId);
         }
@@ -73,7 +73,7 @@ class ChannelManager
      *
      * @throws InvalidArgumentException if no channel exists with that ID
      */
-    public function getChannelName(string $channelId): string
+    public function name(string $channelId): string
     {
         return Cache::remember(
             "apple-news:channel-name:$channelId",

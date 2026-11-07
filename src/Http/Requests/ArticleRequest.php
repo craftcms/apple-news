@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace CraftCms\AppleNews\Http\Requests;
 
 use CraftCms\AppleNews\ChannelInterface;
-use CraftCms\AppleNews\ChannelManager;
+use CraftCms\AppleNews\Channels;
 use CraftCms\Cms\Entry\Elements\Entry;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
@@ -51,7 +51,7 @@ abstract class ArticleRequest extends FormRequest
             'channelId' => [
                 $this->requiresChannel ? 'required' : 'nullable',
                 'string',
-                Rule::in(array_keys(app(ChannelManager::class)->getChannels())),
+                Rule::in(array_keys(app(Channels::class)->all())),
             ],
         ];
     }
@@ -71,7 +71,7 @@ abstract class ArticleRequest extends FormRequest
     {
         $channelId = $this->validated('channelId');
 
-        return $channelId !== null ? app(ChannelManager::class)->getChannelById($channelId) : null;
+        return $channelId !== null ? app(Channels::class)->get($channelId) : null;
     }
 
     #[Override]
