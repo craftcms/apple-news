@@ -15,7 +15,7 @@
 - Fixed a bug where articles that Apple News marked as duplicates were shown as not published yet.
 - Fixed a bug where the “Publish to Apple News” bulk action published entries that the user wasn’t allowed to save, such as other authors’ entries.
 - Fixed a bug where an unknown channel ID sent to the `apple-news/article/*` actions caused a server error, and `publish` queued the entry for it anyway. The actions now return a validation error.
-- Fixed a bug where `ArticleManager::queue()` queued entries for the given channels even if the channel didn’t match the entry or couldn’t publish it.
+- Fixed a bug where `Articles::queue()` queued entries for the given channels even if the channel didn’t match the entry or couldn’t publish it.
 - Publish jobs now retry connection errors, server errors and throttled requests up to three times. Other errors from Apple News fail the job right away.
 - Fixed a bug where two queue workers could publish the same entry at once, creating duplicate articles on Apple News.
 - Fixed a bug where changes saved while an article was being published weren’t published.

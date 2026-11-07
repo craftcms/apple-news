@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace CraftCms\AppleNews\Listeners;
 
-use CraftCms\AppleNews\ArticleManager;
+use CraftCms\AppleNews\Articles;
 use CraftCms\Cms\Element\Events\ElementDeleting;
 use CraftCms\Cms\Entry\Elements\Entry;
 
@@ -16,13 +16,13 @@ use CraftCms\Cms\Entry\Elements\Entry;
 class DeleteArticles
 {
     public function __construct(
-        private readonly ArticleManager $articleManager,
+        private readonly Articles $articles,
     ) {}
 
     public function handle(ElementDeleting $event): void
     {
         if ($event->element instanceof Entry) {
-            $this->articleManager->delete($event->element);
+            $this->articles->delete($event->element);
         }
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace CraftCms\AppleNews\Http\Controllers;
 
-use CraftCms\AppleNews\ArticleManager;
+use CraftCms\AppleNews\Articles;
 use CraftCms\AppleNews\Channels;
 use CraftCms\AppleNews\Http\Requests\ArticleInfoRequest;
 use CraftCms\AppleNews\Http\Requests\DownloadArticleRequest;
@@ -23,7 +23,7 @@ use ZipArchive;
 class ArticleController
 {
     public function __construct(
-        private readonly ArticleManager $articleManager,
+        private readonly Articles $articles,
         private readonly Channels $channels,
     ) {}
 
@@ -69,7 +69,7 @@ class ArticleController
     public function getInfo(ArticleInfoRequest $request): JsonResponse
     {
         return response()->json([
-            'infos' => $this->getArticleInfo($request->entry(), $request->validated('channelId'), true),
+            'infos' => $this->articleInfo($request->entry(), $request->validated('channelId'), true),
         ]);
     }
 
@@ -80,11 +80,11 @@ class ArticleController
     {
         $entry = $request->entry();
         $channelId = $request->validated('channelId');
-        $this->articleManager->queue($entry, $channelId);
+        $this->articles->queue($entry, $channelId);
 
         return response()->json([
             'success' => true,
-            'infos' => $this->getArticleInfo($entry, $channelId),
+            'infos' => $this->articleInfo($entry, $channelId),
         ]);
     }
 
@@ -92,9 +92,9 @@ class ArticleController
      * @param  string|string[]|null  $channelId
      * @return array<string, array<string, mixed>>
      */
-    private function getArticleInfo(Entry $entry, array|string|null $channelId, bool $refresh = false): array
+    private function articleInfo(Entry $entry, array|string|null $channelId, bool $refresh = false): array
     {
-        $infos = $this->articleManager->getArticleInfo($entry, $channelId, $refresh);
+        $infos = $this->articles->info($entry, $channelId, $refresh);
 
         // Add canPublish keys
         $channels = $this->channels->all();

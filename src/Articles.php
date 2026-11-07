@@ -17,7 +17,7 @@ use stdClass;
 
 /** @since 2.0 */
 #[Singleton]
-class ArticleManager
+class Articles
 {
     public function __construct(
         private readonly Channels $channels,
@@ -48,7 +48,7 @@ class ArticleManager
      * @param  bool  $refresh  Whether the info should be refreshed for articles that are processing
      * @return array<string, array<string, mixed>> The info, indexed by channel ID
      */
-    public function getArticleInfo(Entry $entry, array|string|null $channelId = null, bool $refresh = false): array
+    public function info(Entry $entry, array|string|null $channelId = null, bool $refresh = false): array
     {
         $records = ArticleRecord::query()->forEntry($entry->id)->inChannels($channelId)->get();
         $infos = [];
@@ -84,7 +84,7 @@ class ArticleManager
      * @param  Entry  $entry  The entry to check
      * @return bool Whether the entry can be published to any channels
      */
-    public function canPublishEntry(Entry $entry): bool
+    public function canPublish(Entry $entry): bool
     {
         return $this->publishableChannels($entry) !== [];
     }

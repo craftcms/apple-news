@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace CraftCms\AppleNews\Jobs;
 
-use CraftCms\AppleNews\ArticleManager;
+use CraftCms\AppleNews\Articles;
 use CraftCms\Cms\Entry\Elements\Entry;
 use CraftCms\Cms\Queue\Job;
 use CraftCms\Cms\Support\Facades\I18N;
@@ -74,7 +74,7 @@ class PublishArticleJob extends Job implements ShouldBeUniqueUntilProcessing
         ];
     }
 
-    public function handle(ArticleManager $articleManager): void
+    public function handle(Articles $articles): void
     {
         /** @var Entry|null $entry */
         $entry = Entry::find()
@@ -90,7 +90,7 @@ class PublishArticleJob extends Job implements ShouldBeUniqueUntilProcessing
         $this->setProgress(0, $entry->title);
 
         try {
-            $articleManager->publish($entry, $this->channelId);
+            $articles->publish($entry, $this->channelId);
         } catch (RequestException $e) {
             if ($e->response->clientError() && $e->response->status() !== 429) {
                 $this->fail($e);
@@ -104,7 +104,7 @@ class PublishArticleJob extends Job implements ShouldBeUniqueUntilProcessing
 
     public function failed(?Throwable $exception): void
     {
-        app(ArticleManager::class)->unqueue($this->entryId, $this->channelId);
+        app(Articles::class)->unqueue($this->entryId, $this->channelId);
     }
 
     #[Override]

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use CraftCms\AppleNews\ArticleManager;
+use CraftCms\AppleNews\Articles;
 use CraftCms\AppleNews\Enums\ArticleState;
 use CraftCms\AppleNews\Jobs\PublishArticleJob;
 use CraftCms\AppleNews\Models\Article;
@@ -50,7 +50,7 @@ function postedArticles(): array
 it('creates the article, then updates it with the latest revision', function () {
     fakeAppleNews();
     $entry = newsEntry();
-    $manager = app(ArticleManager::class);
+    $manager = app(Articles::class);
 
     $manager->queue($entry);
 
@@ -60,7 +60,7 @@ it('creates the article, then updates it with the latest revision', function () 
         ->revisionId->toBe('rev1');
 
     // Refreshing a processing article picks up Apple’s current state
-    expect($manager->getArticleInfo($entry, refresh: true)[TestCase::CHANNEL_ID])->toMatchArray([
+    expect($manager->info($entry, refresh: true)[TestCase::CHANNEL_ID])->toMatchArray([
         'state' => 'LIVE',
         'revisionId' => 'rev2',
         'isQueued' => false,
@@ -81,12 +81,12 @@ it('marks articles as queued until their job runs', function () {
     publishedArticle($entry);
     $newEntry = newsEntry();
 
-    app(ArticleManager::class)->queue($entry);
-    app(ArticleManager::class)->queue($newEntry);
+    app(Articles::class)->queue($entry);
+    app(Articles::class)->queue($newEntry);
 
     expect(article($entry)->state)->toBe(ArticleState::QueuedUpdate)
         ->and(article($newEntry)->state)->toBe(ArticleState::Queued)
-        ->and(app(ArticleManager::class)->getArticleInfo($entry)[TestCase::CHANNEL_ID])
+        ->and(app(Articles::class)->info($entry)[TestCase::CHANNEL_ID])
         ->toMatchArray(['isQueued' => true, 'isShareable' => true]);
 });
 
@@ -94,8 +94,8 @@ it('only queues one job per article', function () {
     Queue::fake();
     $entry = newsEntry();
 
-    app(ArticleManager::class)->queue($entry);
-    app(ArticleManager::class)->queue($entry);
+    app(Articles::class)->queue($entry);
+    app(Articles::class)->queue($entry);
 
     Queue::assertPushed(PublishArticleJob::class, 1);
 });
@@ -106,7 +106,7 @@ it('publishes the entry’s current content even if its article isn’t queued a
     publishedArticle($entry);
 
     // e.g. a job for an earlier save has already replaced the queued state
-    (new PublishArticleJob($entry->id, $entry->siteId, TestCase::CHANNEL_ID))->handle(app(ArticleManager::class));
+    (new PublishArticleJob($entry->id, $entry->siteId, TestCase::CHANNEL_ID))->handle(app(Articles::class));
 
     expect(postedArticles())->toBe(['/articles/article-1']);
 });
@@ -115,7 +115,7 @@ it('doesn’t queue entries for channels that don’t match them', function () {
     Queue::fake();
     $entry = newsEntry(section: 'pages');
 
-    app(ArticleManager::class)->queue($entry, TestCase::CHANNEL_ID);
+    app(Articles::class)->queue($entry, TestCase::CHANNEL_ID);
 
     expect(article($entry))->toBeNull();
     Queue::assertNothingPushed();
@@ -126,7 +126,7 @@ it('restores the previous state when Apple rejects an update', function () {
     $entry = newsEntry();
     publishedArticle($entry);
 
-    app(ArticleManager::class)->queue($entry);
+    app(Articles::class)->queue($entry);
 
     expect(article($entry))->state->toBe(ArticleState::Live)->revisionId->toBe('rev2')
         ->and(postedArticles())->toHaveCount(1);
@@ -136,7 +136,7 @@ it('removes the record when a new article is rejected', function () {
     fakeAppleNews(fn () => Http::response(['errors' => [['code' => 'INVALID_DOCUMENT']]], 400));
     $entry = newsEntry();
 
-    app(ArticleManager::class)->queue($entry);
+    app(Articles::class)->queue($entry);
 
     expect(article($entry))->toBeNull();
 });
@@ -146,7 +146,7 @@ it('fails the job right away when Apple rejects the article', function () {
     $entry = newsEntry();
     $job = (new PublishArticleJob($entry->id, $entry->siteId, TestCase::CHANNEL_ID))->withFakeQueueInteractions();
 
-    $job->handle(app(ArticleManager::class));
+    $job->handle(app(Articles::class));
 
     $job->assertFailed();
 });
@@ -156,10 +156,10 @@ it('leaves the article queued for a retry after a server error', function (int $
     Queue::fake();
     $entry = newsEntry();
     publishedArticle($entry);
-    app(ArticleManager::class)->queue($entry);
+    app(Articles::class)->queue($entry);
     $job = (new PublishArticleJob($entry->id, $entry->siteId, TestCase::CHANNEL_ID))->withFakeQueueInteractions();
 
-    expect(fn () => $job->handle(app(ArticleManager::class)))->toThrow(RequestException::class);
+    expect(fn () => $job->handle(app(Articles::class)))->toThrow(RequestException::class);
 
     $job->assertNotFailed();
     expect(article($entry)->state)->toBe(ArticleState::QueuedUpdate);
@@ -174,14 +174,14 @@ it('unqueues the article if the entry can’t be published anymore when the job 
     $entry = newsEntry();
     publishedArticle($entry);
     $newEntry = newsEntry();
-    app(ArticleManager::class)->queue($entry);
-    app(ArticleManager::class)->queue($newEntry);
+    app(Articles::class)->queue($entry);
+    app(Articles::class)->queue($newEntry);
 
     fakeAppleNews();
     foreach ([$entry, $newEntry] as $e) {
         $e->enabled = false;
         Elements::saveElement($e);
-        (new PublishArticleJob($e->id, $e->siteId, TestCase::CHANNEL_ID))->handle(app(ArticleManager::class));
+        (new PublishArticleJob($e->id, $e->siteId, TestCase::CHANNEL_ID))->handle(app(Articles::class));
     }
 
     expect(article($entry)->state)->toBe(ArticleState::Live)
@@ -206,7 +206,7 @@ it('deletes articles from Apple News when the entry is deleted', function () {
     $entry = newsEntry();
     publishedArticle($entry);
     $queuedEntry = newsEntry();
-    app(ArticleManager::class)->queue($queuedEntry);
+    app(Articles::class)->queue($queuedEntry);
 
     Elements::deleteElement($entry, hardDelete: true);
     Elements::deleteElement($queuedEntry, hardDelete: true);

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace CraftCms\AppleNews\ElementActions;
 
-use CraftCms\AppleNews\ArticleManager;
+use CraftCms\AppleNews\Articles;
 use CraftCms\Cms\Element\Actions\ElementAction;
 use CraftCms\Cms\Element\Queries\Contracts\ElementQueryInterface;
 use CraftCms\Cms\Entry\Elements\Entry;
@@ -25,13 +25,13 @@ class PublishArticles extends ElementAction
     #[Override]
     public function performAction(ElementQueryInterface $query): bool
     {
-        $articleManager = app(ArticleManager::class);
+        $articles = app(Articles::class);
         $queued = 0;
 
         foreach ($query->cursor() as $entry) {
             /** @var Entry $entry */
             if (Gate::check('save', $entry)) {
-                $articleManager->queue($entry);
+                $articles->queue($entry);
                 $queued++;
             }
         }

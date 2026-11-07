@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace CraftCms\AppleNews\Listeners;
 
-use CraftCms\AppleNews\ArticleManager;
+use CraftCms\AppleNews\Articles;
 use CraftCms\AppleNews\Settings;
 use CraftCms\Cms\Element\ElementHelper;
 use CraftCms\Cms\Element\Events\ElementSaved;
@@ -19,7 +19,7 @@ class QueueSavedEntry
 {
     public function __construct(
         private readonly Settings $settings,
-        private readonly ArticleManager $articleManager,
+        private readonly Articles $articles,
     ) {}
 
     public function handle(ElementSaved $event): void
@@ -32,6 +32,6 @@ class QueueSavedEntry
             return;
         }
 
-        $this->articleManager->queue($event->element);
+        $this->articles->queue($event->element);
     }
 }

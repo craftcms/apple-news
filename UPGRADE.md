@@ -28,7 +28,7 @@ Your existing `applenews_articles` table and its records are kept.
 | `craft\applenews\Api` | `CraftCms\AppleNews\Api` |
 | `craft\applenews\Article` | `CraftCms\AppleNews\Article` |
 | `craft\applenews\ArticleInterface` | `CraftCms\AppleNews\ArticleInterface` |
-| `craft\applenews\ArticleManager` | `CraftCms\AppleNews\ArticleManager` |
+| `craft\applenews\ArticleManager` | `CraftCms\AppleNews\Articles` |
 | `craft\applenews\BaseChannel` | `CraftCms\AppleNews\BaseChannel` |
 | `craft\applenews\ChannelInterface` | `CraftCms\AppleNews\ChannelInterface` |
 | `craft\applenews\ChannelManager` | `CraftCms\AppleNews\Channels` |
@@ -78,10 +78,10 @@ The plugin no longer has `api`, `articleManager` or `channelManager` components.
 Plugin::getInstance()->articleManager->queue($entry);
 
 // After
-app(\CraftCms\AppleNews\ArticleManager::class)->queue($entry);
+app(\CraftCms\AppleNews\Articles::class)->queue($entry);
 ```
 
-`ChannelManager` is now `Channels`, and its methods are shorter: `getChannels()` is `all()`, `getChannelById()` is `get()`, and `getChannelName()` is `name()`. `ArticleManager::$generator` is now the `generator()` method. `ArticleManager::createArticleQuery()` was removed; use `Models\Article::query()->forEntry($entryId)->inChannels($channelIds)`. Methods that threw `yii\base\InvalidConfigException` for an invalid channel config now throw `UnexpectedValueException`.
+`ChannelManager` is now `Channels`, and its methods are shorter: `getChannels()` is `all()`, `getChannelById()` is `get()`, and `getChannelName()` is `name()`. `ArticleManager` is now `Articles`. `getArticleInfo()` is `info()`, `canPublishEntry()` is `canPublish()`, and `$generator` is the `generator()` method. `createArticleQuery()` was removed; use `Models\Article::query()->forEntry($entryId)->inChannels($channelIds)`. Methods that threw `yii\base\InvalidConfigException` for an invalid channel config now throw `UnexpectedValueException`.
 
 ### Apple News API client
 
@@ -106,7 +106,7 @@ use CraftCms\AppleNews\Enums\ArticleState;
 if ($record->state === ArticleState::Live) {
 ```
 
-`Models\Article::$state` is cast to `ArticleState`. `ArticleManager::getArticleInfo()` still returns each state as a string, and now also returns `isQueued`, `isProcessing` and `isShareable` flags.
+`Models\Article::$state` is cast to `ArticleState`. `Articles::info()` still returns each state as a string, and now also returns `isQueued`, `isProcessing` and `isShareable` flags.
 
 ### Routes and action URLs
 

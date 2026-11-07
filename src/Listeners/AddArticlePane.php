@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace CraftCms\AppleNews\Listeners;
 
-use CraftCms\AppleNews\ArticleManager;
+use CraftCms\AppleNews\Articles;
 use CraftCms\AppleNews\Channels;
 use CraftCms\Cms\Element\Events\ElementEditorPayloadResolving;
 use CraftCms\Cms\Entry\Elements\Entry;
@@ -23,7 +23,7 @@ class AddArticlePane
 {
     public function __construct(
         private readonly Channels $channels,
-        private readonly ArticleManager $articleManager,
+        private readonly Articles $articles,
     ) {}
 
     public function handle(ElementEditorPayloadResolving $event): void
@@ -43,7 +43,7 @@ class AddArticlePane
             return;
         }
 
-        $infos = $this->articleManager->getArticleInfo($entry, array_keys($channels));
+        $infos = $this->articles->info($entry, array_keys($channels));
         $isDraftOrRevision = $entry->getIsDraft() || $entry->getIsRevision();
         $downloadParams = [
             'entryId' => $entry->getCanonicalId(),
