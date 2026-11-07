@@ -41,7 +41,13 @@ php artisan craft:plugin:install apple-news
 
 ## Configuration
 
-Publish to Apple News gets its own configuration file, located at `config/craft/apple-news.php`. It can have the following config settings:
+Publish to Apple News gets its own configuration file, located at `config/craft/apple-news.php`. To create it, run:
+
+```bash
+php artisan vendor:publish --tag=apple-news
+```
+
+It can have the following config settings:
 
 - `channels` _(array)_ – List of [channel class](#channel-classes) configs
 - `autoPublishOnSave` _(bool)_ – Whether entries should be automatically published to Apple News whenever they are saved (`true` by default)

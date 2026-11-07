@@ -6,7 +6,7 @@
 - The plugin’s classes moved to the `CraftCms\AppleNews` namespace. See [UPGRADE.md](UPGRADE.md).
 - The Apple News Channels pane is now a details panel in the entry editor.
 - The “Publish to Apple News” bulk action requires the “Save entries” permission for the section.
-- Plugin settings are now read from `config/craft/apple-news.php`.
+- Plugin settings are now read from `config/craft/apple-news.php`. Run `php artisan vendor:publish --tag=apple-news` to create it.
 - Article publishing now uses Laravel queue jobs (`CraftCms\AppleNews\Jobs\PublishArticleJob`).
 - The Apple News API is now called with Laravel’s HTTP client. The plugin no longer requires `chapter-three/apple-news-api`.
 - Errors from the Apple News API now throw `Illuminate\Http\Client\RequestException`, which includes Apple’s error codes.
