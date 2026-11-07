@@ -6,15 +6,15 @@ namespace CraftCms\AppleNews\Http\Controllers;
 
 use CraftCms\AppleNews\ArticleManager;
 use CraftCms\AppleNews\ChannelManager;
+use CraftCms\AppleNews\Http\Requests\ArticleInfoRequest;
+use CraftCms\AppleNews\Http\Requests\DownloadArticleRequest;
+use CraftCms\AppleNews\Http\Requests\PublishArticleRequest;
 use CraftCms\Cms\Entry\Elements\Entry;
 use CraftCms\Cms\Support\Facades\Path;
 use CraftCms\Cms\Support\File;
 use CraftCms\Cms\Support\Json;
 use CraftCms\Cms\Support\Str;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\Rule;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use ZipArchive;
@@ -31,11 +31,10 @@ class ArticleController
     /**
      * Downloads a bundle for Apple News Preview.
      */
-    public function download(Request $request): BinaryFileResponse
+    public function download(DownloadArticleRequest $request): BinaryFileResponse
     {
-        $entry = $this->entry($request, 'view', acceptRevision: true);
-        $request->validate(['channelId' => ['required', ...$this->channelRules()]]);
-        $channel = $this->channelManager->getChannelById($request->input('channelId'));
+        $entry = $request->entry();
+        $channel = $request->channel();
 
         abort_unless($channel->matchEntry($entry), 400, 'This channel does not want anything to do with this entry.');
 
@@ -68,74 +67,26 @@ class ArticleController
     /**
      * Returns the latest info about an entry's articles.
      */
-    public function getInfo(Request $request): JsonResponse
+    public function getInfo(ArticleInfoRequest $request): JsonResponse
     {
-        $entry = $this->entry($request, 'view');
-        $request->validate(['channelId' => ['nullable', ...$this->channelRules()]]);
-
         return response()->json([
-            'infos' => $this->getArticleInfo($entry, $request->input('channelId'), true),
+            'infos' => $this->getArticleInfo($request->entry(), $request->validated('channelId'), true),
         ]);
     }
 
     /**
      * Queues an entry to be published to Apple News.
      */
-    public function publish(Request $request): JsonResponse
+    public function publish(PublishArticleRequest $request): JsonResponse
     {
-        $entry = $this->entry($request, 'save');
-        $request->validate(['channelId' => ['nullable', ...$this->channelRules()]]);
-        $channelId = $request->input('channelId');
+        $entry = $request->entry();
+        $channelId = $request->validated('channelId');
         $this->articleManager->queue($entry, $channelId);
 
         return response()->json([
             'success' => true,
             'infos' => $this->getArticleInfo($entry, $channelId),
         ]);
-    }
-
-    private function entry(Request $request, string $ability, bool $acceptRevision = false): Entry
-    {
-        $request->validate([
-            'entryId' => ['required', 'integer'],
-            'siteId' => ['required', 'integer'],
-            'draftId' => ['nullable', 'integer'],
-            'revisionId' => ['nullable', 'integer'],
-        ]);
-
-        $draftId = $acceptRevision ? $request->integer('draftId') : 0;
-        $revisionId = $acceptRevision ? $request->integer('revisionId') : 0;
-
-        $query = Entry::find()
-            ->siteId($request->integer('siteId'))
-            ->status(null);
-
-        if ($draftId) {
-            $query->draftId($draftId);
-        } elseif ($revisionId) {
-            $query->revisionId($revisionId);
-        } else {
-            $query->id($request->integer('entryId'));
-        }
-
-        /** @var Entry|null $entry */
-        $entry = $query->one();
-
-        abort_unless($entry !== null, 400);
-
-        Gate::authorize($ability, $entry);
-
-        return $entry;
-    }
-
-    /**
-     * Validation rules for a `channelId` param, which must be one of the configured channels.
-     *
-     * @return array<mixed>
-     */
-    private function channelRules(): array
-    {
-        return ['string', Rule::in(array_keys($this->channelManager->getChannels()))];
     }
 
     /**
