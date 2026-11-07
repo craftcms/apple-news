@@ -8,6 +8,7 @@ use CraftCms\AppleNews\ArticleManager;
 use CraftCms\AppleNews\ChannelManager;
 use CraftCms\Cms\Element\Events\ElementEditorPayloadResolving;
 use CraftCms\Cms\Entry\Elements\Entry;
+use CraftCms\Cms\Support\Arr;
 use CraftCms\Cms\Support\Url;
 
 /**
@@ -59,8 +60,12 @@ class AddArticlePane
             'channels' => array_values(array_map(fn($channel) => [
                 'id' => $channel->getChannelId(),
                 'name' => $this->channelManager->getChannelName($channel->getChannelId()),
-                'state' => $infos[$channel->getChannelId()]['state'] ?? null,
-                'shareUrl' => $infos[$channel->getChannelId()]['shareUrl'] ?? null,
+                'state' => null,
+                'shareUrl' => null,
+                'isQueued' => false,
+                'isProcessing' => false,
+                'isShareable' => false,
+                ...Arr::only($infos[$channel->getChannelId()] ?? [], ['state', 'shareUrl', 'isQueued', 'isProcessing', 'isShareable']),
                 'canPublish' => !$isDraftOrRevision && $channel->canPublish($entry),
                 'downloadUrl' => Url::actionUrl('apple-news/article/download', array_filter([
                     ...$downloadParams,

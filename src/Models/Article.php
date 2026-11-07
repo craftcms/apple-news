@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CraftCms\AppleNews\Models;
 
+use CraftCms\AppleNews\Enums\ArticleState;
 use CraftCms\Cms\Shared\BaseModel;
 use CraftCms\Cms\Shared\Concerns\HasUid;
 
@@ -17,7 +18,7 @@ use CraftCms\Cms\Shared\Concerns\HasUid;
  * @property string|null $revisionId
  * @property bool $isSponsored
  * @property bool $isPreview
- * @property string $state
+ * @property ArticleState $state
  * @property string|null $shareUrl
  * @property string|null $response
  *
@@ -33,5 +34,6 @@ class Article extends BaseModel
         'entryId' => 'integer',
         'isSponsored' => 'boolean',
         'isPreview' => 'boolean',
+        'state' => ArticleState::class,
     ];
 }

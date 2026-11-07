@@ -83,6 +83,22 @@ app(\CraftCms\AppleNews\ArticleManager::class)->queue($entry);
 
 `ArticleManager::$generator` is now the `generator()` method. Methods that threw `yii\base\InvalidConfigException` for an invalid channel config now throw `UnexpectedValueException`.
 
+### Article states
+
+The `ArticleManager::STATE_*` constants were removed. Use the `CraftCms\AppleNews\Enums\ArticleState` enum instead, which has the same values plus `DUPLICATE`:
+
+```php
+// Before
+if ($record->state === ArticleManager::STATE_LIVE) {
+
+// After
+use CraftCms\AppleNews\Enums\ArticleState;
+
+if ($record->state === ArticleState::Live) {
+```
+
+`Models\Article::$state` is cast to `ArticleState`. `ArticleManager::getArticleInfo()` still returns each state as a string, and now also returns `isQueued`, `isProcessing` and `isShareable` flags.
+
 ### Routes and action URLs
 
 The `apple-news/article/download`, `apple-news/article/get-info` and `apple-news/article/publish` action URLs keep working. They now require a logged-in user, and authorize with Craft’s entry policies: `download` and `get-info` need permission to view the entry, and `publish` needs permission to save it.

@@ -6,20 +6,6 @@
     payload: {type: Object, required: true},
   });
 
-  const busyStates = [
-    'QUEUED',
-    'QUEUED_UPDATE',
-    'PROCESSING',
-    'PROCESSING_UPDATE',
-  ];
-  const sharedStates = [
-    'QUEUED_UPDATE',
-    'PROCESSING',
-    'PROCESSING_UPDATE',
-    'LIVE',
-  ];
-  const queuedStates = ['QUEUED', 'QUEUED_UPDATE'];
-
   const info = computed(() => props.payload.appleNews);
   const channels = ref([]);
   const loading = ref(false);
@@ -101,6 +87,15 @@
             'apple-news'
           ),
         };
+      case 'DUPLICATE':
+        return {
+          fill: null,
+          label: t(
+            'The article is a duplicate of another article and is not visible in the News app.',
+            {},
+            'apple-news'
+          ),
+        };
       case 'TAKEN_DOWN':
         return {
           fill: null,
@@ -121,7 +116,7 @@
   function actions(channel) {
     const items = [];
 
-    if (sharedStates.includes(channel.state) && channel.shareUrl) {
+    if (channel.isShareable && channel.shareUrl) {
       items.push({
         label: t('Copy share URL', {}, 'apple-news'),
         icon: 'clipboard',
@@ -132,7 +127,7 @@
     if (
       !info.value.isDraftOrRevision &&
       channel.canPublish &&
-      !queuedStates.includes(channel.state)
+      !channel.isQueued
     ) {
       items.push({
         label: t('Publish to Apple News', {}, 'apple-news'),
@@ -161,9 +156,7 @@
     for (const channel of channels.value) {
       const channelInfo = infos?.[channel.id];
       if (channelInfo) {
-        channel.state = channelInfo.state;
-        channel.shareUrl = channelInfo.shareUrl;
-        channel.canPublish = channelInfo.canPublish ?? channel.canPublish;
+        Object.assign(channel, channelInfo);
       }
     }
   }
@@ -204,7 +197,9 @@
     clearTimeout(refreshTimeout);
     refreshTimeout = null;
 
-    if (channels.value.some((channel) => busyStates.includes(channel.state))) {
+    if (
+      channels.value.some((channel) => channel.isQueued || channel.isProcessing)
+    ) {
       refreshTimeout = setTimeout(refresh, delay);
     }
   }

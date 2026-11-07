@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CraftCms\AppleNews;
 
+use CraftCms\AppleNews\Enums\ArticleState;
 use CraftCms\AppleNews\Jobs\PublishArticleJob;
 use CraftCms\AppleNews\Models\Article as ArticleRecord;
 use CraftCms\Cms\Cms;
@@ -12,28 +13,14 @@ use CraftCms\Cms\Support\Json;
 use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
+use RuntimeException;
 use stdClass;
+use Throwable;
 
 /** @since 2.0 */
 #[Singleton]
 class ArticleManager
 {
-    public const string STATE_PROCESSING = 'PROCESSING';
-
-    public const string STATE_PROCESSING_UPDATE = 'PROCESSING_UPDATE';
-
-    public const string STATE_QUEUED = 'QUEUED';
-
-    public const string STATE_QUEUED_UPDATE = 'QUEUED_UPDATE';
-
-    public const string STATE_LIVE = 'LIVE';
-
-    public const string STATE_FAILED_PROCESSING = 'FAILED_PROCESSING';
-
-    public const string STATE_FAILED_PROCESSING_UPDATE = 'FAILED_PROCESSING_UPDATE';
-
-    public const string STATE_TAKEN_DOWN = 'TAKEN_DOWN';
-
     public function __construct(
         private readonly ChannelManager $channelManager,
         private readonly Api $api,
@@ -71,7 +58,7 @@ class ArticleManager
 
         foreach ($records as $record) {
             // Refresh first?
-            if ($refresh && in_array($record->state, [self::STATE_PROCESSING, self::STATE_PROCESSING_UPDATE], true)) {
+            if ($refresh && $record->state->isProcessing()) {
                 $response = $this->api->article($record->channelId, $record->articleId);
                 if (isset($response->data)) {
                     $this->updateArticleRecord($record, $response);
@@ -83,8 +70,11 @@ class ArticleManager
                 'revisionId' => $record->revisionId,
                 'isSponsored' => $record->isSponsored,
                 'isPreview' => $record->isPreview,
-                'state' => $record->state,
+                'state' => $record->state->value,
                 'shareUrl' => $record->shareUrl,
+                'isQueued' => $record->state->isQueued(),
+                'isProcessing' => $record->state->isProcessing(),
+                'isShareable' => $record->state->isShareable(),
             ];
         }
 
@@ -139,7 +129,7 @@ class ArticleManager
                 'entryId' => $entry->id,
                 'channelId' => $channelId,
             ]);
-            $article->state = $article->articleId ? self::STATE_QUEUED_UPDATE : self::STATE_QUEUED;
+            $article->state = $article->articleId ? ArticleState::QueuedUpdate : ArticleState::Queued;
             $article->save();
 
             dispatch(new PublishArticleJob($entry->id, $entry->siteId, $channelId));
@@ -148,6 +138,9 @@ class ArticleManager
 
     /**
      * Publishes an article to Apple News.
+     *
+     * If the entry can’t be published to a channel it was queued for, or publishing to it fails, the article goes
+     * back to the state it had before it was queued.
      *
      * @param  Entry  $entry  The entry to be published
      * @param  string|string[]|null  $channelIds  The Apple News channel ID(s) to publish the entry to
@@ -167,58 +160,38 @@ class ArticleManager
             ),
         );
 
-        if (empty($channels)) {
-            return;
-        }
-
         $articleRecords = $this->createArticleQuery($entry->id, $channelIds)->get()->keyBy('channelId');
 
-        foreach ($channels as $channel) {
-            $channelId = $channel->getChannelId();
+        foreach ($articleRecords as $channelId => $articleRecord) {
+            if (!isset($channels[$channelId]) && $articleRecord->state->isQueued()) {
+                $this->unqueue($articleRecord);
+            }
+        }
+
+        foreach ($channels as $channelId => $channel) {
             $articleRecord = $articleRecords[$channelId] ?? null;
 
-            $article = $channel->createArticle($entry);
-            $content = $article->getContent();
-            $metadata = $article->getMetadata() ?: [];
-
-            // Include the generator metadata in the content
-            $content['metadata'] = array_merge(
-                $content['metadata'] ?? [],
-                $this->generator(),
-            );
-
-            // Include the latest revision ID if we have one
-            if ($articleRecord !== null) {
-                $metadata['revision'] = $articleRecord->revisionId;
-            }
-
-            // Prepare the data and send the request
-            $data = [
-                'files' => $article->getFiles(),
-                'metadata' => !empty($metadata) ? Json::encode(['data' => $metadata]) : null,
-                'json' => Json::encode($content),
-            ];
-
-            // Publish the article
-            if ($articleRecord !== null && $articleRecord->articleId) {
-                $response = $this->api->updateArticle($channelId, $articleRecord->articleId, $data);
-            } else {
-                $response = $this->api->createArticle($channelId, $data);
-            }
-
-            if (isset($response->data)) {
-                // Save a record of the article
-                if ($articleRecord === null) {
-                    $articleRecord = new ArticleRecord([
-                        'entryId' => $entry->id,
-                        'channelId' => $channelId,
-                        'articleId' => $response->data->id,
-                    ]);
-                } elseif (!$articleRecord->articleId) {
-                    $articleRecord->articleId = $response->data->id;
+            try {
+                $response = $this->sendArticle($entry, $channel, $articleRecord);
+            } catch (Throwable $e) {
+                if ($articleRecord?->state->isQueued()) {
+                    $this->unqueue($articleRecord);
                 }
-                $this->updateArticleRecord($articleRecord, $response);
+
+                throw $e;
             }
+
+            // Save a record of the article
+            if ($articleRecord === null) {
+                $articleRecord = new ArticleRecord([
+                    'entryId' => $entry->id,
+                    'channelId' => $channelId,
+                    'articleId' => $response->data->id,
+                ]);
+            } elseif (!$articleRecord->articleId) {
+                $articleRecord->articleId = $response->data->id;
+            }
+            $this->updateArticleRecord($articleRecord, $response);
         }
     }
 
@@ -229,14 +202,58 @@ class ArticleManager
      */
     public function delete(Entry $entry, array|string|null $channelIds = null): void
     {
-        $records = $this->createArticleQuery($entry->id, $channelIds)
-            ->where('articleId', '!=', null)
-            ->get();
-
-        foreach ($records as $record) {
-            $this->api->deleteArticle($record->channelId, $record->articleId);
+        foreach ($this->createArticleQuery($entry->id, $channelIds)->get() as $record) {
+            // Queued articles may not be on Apple News yet
+            if ($record->articleId) {
+                $this->api->deleteArticle($record->channelId, $record->articleId);
+            }
             $record->delete();
         }
+    }
+
+    /**
+     * Sends an entry’s article to Apple News, creating it or updating the existing one.
+     *
+     * @throws RuntimeException if Apple News doesn’t return the article
+     */
+    protected function sendArticle(Entry $entry, ChannelInterface $channel, ?ArticleRecord $articleRecord): stdClass
+    {
+        $channelId = $channel->getChannelId();
+
+        $article = $channel->createArticle($entry);
+        $content = $article->getContent();
+        $metadata = $article->getMetadata() ?: [];
+
+        // Include the generator metadata in the content
+        $content['metadata'] = array_merge(
+            $content['metadata'] ?? [],
+            $this->generator(),
+        );
+
+        // Include the latest revision ID if we have one
+        if ($articleRecord !== null) {
+            $metadata['revision'] = $articleRecord->revisionId;
+        }
+
+        // Prepare the data and send the request
+        $data = [
+            'files' => $article->getFiles(),
+            'metadata' => !empty($metadata) ? Json::encode(['data' => $metadata]) : null,
+            'json' => Json::encode($content),
+        ];
+
+        // Publish the article
+        if ($articleRecord !== null && $articleRecord->articleId) {
+            $response = $this->api->updateArticle($channelId, $articleRecord->articleId, $data);
+        } else {
+            $response = $this->api->createArticle($channelId, $data);
+        }
+
+        if (!$response instanceof stdClass || !isset($response->data)) {
+            throw new RuntimeException("Apple News didn’t return the article for entry $entry->id in channel $channelId.");
+        }
+
+        return $response;
     }
 
     /**
@@ -264,9 +281,27 @@ class ArticleManager
         $record->revisionId = $response->data->revision;
         $record->isSponsored = $response->data->isSponsored;
         $record->isPreview = $response->data->isPreview;
-        $record->state = $response->data->state;
+        $record->state = ArticleState::from($response->data->state);
         $record->shareUrl = $response->data->shareUrl;
         $record->response = Json::encode($response);
+        $record->save();
+    }
+
+    /**
+     * Returns a queued article to the state Apple News last reported for it, or removes it if it never reached Apple
+     * News.
+     */
+    protected function unqueue(ArticleRecord $record): void
+    {
+        $previousState = ArticleState::tryFrom(Json::decode($record->response)['data']['state'] ?? '');
+
+        if ($previousState === null) {
+            $record->delete();
+
+            return;
+        }
+
+        $record->state = $previousState;
         $record->save();
     }
 }

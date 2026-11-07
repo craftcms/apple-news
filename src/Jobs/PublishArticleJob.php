@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CraftCms\AppleNews\Jobs;
 
 use CraftCms\AppleNews\ArticleManager;
+use CraftCms\AppleNews\Enums\ArticleState;
 use CraftCms\AppleNews\Models\Article;
 use CraftCms\Cms\Entry\Elements\Entry;
 use CraftCms\Cms\Queue\Job;
@@ -32,7 +33,7 @@ class PublishArticleJob extends Job
         $queued = Article::query()
             ->where('entryId', $this->entryId)
             ->where('channelId', $this->channelId)
-            ->whereIn('state', [ArticleManager::STATE_QUEUED, ArticleManager::STATE_QUEUED_UPDATE])
+            ->whereIn('state', [ArticleState::Queued, ArticleState::QueuedUpdate])
             ->exists();
 
         if (!$queued) {
