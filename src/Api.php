@@ -175,7 +175,10 @@ class Api extends Component
      */
     protected function delete(string $channelId, string $path, array $pathArgs = [], array $data = []): object
     {
-        return $this->api($channelId)->delete($path, $pathArgs, $data);
+        // Apple responds to DELETE requests with 204 No Content, which the client returns as an empty string
+        /** @var object|string $response */
+        $response = $this->api($channelId)->delete($path, $pathArgs, $data);
+        return is_object($response) ? $response : new stdClass();
     }
 
     /**

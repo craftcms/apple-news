@@ -60,7 +60,7 @@ class ArticleManager extends Component
      * @return array[] The info, indexed by channel ID
      * @throws InvalidConfigException
      */
-    public function getArticleInfo(Entry $entry, array|string $channelId = null, bool $refresh = false): array
+    public function getArticleInfo(Entry $entry, array|string|null $channelId = null, bool $refresh = false): array
     {
         $query = ArticleRecord::find()
             ->where(['entryId' => $entry->id]);
@@ -122,7 +122,7 @@ class ArticleManager extends Component
      * @param array|null $channelIds The Apple News channel ID(s) that the entry should be published to
      * @throws InvalidConfigException
      */
-    public function queue(Entry $entry, array|string $channelIds = null): void
+    public function queue(Entry $entry, array|string|null $channelIds = null): void
     {
         if ($channelIds === null) {
             // Queue all of them
@@ -174,7 +174,7 @@ class ArticleManager extends Component
      * @param array|string|null $channelIds The Apple News channel ID(s) to publish the entry to
      * @throws InvalidConfigException
      */
-    public function publish(Entry $entry, array|string $channelIds = null): void
+    public function publish(Entry $entry, array|string|null $channelIds = null): void
     {
         if ($channelIds && is_string($channelIds)) {
             $channelIds = [$channelIds];
@@ -256,7 +256,7 @@ class ArticleManager extends Component
      * @throws StaleObjectException
      * @throws \Throwable
      */
-    public function delete(Entry $entry, array|string $channelIds = null): void
+    public function delete(Entry $entry, array|string|null $channelIds = null): void
     {
         /** @var ArticleRecord[] $records */
         $records = $this->createArticleQuery($entry->id, $channelIds)
@@ -277,7 +277,7 @@ class ArticleManager extends Component
      * @param string[]|null $channelIds
      * @return ActiveQuery
      */
-    protected function createArticleQuery(int $entryId, array $channelIds = null): ActiveQuery
+    protected function createArticleQuery(int $entryId, ?array $channelIds = null): ActiveQuery
     {
         $query = ArticleRecord::find()
             ->where(['entryId' => $entryId])
