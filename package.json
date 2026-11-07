@@ -15,7 +15,7 @@
     "prepare": "husky install",
     "dev": "vite",
     "build": "vite build",
-    "check-prettier": "prettier --check .",
-    "fix-prettier": "prettier --write ."
+    "check-prettier": "prettier --check . '!vendor/**'",
+    "fix-prettier": "prettier --write . '!vendor/**'"
   }
 }

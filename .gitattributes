@@ -14,6 +14,7 @@
 /composer.lock export-ignore
 /ecs.php export-ignore
 /phpstan.neon export-ignore
+/phpunit.xml export-ignore
 /.prettierrc.json export-ignore
 /.prettierignore export-ignore
 /gruntfile.js export-ignore
