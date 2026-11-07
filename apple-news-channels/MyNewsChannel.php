@@ -2,13 +2,10 @@
 
 namespace applenewschannels;
 
-use craft\applenews\ArticleInterface;
-use craft\applenews\BaseChannel;
-use craft\elements\Entry;
+use CraftCms\AppleNews\ArticleInterface;
+use CraftCms\AppleNews\BaseChannel;
+use CraftCms\Cms\Entry\Elements\Entry;
 
-/**
- * Class MyNewsChannel
- */
 class MyNewsChannel extends BaseChannel
 {
     /**

@@ -1,4 +1,4 @@
-<p align="center"><img src="./src/icon.svg" width="100" height="100" alt="Apple News icon"></p>
+<p align="center"><img src="./resources/icon.svg" width="100" height="100" alt="Apple News icon"></p>
 
 <h1 align="center">Apple News</h1>
 
@@ -12,7 +12,9 @@ Once you’ve created a channel, you’ll need to write down its Channel ID and 
 
 ## Requirements
 
-This plugin requires Craft CMS 5.0.0+ or 6.0.0-alpha.1+ with the `craftcms/yii2-adapter` package.
+This plugin requires Craft CMS 6.0 or later and PHP 8.5 or later. It doesn’t need the `craftcms/yii2-adapter` package.
+
+For Craft CMS 5, use Apple News 4.x. If you’re upgrading from 4.x, see [UPGRADE.md](UPGRADE.md).
 
 ## Installation
 
@@ -34,15 +36,16 @@ cd /path/to/my-project.test
 composer require craftcms/apple-news
 
 # tell Craft to install the plugin
-./craft install/plugin apple-news
+php artisan craft:plugin:install apple-news
 ```
 
 ## Configuration
 
-Publish to Apple News gets its own configuration file, located at `config/apple-news.php` (or `config/craft/apple-news.php` if you’re using Craft CMS v6). It can have the following config settings:
+Publish to Apple News gets its own configuration file, located at `config/craft/apple-news.php`. It can have the following config settings:
 
 - `channels` _(array)_ – List of [channel class](#channel-classes) configs
 - `autoPublishOnSave` _(bool)_ – Whether entries should be automatically published to Apple News whenever they are saved (`true` by default)
+- `httpClientTimeout` _(int)_ – Seconds to wait for the Apple News API to respond (`30` by default)
 
 Here’s an example:
 
@@ -53,9 +56,9 @@ return [
     'channels' => [
         [
             'class' => applenewschannels\MyNewsChannel::class,
-            'channelId' => craft\helpers\App::env('NEWS_CHANNEL_ID'), // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-            'apiKeyId' => craft\helpers\App::env('NEWS_API_KEY'),     // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-            'apiSecret' => craft\helpers\App::env('NEWS_API_SECRET'), // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            'channelId' => env('NEWS_CHANNEL_ID'), // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+            'apiKeyId' => env('NEWS_API_KEY'),     // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+            'apiSecret' => env('NEWS_API_SECRET'), // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         ],
     ],
 ];
@@ -63,7 +66,7 @@ return [
 
 ## Channel Classes
 
-Channel classes tell the plugin everything it needs to know to start publishing content Apple News. They should extend [craft\applenews\BaseChannel](https://github.com/craftcms/apple-news/blob/master/src/BaseChannel.php).
+Channel classes tell the plugin everything it needs to know to start publishing content Apple News. They should extend [CraftCms\AppleNews\BaseChannel](https://github.com/craftcms/apple-news/blob/5.x/src/BaseChannel.php). Each channel’s config can set any of the class’s public properties.
 
 We recommend that you save your channel classes in `config/apple-news-channels` and use an `applenewschannels` namespace.
 
@@ -73,7 +76,7 @@ namespace applenewschannels;
 // ...
 ```
 
-An example channel class is provided at [apple-news-channels/MyNewsChannel.php](https://github.com/craftcms/apple-news/blob/master/apple-news-channels/MyNewsChannel.php), which will more or less work with the “News” section within the [Happy Lager demo site](https://github.com/craftcms/demo).
+An example channel class is provided at [apple-news-channels/MyNewsChannel.php](https://github.com/craftcms/apple-news/blob/5.x/apple-news-channels/MyNewsChannel.php), which will more or less work with the “News” section within the [Happy Lager demo site](https://github.com/craftcms/demo).
 
 ### Autoloading your Channel Classes
 
@@ -91,17 +94,21 @@ To make your channel classes auto-loadable, add a new [autoload root](https://ge
 
 ## Usage
 
-Once your Channel classes are set up and included properly, a new **Apple News Channels** area appear in the details pane of Edit Entry pages, for entries that have at least one matching channel.
+Once your Channel classes are set up and included properly, an **Apple News Channels** panel appears in the details pane of the entry editor, for entries that have at least one matching channel. It shows the state of the entry’s article in each channel, and keeps it up to date while the article is queued or processing.
 
 <img src="./entry-channels.png" width="350" height="137" alt="The Apple News Channels area within an Edit Entry page">
 
-Each channel will display an action menu beside it with some of the following options, depending on the state of the article:
+Each channel displays an action menu beside it with some of the following options, depending on the state of the article:
 
 - **Publish to Apple News** – Queues the article to be published to Apple News.
 - **Copy share URL** – Displays a prompt that allows the user to copy the article’s share URL.
 - **Download for News Preview** – Downloads the entry’s `article.json` (and other files), which can be loaded into the [News Preview](https://developer.apple.com/news-preview/) app, to see exactly how your article will look on various iOS devices once published.
 
-There will also be a new **Publish to Apple News** bulk action on the Entries index page, which makes it possible to queue up several entries to be published at once.
+There is also a **Publish to Apple News** bulk action on the Entries index page, which makes it possible to queue up several entries to be published at once. It’s available to admins and to people who can save entries in the selected section.
+
+Articles are published by queue jobs, so make sure your project runs a queue worker (`php artisan queue:work`).
+
+The **Apple News Info** utility lists each channel’s sections and their IDs.
 
 <img src="./bulk-action.png" width="322" height="210" alt="The “Publish to Apple News” bulk entry action">
 

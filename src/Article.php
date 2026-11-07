@@ -1,19 +1,16 @@
 <?php
 
-namespace craft\applenews;
+declare(strict_types=1);
 
-use craft\elements\Asset;
-use craft\elements\Entry;
-use craft\helpers\FileHelper;
-use yii\base\BaseObject;
+namespace CraftCms\AppleNews;
 
-/**
- * Article
- *
- * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @since 2.0
- */
-class Article extends BaseObject implements ArticleInterface
+use CraftCms\Cms\Asset\Elements\Asset;
+use CraftCms\Cms\Entry\Elements\Entry;
+use CraftCms\Cms\Support\File;
+use CraftCms\Cms\Support\Typecast;
+
+/** @since 2.0 */
+class Article implements ArticleInterface
 {
     /**
      * @var Entry|null The associated entry
@@ -36,15 +33,22 @@ class Article extends BaseObject implements ArticleInterface
     protected array $content;
 
     /**
-     * Constructor
-     *
-     * @param Entry|null $entry
-     * @param array $config
+     * @param  array<string, mixed>  $config  Property values to set, before {@see init()} is called
      */
-    public function __construct(Entry $entry = null, array $config = [])
+    public function __construct(?Entry $entry = null, array $config = [])
     {
         $this->entry = $entry;
-        parent::__construct($config);
+        Typecast::configure($this, $config);
+        $this->init();
+    }
+
+    /**
+     * Initializes the article.
+     *
+     * Subclasses can override this to define the article content, files, and metadata.
+     */
+    public function init(): void
+    {
     }
 
     /**
@@ -77,7 +81,7 @@ class Article extends BaseObject implements ArticleInterface
         }
 
         // Get a unique filename for the article
-        $basename = FileHelper::sanitizeFilename(str_replace('@', '-', pathinfo($file, PATHINFO_FILENAME)), [
+        $basename = File::sanitizeFilename(str_replace('@', '-', pathinfo($file, PATHINFO_FILENAME)), [
             'asciiOnly' => true,
             'separator' => '-',
         ]);

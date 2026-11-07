@@ -1,15 +1,12 @@
 <?php
 
-namespace craft\applenews;
+declare(strict_types=1);
 
-use craft\elements\Entry;
+namespace CraftCms\AppleNews;
 
-/**
- * Channel interface
- *
- * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @since 2.0
- */
+use CraftCms\Cms\Entry\Elements\Entry;
+
+/** @since 2.0 */
 interface ChannelInterface
 {
     /**

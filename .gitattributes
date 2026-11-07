@@ -23,6 +23,7 @@
 /package-lock.json export-ignore
 /tsconfig.json export-ignore
 /webpack.config.js export-ignore
+/vite.config.js export-ignore
 /stubs/ export-ignore
 /tests/ export-ignore
 /packages/ export-ignore

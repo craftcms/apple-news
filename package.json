@@ -1,13 +1,20 @@
 {
   "name": "@craftcms/apple-news",
   "private": true,
+  "type": "module",
   "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.0",
     "husky": "^7.0.4",
+    "laravel-vite-plugin": "^2.0.0",
     "lint-staged": "^12.4.0",
-    "prettier": "^2.7.1"
+    "prettier": "^2.7.1",
+    "vite": "^7.0.0",
+    "vue": "^3.5.0"
   },
   "scripts": {
     "prepare": "husky install",
+    "dev": "vite",
+    "build": "vite build",
     "check-prettier": "prettier --check .",
     "fix-prettier": "prettier --write ."
   }

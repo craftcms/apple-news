@@ -1,5 +1,14 @@
 # Release Notes for Apple News for Craft CMS
 
+## Unreleased
+
+- Apple News now requires Craft CMS 6.0 or later and PHP 8.5 or later, and runs natively on Craft 6 without the `craftcms/yii2-adapter` package.
+- The plugin’s classes moved to the `CraftCms\AppleNews` namespace. See [UPGRADE.md](UPGRADE.md).
+- The Apple News Channels pane is now a details panel in the entry editor.
+- The “Publish to Apple News” bulk action requires the “Save entries” permission for the section.
+- Plugin settings are now read from `config/craft/apple-news.php`.
+- Article publishing now uses Laravel queue jobs (`CraftCms\AppleNews\Jobs\PublishArticleJob`).
+
 ## 4.1.0 - 2026-03-27
 
 - Fixed a bug where remote assets in an Apple News article might not download.

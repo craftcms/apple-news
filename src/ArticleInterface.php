@@ -1,16 +1,15 @@
 <?php
 
-namespace craft\applenews;
+declare(strict_types=1);
 
-use craft\elements\Asset;
+namespace CraftCms\AppleNews;
+
+use CraftCms\Cms\Asset\Elements\Asset;
 
 /**
- * Article interface
- *
  * See <https://developer.apple.com/documentation/apple_news/apple_news_api#//apple_ref/doc/uid/TP40015409-CH14-SW1> for
  * info about the Apple News API.
  *
- * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 2.0
  */
 interface ArticleInterface

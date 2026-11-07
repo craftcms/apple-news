@@ -1,0 +1,43 @@
+<div class="grid gap-8">
+  {% if not channels %}
+    <p>{{ 'You haven’t defined any channels yet.'|t('apple-news') }}</p>
+  {% endif %}
+
+  {% for channelId, channel in channels %}
+    <div>
+      <h2 class="mb-3">{{ channelNames[channelId] }}</h2>
+
+      <table class="cp-table cp-table--aligned" dir="ltr">
+        <tbody>
+          <tr>
+            <th class="light">{{ 'ID'|t('apple-news') }}</th>
+            <td><code>{{ channelId }}</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="mt-6 mb-3">{{ 'Channel Sections'|t('apple-news') }}</h3>
+
+      {% for section in sections[channelId] %}
+        <h4 class="mb-2">
+          {{ section.name }}
+          {% if section.isDefault %}
+            {{ '(Default)'|t('apple-news') }}
+          {% endif %}
+        </h4>
+        <table class="cp-table cp-table--aligned mb-3" dir="ltr">
+          <tbody>
+            <tr>
+              <th class="light">{{ 'ID'|t('apple-news') }}</th>
+              <td><code>{{ section.id }}</code></td>
+            </tr>
+            <tr>
+              <th class="light">{{ 'Link'|t('apple-news') }}</th>
+              <td><code>{{ section.links.self }}</code></td>
+            </tr>
+          </tbody>
+        </table>
+      {% endfor %}
+    </div>
+  {% endfor %}
+</div>

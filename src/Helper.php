@@ -1,25 +1,22 @@
 <?php
 
-namespace craft\applenews;
+declare(strict_types=1);
 
-use craft\base\Field;
-use craft\base\FieldInterface;
-use craft\elements\Entry;
-use craft\errors\InvalidFieldException;
-use craft\helpers\Search;
-use craft\htmlfield\HtmlFieldData as FieldData;
+namespace CraftCms\AppleNews;
+
+use CraftCms\Cms\Entry\Elements\Entry;
+use CraftCms\Cms\Field\Contracts\FieldInterface;
+use CraftCms\Cms\Field\Exceptions\InvalidFieldException;
+use CraftCms\Cms\Markdown\Markdown as MarkdownParser;
+use CraftCms\Cms\Support\Facades\Markdown;
+use CraftCms\Cms\Support\Search;
 use DOMDocument;
 use DOMNode;
 use InvalidArgumentException;
 use League\HTMLToMarkdown\HtmlConverter;
-use yii\helpers\Markdown;
+use Stringable;
 
-/**
- * Apple News helper
- *
- * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @since 2.0
- */
+/** @since 2.0 */
 abstract class Helper
 {
     /**
@@ -56,7 +53,6 @@ abstract class Helper
         /** @var FieldInterface[] $fields */
         $fields = [];
         foreach ($entry->getFieldLayout()->getCustomFields() as $field) {
-            /** @var Field $field */
             $fieldHandle = $field->handle;
             if (in_array($fieldHandle, $fieldHandles, true)) {
                 $fields[$fieldHandle] = $field;
@@ -84,14 +80,12 @@ abstract class Helper
     /**
      * Strips HTML tags from a given string, returning just the text. Block-level tags will be joined by two newlines.
      *
-     * @param string|FieldData $html HTML-formatted text, or a FieldData object
+     * @param  string|Stringable  $html  HTML-formatted text, or an HTML field value (such as a CKEditor field’s)
      * @return string Text without HTML tags
      */
-    public static function stripHtml(FieldData|string $html): string
+    public static function stripHtml(Stringable|string $html): string
     {
-        if ($html instanceof FieldData) {
-            $html = $html->getParsedContent();
-        }
+        $html = static::htmlString($html);
 
         // Replace block-level tags with newlines
         $blockTags = 'h1|h2|h3|h4|h5|h6|p|ul|ol|li|div';
@@ -114,14 +108,12 @@ abstract class Helper
     /**
      * Converts HTML-formatted text into Markdown, stripped of any tags that aren’t supported by Apple News Format.
      *
-     * @param string|FieldData $html HTML-formatted text, or a FieldData object
+     * @param  string|Stringable  $html  HTML-formatted text, or an HTML field value (such as a CKEditor field’s)
      * @return string Markdown-formatted text
      */
-    public static function html2Markdown(FieldData|string $html): string
+    public static function html2Markdown(Stringable|string $html): string
     {
-        if ($html instanceof FieldData) {
-            $html = $html->getParsedContent();
-        }
+        $html = static::htmlString($html);
 
         // Trim unwanted whitespace within block tags
         $blockTags = 'h1|h2|h3|h4|h5|h6|p|ul|ol|li|div';
@@ -144,18 +136,16 @@ abstract class Helper
      * - <h1-6> => role=heading1-6 with either `heading1-6` or `heading` properties
      * - everything else => role=body with `body` properties
      *
-     * @param string|FieldData $html HTML-formatted text, or a FieldData object
+     * @param  string|Stringable  $html  HTML-formatted text, or an HTML field value (such as a CKEditor field’s)
      * @param callable|array $properties An array defining the component properties that should be applied to each component type,
      *                                   or a function that returns the full component definition, given the type and Markdown text.
      *
      * @return array Component definitions
      * @todo Add support for images + captions and videos
      */
-    public static function html2Components(FieldData|string $html, callable|array $properties = []): array
+    public static function html2Components(Stringable|string $html, callable|array $properties = []): array
     {
-        if ($html instanceof FieldData) {
-            $html = $html->getParsedContent();
-        }
+        $html = static::htmlString($html);
 
         // Remove comments
         $html = preg_replace('<!--.*?-->', '', $html);
@@ -324,8 +314,23 @@ abstract class Helper
     public static function markdown2Components(string $text, callable|array $properties = []): array
     {
         // Convert Markdown to HTML and run through html2Components()
-        $html = Markdown::process($text);
+        $html = Markdown::parse($text, MarkdownParser::FLAVOR_ORIGINAL);
         return static::html2Components($html, $properties);
+    }
+
+    /**
+     * Returns the HTML for a string or an HTML field value.
+     *
+     * HTML field values (such as a CKEditor field’s) provide their content with reference tags parsed
+     * through `getParsedContent()`.
+     */
+    protected static function htmlString(Stringable|string $html): string
+    {
+        if ($html instanceof Stringable && method_exists($html, 'getParsedContent')) {
+            return $html->getParsedContent();
+        }
+
+        return (string) $html;
     }
 
     /**

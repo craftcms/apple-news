@@ -1,27 +1,29 @@
 <?php
 
-namespace craft\applenews;
+declare(strict_types=1);
+
+namespace CraftCms\AppleNews;
 
 use ChapterThree\AppleNewsAPI\PublisherAPI;
 use Curl\Curl;
+use Illuminate\Container\Attributes\Singleton;
 use stdClass;
-use yii\base\Component;
-use yii\base\InvalidConfigException;
 
-/**
- * API
- *
- * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @since 2.0
- */
-class Api extends Component
+/** @since 2.0 */
+#[Singleton]
+class Api
 {
+    public function __construct(
+        private readonly ChannelManager $channelManager,
+        private readonly Settings $settings,
+    ) {
+    }
+
     /**
      * Returns information about a channel.
      *
      * @param string $channelId
      * @return stdClass
-     * @throws InvalidConfigException
      */
     public function channel(string $channelId): stdClass
     {
@@ -35,7 +37,6 @@ class Api extends Component
      *
      * @param string $channelId
      * @return stdClass
-     * @throws InvalidConfigException
      */
     public function sections(string $channelId): stdClass
     {
@@ -50,7 +51,6 @@ class Api extends Component
      * @param string $channelId
      * @param string $sectionId
      * @return stdClass
-     * @throws InvalidConfigException
      */
     public function section(string $channelId, string $sectionId): stdClass
     {
@@ -65,7 +65,6 @@ class Api extends Component
      * @param string $channelId
      * @param string $articleId
      * @return stdClass
-     * @throws InvalidConfigException
      */
     public function article(string $channelId, string $articleId): stdClass
     {
@@ -78,7 +77,6 @@ class Api extends Component
      * @param string $channelId
      * @param array $params
      * @return object
-     * @throws InvalidConfigException
      */
     public function search(string $channelId, array $params = []): object
     {
@@ -93,7 +91,6 @@ class Api extends Component
      * @param string $channelId
      * @param array $data
      * @return object
-     * @throws InvalidConfigException
      */
     public function createArticle(string $channelId, array $data): object
     {
@@ -109,7 +106,6 @@ class Api extends Component
      * @param string $articleId
      * @param array $data
      * @return object
-     * @throws InvalidConfigException
      */
     public function updateArticle(string $channelId, string $articleId, array $data): object
     {
@@ -124,7 +120,6 @@ class Api extends Component
      * @param string $channelId
      * @param string $articleId
      * @return object
-     * @throws InvalidConfigException
      */
     public function deleteArticle(string $channelId, string $articleId): object
     {
@@ -141,7 +136,6 @@ class Api extends Component
      * @param array $pathArgs
      * @param array $data
      * @return object
-     * @throws InvalidConfigException
      */
     protected function get(string $channelId, string $path, array $pathArgs = [], array $data = []): object
     {
@@ -156,7 +150,6 @@ class Api extends Component
      * @param array $pathArgs
      * @param array $data
      * @return object
-     * @throws InvalidConfigException
      */
     protected function post(string $channelId, string $path, array $pathArgs = [], array $data = []): object
     {
@@ -171,7 +164,6 @@ class Api extends Component
      * @param array $pathArgs
      * @param array $data
      * @return object
-     * @throws InvalidConfigException
      */
     protected function delete(string $channelId, string $path, array $pathArgs = [], array $data = []): object
     {
@@ -183,15 +175,14 @@ class Api extends Component
      *
      * @param string $channelId
      * @return PublisherAPI
-     * @throws InvalidConfigException
      */
     protected function api(string $channelId): PublisherAPI
     {
-        $channel = Plugin::getInstance()->channelManager->getChannelById($channelId);
+        $channel = $this->channelManager->getChannelById($channelId);
         $publisherApi = new PublisherAPI($channel->getApiKeyId(), $channel->getApiSecret(), 'https://news-api.apple.com');
 
         $client = new Curl();
-        $client->setTimeout(Plugin::getInstance()->getSettings()->httpClientTimeout);
+        $client->setTimeout($this->settings->httpClientTimeout);
         $publisherApi->client = $client;
         return $publisherApi;
     }

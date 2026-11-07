@@ -1,83 +1,78 @@
 <?php
 
-namespace craft\applenews;
+declare(strict_types=1);
 
-use Craft;
-use craft\applenews\jobs\PublishArticle;
-use craft\applenews\records\Article as ArticleRecord;
-use craft\elements\Entry;
-use craft\helpers\ArrayHelper;
-use craft\helpers\Json;
+namespace CraftCms\AppleNews;
+
+use CraftCms\AppleNews\Jobs\PublishArticleJob;
+use CraftCms\AppleNews\Models\Article as ArticleRecord;
+use CraftCms\Cms\Cms;
+use CraftCms\Cms\Entry\Elements\Entry;
+use CraftCms\Cms\Support\Json;
+use Illuminate\Container\Attributes\Singleton;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Arr;
 use stdClass;
-use yii\base\Component;
-use yii\base\InvalidConfigException;
-use yii\db\ActiveQuery;
-use yii\db\StaleObjectException;
 
-/**
- * Article manager
- *
- * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @since 2.0
- */
-class ArticleManager extends Component
+/** @since 2.0 */
+#[Singleton]
+class ArticleManager
 {
-    public const STATE_PROCESSING = 'PROCESSING';
-    public const STATE_PROCESSING_UPDATE = 'PROCESSING_UPDATE';
-    public const STATE_QUEUED = 'QUEUED';
-    public const STATE_QUEUED_UPDATE = 'QUEUED_UPDATE';
-    public const STATE_LIVE = 'LIVE';
-    public const STATE_FAILED_PROCESSING = 'FAILED_PROCESSING';
-    public const STATE_FAILED_PROCESSING_UPDATE = 'FAILED_PROCESSING_UPDATE';
-    public const STATE_TAKEN_DOWN = 'TAKEN_DOWN';
+    public const string STATE_PROCESSING = 'PROCESSING';
+
+    public const string STATE_PROCESSING_UPDATE = 'PROCESSING_UPDATE';
+
+    public const string STATE_QUEUED = 'QUEUED';
+
+    public const string STATE_QUEUED_UPDATE = 'QUEUED_UPDATE';
+
+    public const string STATE_LIVE = 'LIVE';
+
+    public const string STATE_FAILED_PROCESSING = 'FAILED_PROCESSING';
+
+    public const string STATE_FAILED_PROCESSING_UPDATE = 'FAILED_PROCESSING_UPDATE';
+
+    public const string STATE_TAKEN_DOWN = 'TAKEN_DOWN';
+
+    public function __construct(
+        private readonly ChannelManager $channelManager,
+        private readonly Api $api,
+    ) {
+    }
 
     /**
-     * @var array The generator metadata
+     * Returns the generator metadata that is included in each article’s content.
+     *
+     * @return array<string, string>
      */
-    public array $generator;
-
-    /**
-     * @inheritdoc
-     */
-    public function init(): void
+    public function generator(): array
     {
-        parent::init();
+        $plugin = app(Plugin::class);
 
-        $plugin = Plugin::getInstance();
-        $this->generator = [
+        return [
             'generatorIdentifier' => 'CraftCMS',
             'generatorName' => 'Craft CMS',
-            'generatorVersion' => Craft::$app->getVersion() . " ($plugin->name $plugin->version)",
+            'generatorVersion' => Cms::version() . " ($plugin->name $plugin->version)",
         ];
     }
 
     /**
      * Returns all known info about an entry's articles on Apple News.
      *
-     * @param Entry $entry The entry
-     * @param string|string[]|null $channelId The channel ID(s) to limit the query to
-     * @param bool $refresh Whether the info should be refreshed for articles that are processing
-     * @return array[] The info, indexed by channel ID
-     * @throws InvalidConfigException
+     * @param  Entry  $entry  The entry
+     * @param  string|string[]|null  $channelId  The channel ID(s) to limit the query to
+     * @param  bool  $refresh  Whether the info should be refreshed for articles that are processing
+     * @return array<string, array<string, mixed>> The info, indexed by channel ID
      */
-    public function getArticleInfo(Entry $entry, array|string $channelId = null, bool $refresh = false): array
+    public function getArticleInfo(Entry $entry, array|string|null $channelId = null, bool $refresh = false): array
     {
-        $query = ArticleRecord::find()
-            ->where(['entryId' => $entry->id]);
-
-        if ($channelId !== null) {
-            $query->andWhere(['channelId' => $channelId]);
-        }
-
-        /** @var ArticleRecord[] $records */
-        $records = $query->all();
+        $records = $this->createArticleQuery($entry->id, $channelId)->get();
         $infos = [];
-        $api = Plugin::getInstance()->api;
 
         foreach ($records as $record) {
             // Refresh first?
             if ($refresh && in_array($record->state, [self::STATE_PROCESSING, self::STATE_PROCESSING_UPDATE], true)) {
-                $response = $api->article($record->channelId, $record->articleId);
+                $response = $this->api->article($record->channelId, $record->articleId);
                 if (isset($response->data)) {
                     $this->updateArticleRecord($record, $response);
                 }
@@ -99,14 +94,12 @@ class ArticleManager extends Component
     /**
      * Returns whether any Apple News channels can publish the given entry.
      *
-     * @param Entry $entry The entry to check
+     * @param  Entry  $entry  The entry to check
      * @return bool Whether the entry can be published to any channels
-     * @throws InvalidConfigException
      */
     public function canPublishEntry(Entry $entry): bool
     {
-        // See if any channels will have it
-        foreach (Plugin::getInstance()->channelManager->getChannels() as $channel) {
+        foreach ($this->channelManager->getChannels() as $channel) {
             if ($channel->matchEntry($entry) && $channel->canPublish($entry)) {
                 return true;
             }
@@ -118,84 +111,67 @@ class ArticleManager extends Component
     /**
      * Queues an entry up to be published on Apple News
      *
-     * @param Entry $entry The entry to be published
-     * @param array|null $channelIds The Apple News channel ID(s) that the entry should be published to
-     * @throws InvalidConfigException
+     * @param  Entry  $entry  The entry to be published
+     * @param  string|string[]|null  $channelIds  The Apple News channel ID(s) that the entry should be published to
      */
-    public function queue(Entry $entry, array|string $channelIds = null): void
+    public function queue(Entry $entry, array|string|null $channelIds = null): void
     {
         if ($channelIds === null) {
             // Queue all of them
             $channelIds = [];
-            foreach (Plugin::getInstance()->channelManager->getChannels() as $channel) {
+            foreach ($this->channelManager->getChannels() as $channel) {
                 if ($channel->matchEntry($entry) && $channel->canPublish($entry)) {
                     $channelIds[] = $channel->getChannelId();
                 }
             }
-        } elseif (!is_array($channelIds)) {
-            $channelIds = [$channelIds];
+        } else {
+            $channelIds = Arr::wrap($channelIds);
         }
 
         if (empty($channelIds)) {
             return;
         }
 
-        $queue = Craft::$app->getQueue();
-
-        /** @var ArticleRecord $articles */
-        $articles = ArticleRecord::find()
-            ->where([
-                'entryId' => $entry->id,
-                'channelId' => $channelIds,
-            ])
-            ->indexBy('channelId')
-            ->all();
+        $articles = $this->createArticleQuery($entry->id, $channelIds)->get()->keyBy('channelId');
 
         foreach ($channelIds as $channelId) {
             $article = $articles[$channelId] ?? new ArticleRecord([
-                    'entryId' => $entry->id,
-                    'channelId' => $channelId,
-                ]);
+                'entryId' => $entry->id,
+                'channelId' => $channelId,
+            ]);
             $article->state = $article->articleId ? self::STATE_QUEUED_UPDATE : self::STATE_QUEUED;
             $article->save();
 
-            $queue->push(new PublishArticle([
-                'entryId' => $entry->id,
-                'siteId' => $entry->siteId,
-                'channelId' => $channelId,
-            ]));
+            dispatch(new PublishArticleJob($entry->id, $entry->siteId, $channelId));
         }
     }
 
     /**
      * Publishes an article to Apple News.
      *
-     * @param Entry $entry The entry to be published
-     * @param array|string|null $channelIds The Apple News channel ID(s) to publish the entry to
-     * @throws InvalidConfigException
+     * @param  Entry  $entry  The entry to be published
+     * @param  string|string[]|null  $channelIds  The Apple News channel ID(s) to publish the entry to
      */
-    public function publish(Entry $entry, array|string $channelIds = null): void
+    public function publish(Entry $entry, array|string|null $channelIds = null): void
     {
-        if ($channelIds && is_string($channelIds)) {
-            $channelIds = [$channelIds];
+        if ($channelIds !== null) {
+            $channelIds = Arr::wrap($channelIds);
         }
 
-        /** @var ChannelInterface[] $channels */
-        $channels = ArrayHelper::where(Plugin::getInstance()->channelManager->getChannels(),
-            function(ChannelInterface $channel) use ($entry, $channelIds) {
-                return (
-                    ($channelIds === null || in_array($channel->getChannelId(), $channelIds)) &&
-                    $channel->matchEntry($entry) &&
-                    $channel->canPublish($entry)
-                );
-            });
+        $channels = array_filter(
+            $this->channelManager->getChannels(),
+            fn(ChannelInterface $channel) => (
+                ($channelIds === null || in_array($channel->getChannelId(), $channelIds, true)) &&
+                $channel->matchEntry($entry) &&
+                $channel->canPublish($entry)
+            ),
+        );
 
         if (empty($channels)) {
             return;
         }
 
-        /** @var ArticleRecord[] $articleRecords */
-        $articleRecords = $this->createArticleQuery($entry->id, $channelIds)->all();
+        $articleRecords = $this->createArticleQuery($entry->id, $channelIds)->get()->keyBy('channelId');
 
         foreach ($channels as $channel) {
             $channelId = $channel->getChannelId();
@@ -208,7 +184,7 @@ class ArticleManager extends Component
             // Include the generator metadata in the content
             $content['metadata'] = array_merge(
                 $content['metadata'] ?? [],
-                $this->generator
+                $this->generator(),
             );
 
             // Include the latest revision ID if we have one
@@ -224,11 +200,10 @@ class ArticleManager extends Component
             ];
 
             // Publish the article
-            $api = Plugin::getInstance()->api;
             if ($articleRecord !== null && $articleRecord->articleId) {
-                $response = $api->updateArticle($channelId, $articleRecord->articleId, $data);
+                $response = $this->api->updateArticle($channelId, $articleRecord->articleId, $data);
             } else {
-                $response = $api->createArticle($channelId, $data);
+                $response = $this->api->createArticle($channelId, $data);
             }
 
             if (isset($response->data)) {
@@ -250,22 +225,16 @@ class ArticleManager extends Component
     /**
      * Deletes an article on Apple News.
      *
-     * @param Entry $entry
-     * @param string|string[]|null $channelIds The Apple News channel ID(s) to delete the entry from
-     * @throws StaleObjectException|InvalidConfigException
-     * @throws StaleObjectException
-     * @throws \Throwable
+     * @param  string|string[]|null  $channelIds  The Apple News channel ID(s) to delete the entry from
      */
-    public function delete(Entry $entry, array|string $channelIds = null): void
+    public function delete(Entry $entry, array|string|null $channelIds = null): void
     {
-        /** @var ArticleRecord[] $records */
         $records = $this->createArticleQuery($entry->id, $channelIds)
-            ->andWhere(['not', ['articleId' => null]])
-            ->all();
-        $api = Plugin::getInstance()->api;
+            ->where('articleId', '!=', null)
+            ->get();
 
         foreach ($records as $record) {
-            $api->deleteArticle($record->channelId, $record->articleId);
+            $this->api->deleteArticle($record->channelId, $record->articleId);
             $record->delete();
         }
     }
@@ -273,18 +242,15 @@ class ArticleManager extends Component
     /**
      * Creates an article record query for the given entry ID and channel IDs.
      *
-     * @param int $entryId
-     * @param string[]|null $channelIds
-     * @return ActiveQuery
+     * @param  string|string[]|null  $channelIds
+     * @return Builder<ArticleRecord>
      */
-    protected function createArticleQuery(int $entryId, array $channelIds = null): ActiveQuery
+    protected function createArticleQuery(int $entryId, array|string|null $channelIds = null): Builder
     {
-        $query = ArticleRecord::find()
-            ->where(['entryId' => $entryId])
-            ->indexBy('channelId');
+        $query = ArticleRecord::query()->where('entryId', $entryId);
 
         if ($channelIds !== null) {
-            $query->andWhere(['channelId' => $channelIds]);
+            $query->whereIn('channelId', Arr::wrap($channelIds));
         }
 
         return $query;
@@ -292,9 +258,6 @@ class ArticleManager extends Component
 
     /**
      * Updates a given Article record with the data in an Apple News API response.
-     *
-     * @param ArticleRecord $record
-     * @param stdClass $response
      */
     protected function updateArticleRecord(ArticleRecord $record, stdClass $response): void
     {
