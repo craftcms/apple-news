@@ -24,7 +24,7 @@
   },
   "require": {
     "php": "^8.2.0",
-    "craftcms/cms": "^5.0.0-beta.1|^6.0.0-alpha.1",
+    "craftcms/cms": "^5.0.0-beta.1|^6.0.0-beta.1",
     "chapter-three/apple-news-api": "^0.3.9",
     "league/html-to-markdown": "^5.0"
   },
