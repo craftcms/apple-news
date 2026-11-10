@@ -11,6 +11,14 @@ it('removes HTML comments, including ones that span lines', function () {
         ]);
 });
 
+it('treats empty field values as empty text', function () {
+    expect(Helper::stripHtml(null))->toBe('')
+        ->and(Helper::html2Markdown(null))->toBe('')
+        ->and(Helper::html2Components(null))->toBe([])
+        ->and(Helper::html2Components(''))->toBe([])
+        ->and(Helper::html2Components("<!-- note -->\n"))->toBe([]);
+});
+
 it('turns HTML into components', function () {
     expect(Helper::html2Components('<h2>Title</h2><p>One</p><p>Two <strong>bold</strong></p><hr><blockquote>Quote</blockquote>', [
         'heading' => ['textStyle' => 'heading'],

@@ -78,10 +78,10 @@ abstract class Helper
     /**
      * Strips HTML tags from a given string, returning just the text. Block-level tags will be joined by two newlines.
      *
-     * @param  string|Stringable  $html  HTML-formatted text, or an HTML field value (such as a CKEditor field’s)
+     * @param  string|Stringable|null  $html  HTML-formatted text, or an HTML field value (such as a CKEditor field’s)
      * @return string Text without HTML tags
      */
-    public static function stripHtml(Stringable|string $html): string
+    public static function stripHtml(Stringable|string|null $html): string
     {
         $html = static::htmlString($html);
 
@@ -106,10 +106,10 @@ abstract class Helper
     /**
      * Converts HTML-formatted text into Markdown, stripped of any tags that aren’t supported by Apple News Format.
      *
-     * @param  string|Stringable  $html  HTML-formatted text, or an HTML field value (such as a CKEditor field’s)
+     * @param  string|Stringable|null  $html  HTML-formatted text, or an HTML field value (such as a CKEditor field’s)
      * @return string Markdown-formatted text
      */
-    public static function html2Markdown(Stringable|string $html): string
+    public static function html2Markdown(Stringable|string|null $html): string
     {
         $html = static::htmlString($html);
 
@@ -135,19 +135,23 @@ abstract class Helper
      * - <h1-6> => role=heading1-6 with either `heading1-6` or `heading` properties
      * - everything else => role=body with `body` properties
      *
-     * @param  string|Stringable  $html  HTML-formatted text, or an HTML field value (such as a CKEditor field’s)
+     * @param  string|Stringable|null  $html  HTML-formatted text, or an HTML field value (such as a CKEditor field’s)
      * @param  callable|array  $properties  An array defining the component properties that should be applied to each component type,
      *                                      or a function that returns the full component definition, given the type and Markdown text.
      * @return array Component definitions
      *
      * @todo Add support for images + captions and videos
      */
-    public static function html2Components(Stringable|string $html, callable|array $properties = []): array
+    public static function html2Components(Stringable|string|null $html, callable|array $properties = []): array
     {
         $html = static::htmlString($html);
 
         // Remove comments
         $html = preg_replace('/<!--.*?-->/s', '', $html);
+
+        if (trim($html) === '') {
+            return [];
+        }
 
         // Create a DOMDocument object for the HTML
         // (from HtmlConverter::convert)
@@ -322,7 +326,7 @@ abstract class Helper
      * HTML field values (such as a CKEditor field’s) provide their content with reference tags parsed
      * through `getParsedContent()`.
      */
-    protected static function htmlString(Stringable|string $html): string
+    protected static function htmlString(Stringable|string|null $html): string
     {
         if ($html instanceof Stringable && method_exists($html, 'getParsedContent')) {
             return $html->getParsedContent();

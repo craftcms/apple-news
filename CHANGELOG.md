@@ -13,6 +13,7 @@
 - Added `CraftCms\AppleNews\Enums\ArticleState`, which replaces the `ArticleManager::STATE_*` constants.
 - Fixed a bug where an article stayed queued if publishing it failed, or if the entry could no longer be published by the time the queue job ran. The article now goes back to its previous state.
 - Fixed a bug where articles that Apple News marked as duplicates were shown as not published yet.
+- Fixed an error that occurred when passing an empty field value to `Helper::stripHtml()`, `html2Markdown()`, or `html2Components()`.
 - Fixed a bug where the “Publish to Apple News” bulk action published entries that the user wasn’t allowed to save, such as other authors’ entries.
 - Fixed a bug where an unknown channel ID sent to the `apple-news/article/*` actions caused a server error, and `publish` queued the entry for it anyway. The actions now return a validation error.
 - Fixed a bug where `Articles::queue()` queued entries for the given channels even if the channel didn’t match the entry or couldn’t publish it.
