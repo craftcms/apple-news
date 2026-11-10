@@ -1,6 +1,6 @@
 # Release Notes for Apple News for Craft CMS
 
-## Unreleased
+## 4.2.0 - 2026-11-10
 
 - Added support for Craft CMS 6, when the `craftcms/yii2-adapter` package is installed.
 - Fixed a bug where entries with published Apple News articles couldn’t be deleted.
