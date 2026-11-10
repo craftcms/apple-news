@@ -84,14 +84,12 @@ abstract class Helper
     /**
      * Strips HTML tags from a given string, returning just the text. Block-level tags will be joined by two newlines.
      *
-     * @param string|FieldData $html HTML-formatted text, or a FieldData object
+     * @param string|FieldData|null $html HTML-formatted text, or a FieldData object
      * @return string Text without HTML tags
      */
-    public static function stripHtml(FieldData|string $html): string
+    public static function stripHtml(FieldData|string|null $html): string
     {
-        if ($html instanceof FieldData) {
-            $html = $html->getParsedContent();
-        }
+        $html = $html instanceof FieldData ? $html->getParsedContent() : (string)$html;
 
         // Replace block-level tags with newlines
         $blockTags = 'h1|h2|h3|h4|h5|h6|p|ul|ol|li|div';
@@ -114,14 +112,12 @@ abstract class Helper
     /**
      * Converts HTML-formatted text into Markdown, stripped of any tags that aren’t supported by Apple News Format.
      *
-     * @param string|FieldData $html HTML-formatted text, or a FieldData object
+     * @param string|FieldData|null $html HTML-formatted text, or a FieldData object
      * @return string Markdown-formatted text
      */
-    public static function html2Markdown(FieldData|string $html): string
+    public static function html2Markdown(FieldData|string|null $html): string
     {
-        if ($html instanceof FieldData) {
-            $html = $html->getParsedContent();
-        }
+        $html = $html instanceof FieldData ? $html->getParsedContent() : (string)$html;
 
         // Trim unwanted whitespace within block tags
         $blockTags = 'h1|h2|h3|h4|h5|h6|p|ul|ol|li|div';
@@ -144,21 +140,23 @@ abstract class Helper
      * - <h1-6> => role=heading1-6 with either `heading1-6` or `heading` properties
      * - everything else => role=body with `body` properties
      *
-     * @param string|FieldData $html HTML-formatted text, or a FieldData object
+     * @param string|FieldData|null $html HTML-formatted text, or a FieldData object
      * @param callable|array $properties An array defining the component properties that should be applied to each component type,
      *                                   or a function that returns the full component definition, given the type and Markdown text.
      *
      * @return array Component definitions
      * @todo Add support for images + captions and videos
      */
-    public static function html2Components(FieldData|string $html, callable|array $properties = []): array
+    public static function html2Components(FieldData|string|null $html, callable|array $properties = []): array
     {
-        if ($html instanceof FieldData) {
-            $html = $html->getParsedContent();
-        }
+        $html = $html instanceof FieldData ? $html->getParsedContent() : (string)$html;
 
         // Remove comments
         $html = preg_replace('<!--.*?-->', '', $html);
+
+        if (trim($html) === '') {
+            return [];
+        }
 
         // Create a DOMDocument object for the HTML
         // (from HtmlConverter::convert)

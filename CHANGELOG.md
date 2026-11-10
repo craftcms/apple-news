@@ -6,6 +6,7 @@
 - Fixed a bug where entries with published Apple News articles couldn’t be deleted.
 - Fixed PHP 8.4 deprecation warnings.
 - Fixed a bug where only admins could use the Apple News Channels pane and the “Publish to Apple News” bulk action. Publishing now requires permission to save the entry.
+- Fixed an error that occurred when passing an empty field value to `craft\applenews\Helper::stripHtml()`, `html2Markdown()`, or `html2Components()`.
 
 ## 4.1.0 - 2026-03-27
 
