@@ -6,7 +6,7 @@ namespace CraftCms\AppleNews\Http\Controllers;
 
 use CraftCms\AppleNews\Articles;
 use CraftCms\AppleNews\Channels;
-use CraftCms\AppleNews\Http\Requests\ArticleInfoRequest;
+use CraftCms\AppleNews\Http\Requests\ArticleRequest;
 use CraftCms\AppleNews\Http\Requests\DownloadArticleRequest;
 use CraftCms\AppleNews\Http\Requests\PublishArticleRequest;
 use CraftCms\Cms\Entry\Elements\Entry;
@@ -66,7 +66,7 @@ class ArticleController
     /**
      * Returns the latest info about an entry's articles.
      */
-    public function getInfo(ArticleInfoRequest $request): JsonResponse
+    public function getInfo(ArticleRequest $request): JsonResponse
     {
         return response()->json([
             'infos' => $this->articleInfo($request->entry(), $request->validated('channelId'), true),

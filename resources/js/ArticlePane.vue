@@ -22,107 +22,8 @@
 
   onBeforeUnmount(() => clearTimeout(refreshTimeout));
 
-  function status(state) {
-    switch (state) {
-      case 'QUEUED':
-        return {
-          fill: 'gray',
-          label: t(
-            'The article is in the queue to be published.',
-            {},
-            'apple-news'
-          ),
-        };
-      case 'QUEUED_UPDATE':
-        return {
-          fill: 'gray',
-          label: t(
-            'A previous version of the article has been published, and an update is currently in the queue to be published.',
-            {},
-            'apple-news'
-          ),
-        };
-      case 'PROCESSING':
-        return {
-          fill: 'orange',
-          label: t(
-            'The article has been published and is going through processing.',
-            {},
-            'apple-news'
-          ),
-        };
-      case 'PROCESSING_UPDATE':
-        return {
-          fill: 'orange',
-          label: t(
-            'A previous version of the article is visible in the News app, and an update is currently in processing.',
-            {},
-            'apple-news'
-          ),
-        };
-      case 'LIVE':
-        return {
-          fill: 'green',
-          label: t(
-            'The article has been published, finished processing, and is visible in the News app.',
-            {},
-            'apple-news'
-          ),
-        };
-      case 'FAILED_PROCESSING':
-        return {
-          fill: 'red',
-          label: t(
-            'The article failed during processing and is not visible in the News app.',
-            {},
-            'apple-news'
-          ),
-        };
-      case 'FAILED_PROCESSING_UPDATE':
-        return {
-          fill: 'red',
-          label: t(
-            'A previous version of the article is visible in the News app, but an update failed during processing.',
-            {},
-            'apple-news'
-          ),
-        };
-      case 'DUPLICATE':
-        return {
-          fill: null,
-          label: t(
-            'The article is a duplicate of another article and is not visible in the News app.',
-            {},
-            'apple-news'
-          ),
-        };
-      case 'TAKEN_DOWN':
-        return {
-          fill: null,
-          label: t(
-            'The article was previously visible in the News app, but was taken down.',
-            {},
-            'apple-news'
-          ),
-        };
-      default:
-        return {
-          fill: null,
-          label: t('The article has not been published yet.', {}, 'apple-news'),
-        };
-    }
-  }
-
   function actions(channel) {
     const items = [];
-
-    if (channel.isShareable && channel.shareUrl) {
-      items.push({
-        label: t('Copy share URL', {}, 'apple-news'),
-        icon: 'clipboard',
-        onClick: () => copyShareUrl(channel.shareUrl),
-      });
-    }
 
     if (
       !info.value.isDraftOrRevision &&
@@ -147,11 +48,6 @@
     return items;
   }
 
-  async function copyShareUrl(url) {
-    await navigator.clipboard.writeText(url);
-    announce(t('Copied to clipboard.', {}, 'app'));
-  }
-
   function applyInfos(infos) {
     for (const channel of channels.value) {
       const channelInfo = infos?.[channel.id];
@@ -170,7 +66,7 @@
         channelId: channel.id,
       });
       applyInfos(data.infos);
-      announce(status(channel.state).label);
+      announce(channel.status.label);
       scheduleRefresh();
     } finally {
       loading.value = false;
@@ -214,15 +110,22 @@
         class="apple-news-pane__channel"
       >
         <craft-indicator
-          :fill="status(channel.state).fill ?? undefined"
-          :appearance="status(channel.state).fill ? undefined : 'outline'"
-          :label="status(channel.state).label"
+          :fill="channel.status.color ?? undefined"
+          :appearance="channel.status.color ? undefined : 'outline'"
+          :label="channel.status.label"
         ></craft-indicator>
         <div class="apple-news-pane__body">
           <div class="apple-news-pane__name">{{ channel.name }}</div>
           <div class="apple-news-pane__status">
-            {{ status(channel.state).label }}
+            {{ channel.status.label }}
           </div>
+          <craft-input-copy
+            v-if="channel.isShareable && channel.shareUrl"
+            class="apple-news-pane__share-url"
+            .modelValue="channel.shareUrl"
+          >
+            <label slot="label">{{ t('Share URL', {}, 'apple-news') }}</label>
+          </craft-input-copy>
         </div>
         <ActionMenu
           :actions="actions(channel)"
@@ -276,6 +179,10 @@
   .apple-news-pane__status {
     color: var(--c-color-text-subtle, inherit);
     font-size: 0.875em;
+  }
+
+  .apple-news-pane__share-url {
+    margin-block-start: var(--c-spacing-sm, 0.5rem);
   }
 
   .apple-news-pane__spinner {

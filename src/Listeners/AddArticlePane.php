@@ -6,6 +6,7 @@ namespace CraftCms\AppleNews\Listeners;
 
 use CraftCms\AppleNews\Articles;
 use CraftCms\AppleNews\Channels;
+use CraftCms\AppleNews\Enums\ArticleState;
 use CraftCms\Cms\Element\Events\ElementEditorPayloadResolving;
 use CraftCms\Cms\Entry\Elements\Entry;
 use CraftCms\Cms\Support\Arr;
@@ -64,7 +65,8 @@ class AddArticlePane
                 'isQueued' => false,
                 'isProcessing' => false,
                 'isShareable' => false,
-                ...Arr::only($infos[$channel->getChannelId()] ?? [], ['state', 'shareUrl', 'isQueued', 'isProcessing', 'isShareable']),
+                'status' => ArticleState::status(null),
+                ...Arr::only($infos[$channel->getChannelId()] ?? [], ['state', 'shareUrl', 'isQueued', 'isProcessing', 'isShareable', 'status']),
                 'canPublish' => ! $isDraftOrRevision && $channel->canPublish($entry),
                 'downloadUrl' => Url::actionUrl('apple-news/article/download', array_filter([
                     ...$downloadParams,

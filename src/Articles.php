@@ -72,6 +72,7 @@ class Articles
                 'isQueued' => $record->state->isQueued(),
                 'isProcessing' => $record->state->isProcessing(),
                 'isShareable' => $record->state->isShareable(),
+                'status' => ArticleState::status($record->state),
             ];
         }
 

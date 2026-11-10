@@ -17,9 +17,11 @@ use Override;
  * A request about an entry’s articles: validates the entry and channel params, loads the entry, and checks that the
  * user may perform {@see $ability} on it.
  *
+ * Used as is for requests that only read an entry’s articles. Subclasses change the ability, draft, and channel rules.
+ *
  * @since 5.0.0
  */
-abstract class ArticleRequest extends FormRequest
+class ArticleRequest extends FormRequest
 {
     /**
      * The entry policy ability the user needs.

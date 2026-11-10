@@ -6,12 +6,11 @@ namespace CraftCms\AppleNews\Utilities;
 
 use CraftCms\AppleNews\Api;
 use CraftCms\AppleNews\Channels;
+use CraftCms\Cms\Support\Html;
 use CraftCms\Cms\Utility\Utility;
-use CraftCms\Cms\View\TemplateMode;
 use Override;
 
 use function CraftCms\Cms\t;
-use function CraftCms\Cms\template;
 
 /**
  * Lists each channel’s sections, with their IDs.
@@ -44,19 +43,17 @@ class AppleNewsInfo extends Utility
         $channels = app(Channels::class);
         $api = app(Api::class);
 
-        // Load the channel info
-        $channelNames = [];
-        $sections = [];
-
-        foreach ($channels->all() as $channelId => $channel) {
-            $channelNames[$channelId] = $channels->name($channelId);
-            $sections[$channelId] = $api->sections($channelId)->data;
-        }
-
-        return template('apple-news/_info', [
-            'channels' => $channels->all(),
-            'channelNames' => $channelNames,
-            'sections' => $sections,
-        ], TemplateMode::Cp);
+        return Html::tag('AppleNewsInfo', attributes: [
+            ':channels' => array_map(fn (string $channelId) => [
+                'id' => $channelId,
+                'name' => $channels->name($channelId),
+                'sections' => array_map(fn (object $section) => [
+                    'id' => $section->id,
+                    'name' => $section->name,
+                    'isDefault' => (bool) ($section->isDefault ?? false),
+                    'link' => $section->links->self ?? null,
+                ], $api->sections($channelId)->data ?? []),
+            ], array_keys($channels->all())),
+        ]);
     }
 }
