@@ -41,7 +41,7 @@ class Article extends BaseObject implements ArticleInterface
      * @param Entry|null $entry
      * @param array $config
      */
-    public function __construct(Entry $entry = null, array $config = [])
+    public function __construct(?Entry $entry = null, array $config = [])
     {
         $this->entry = $entry;
         parent::__construct($config);

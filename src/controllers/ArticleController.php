@@ -102,6 +102,11 @@ class ArticleController extends Controller
     public function actionPublish(): Response
     {
         $entry = $this->entry();
+
+        if (!Craft::$app->getElements()->canSave($entry)) {
+            throw new ForbiddenHttpException('User not authorized to save this entry.');
+        }
+
         $channelId = Craft::$app->getRequest()->getParam('channelId');
         Plugin::getInstance()->articleManager->queue($entry, $channelId);
 
@@ -144,8 +149,10 @@ class ArticleController extends Controller
             throw new BadRequestHttpException();
         }
 
-        // Make sure the user is allowed to edit entries in this section
-        $this->requirePermission("editEntries:{$entry->section->uid}");
+        // Make sure the user is allowed to view the entry
+        if (!Craft::$app->getElements()->canView($entry)) {
+            throw new ForbiddenHttpException('User not authorized to view this entry.');
+        }
 
         return $entry;
     }

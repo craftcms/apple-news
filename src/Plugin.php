@@ -73,7 +73,7 @@ class Plugin extends \craft\base\Plugin
                     $userSession->getIsAdmin() ||
                     (
                         preg_match('/^section:(.+)/', $e->source, $matches) &&
-                        $userSession->checkPermission("publishEntries:$matches[1]")
+                        $userSession->checkPermission("saveEntries:$matches[1]")
                     )
                 ) {
                     $e->actions[] = PublishArticles::class;

@@ -32,9 +32,12 @@ class PublishArticles extends ElementAction
     public function performAction(ElementQueryInterface $query): bool
     {
         $articleManager = Plugin::getInstance()->articleManager;
+        $elementsService = Craft::$app->getElements();
         foreach ($query->all() as $entry) {
             /** @var Entry $entry */
-            $articleManager->queue($entry);
+            if ($elementsService->canSave($entry)) {
+                $articleManager->queue($entry);
+            }
         }
         return true;
     }
