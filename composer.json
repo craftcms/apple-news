@@ -35,6 +35,9 @@
     "craftcms/ckeditor": "*",
     "vlucas/phpdotenv": "^5.4"
   },
+  "suggest": {
+    "craftcms/yii2-adapter": "Required to use Apple News with Craft CMS 6."
+  },
   "autoload": {
     "psr-4": {
       "craft\\applenews\\": "src/"
