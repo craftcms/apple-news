@@ -1,5 +1,9 @@
 # Release Notes for Apple News for Craft CMS
 
+## 4.2.1 - 2026-11-10
+
+- Apple News now suggests the `craftcms/yii2-adapter` package, so the Plugin Store installs it alongside the plugin on Craft CMS 6.
+
 ## 4.2.0 - 2026-11-10
 
 - Added support for Craft CMS 6, when the `craftcms/yii2-adapter` package is installed.
