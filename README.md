@@ -100,14 +100,13 @@ To make your channel classes auto-loadable, add a new [autoload root](https://ge
 
 ## Usage
 
-Once your Channel classes are set up and included properly, an **Apple News Channels** panel appears in the details pane of the entry editor, for entries that have at least one matching channel. It shows the state of the entry’s article in each channel, and keeps it up to date while the article is queued or processing.
+Once your Channel classes are set up and included properly, an **Apple News Channels** panel appears in the details pane of the entry editor, for entries that have at least one matching channel. It shows the state of the entry’s article in each channel, and keeps it up to date while the article is queued or processing. Once a version of the article is visible in the News app, or about to be, the panel also shows its share URL with a copy button.
 
 <img src="./entry-channels.png" width="350" height="137" alt="The Apple News Channels area within an Edit Entry page">
 
 Each channel displays an action menu beside it with some of the following options, depending on the state of the article:
 
 - **Publish to Apple News** – Queues the article to be published to Apple News.
-- **Copy share URL** – Displays a prompt that allows the user to copy the article’s share URL.
 - **Download for News Preview** – Downloads the entry’s `article.json` (and other files), which can be loaded into the [News Preview](https://developer.apple.com/news-preview/) app, to see exactly how your article will look on various iOS devices once published.
 
 There is also a **Publish to Apple News** bulk action on the Entries index page, which makes it possible to queue up several entries to be published at once. It’s available to admins and to people who can save entries in the selected section.

@@ -122,7 +122,7 @@
           <craft-input-copy
             v-if="channel.isShareable && channel.shareUrl"
             class="apple-news-pane__share-url"
-            .modelValue="channel.shareUrl"
+            .value="channel.shareUrl"
           >
             <label slot="label">{{ t('Share URL', {}, 'apple-news') }}</label>
           </craft-input-copy>
