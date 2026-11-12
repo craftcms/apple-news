@@ -22,6 +22,18 @@
 - Fixed a bug where changes saved while an article was being published weren’t published.
 - Fixed a bug where HTML comments weren’t removed from HTML converted to Markdown or article components.
 
+## 4.2.1 - 2026-11-10
+
+- Apple News now suggests the `craftcms/yii2-adapter` package, so the Plugin Store installs it alongside the plugin on Craft CMS 6.
+
+## 4.2.0 - 2026-11-10
+
+- Added support for Craft CMS 6, when the `craftcms/yii2-adapter` package is installed.
+- Fixed a bug where entries with published Apple News articles couldn’t be deleted.
+- Fixed PHP 8.4 deprecation warnings.
+- Fixed a bug where only admins could use the Apple News Channels pane and the “Publish to Apple News” bulk action. Publishing now requires permission to save the entry.
+- Fixed an error that occurred when passing an empty field value to `craft\applenews\Helper::stripHtml()`, `html2Markdown()`, or `html2Components()`.
+
 ## 4.1.0 - 2026-03-27
 
 - Fixed a bug where remote assets in an Apple News article might not download.
