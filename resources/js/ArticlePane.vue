@@ -9,6 +9,8 @@
   const info = computed(() => props.payload.appleNews);
   const channels = ref([]);
   const loading = ref(false);
+  /** The channel an article is being published to, which shows a spinner in its badge. */
+  const publishingId = ref(null);
   let refreshTimeout = null;
 
   watch(
@@ -59,6 +61,7 @@
 
   async function publish(channel) {
     loading.value = true;
+    publishingId.value = channel.id;
     try {
       const {data} = await actionClient.post('apple-news/article/publish', {
         entryId: info.value.entryId,
@@ -70,6 +73,7 @@
       scheduleRefresh();
     } finally {
       loading.value = false;
+      publishingId.value = null;
     }
   }
 
@@ -104,21 +108,32 @@
 <template>
   <div class="apple-news-pane" :aria-busy="loading">
     <ul class="apple-news-pane__channels">
-      <li
-        v-for="channel in channels"
-        :key="channel.id"
-        class="apple-news-pane__channel"
-      >
-        <craft-indicator
-          :fill="channel.status.color ?? undefined"
-          :appearance="channel.status.color ? undefined : 'outline'"
-          :label="channel.status.label"
-        ></craft-indicator>
-        <div class="apple-news-pane__body">
-          <div class="apple-news-pane__name">{{ channel.name }}</div>
-          <div class="apple-news-pane__status">
-            {{ channel.status.label }}
-          </div>
+      <li v-for="channel in channels" :key="channel.id">
+        <craft-card>
+          <span slot="label" class="apple-news-pane__name">{{
+            channel.name
+          }}</span>
+          <craft-badge slot="badge" :fill="channel.status.color" size="small">
+            <craft-spinner
+              v-if="publishingId === channel.id"
+              slot="prefix"
+            ></craft-spinner>
+            {{
+              publishingId === channel.id
+                ? t('Publishing…', {}, 'apple-news')
+                : channel.status.label
+            }}
+          </craft-badge>
+          <ActionMenu
+            slot="actions"
+            :actions="actions(channel)"
+            :label="
+              t('Actions for {channel}', {channel: channel.name}, 'apple-news')
+            "
+          />
+          <p class="apple-news-pane__status">
+            {{ channel.status.description }}
+          </p>
           <craft-input-copy
             v-if="channel.isShareable && channel.shareUrl"
             class="apple-news-pane__share-url"
@@ -126,25 +141,14 @@
           >
             <label slot="label">{{ t('Share URL', {}, 'apple-news') }}</label>
           </craft-input-copy>
-        </div>
-        <ActionMenu
-          :actions="actions(channel)"
-          :label="
-            t('Actions for {channel}', {channel: channel.name}, 'apple-news')
-          "
-        />
+        </craft-card>
       </li>
     </ul>
-    <craft-spinner
-      v-if="loading"
-      class="apple-news-pane__spinner"
-    ></craft-spinner>
   </div>
 </template>
 
 <style>
   .apple-news-pane {
-    position: relative;
     padding-block: var(--c-spacing-lg, 1rem);
     padding-inline: var(--cp-container-padding, 1rem);
   }
@@ -157,37 +161,21 @@
     list-style: none;
   }
 
-  .apple-news-pane__channel {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--c-spacing-sm, 0.5rem);
-  }
-
-  .apple-news-pane__channel > craft-indicator {
-    margin-block-start: 0.4em;
-  }
-
-  .apple-news-pane__body {
-    flex: 1;
-    min-width: 0;
-  }
-
   .apple-news-pane__name {
     font-weight: 600;
   }
 
   .apple-news-pane__status {
-    color: var(--c-color-text-subtle, inherit);
-    font-size: 0.875em;
+    margin: 0;
+    color: var(--c-text-quiet, inherit);
+  }
+
+  .apple-news-pane craft-badge craft-spinner {
+    --size: 0.75em;
   }
 
   .apple-news-pane__share-url {
-    margin-block-start: var(--c-spacing-sm, 0.5rem);
-  }
-
-  .apple-news-pane__spinner {
-    position: absolute;
-    inset-block-start: var(--c-spacing-sm, 0.5rem);
-    inset-inline-end: var(--cp-container-padding, 1rem);
+    display: block;
+    margin-block-start: var(--c-spacing-md, 0.75rem);
   }
 </style>

@@ -41,7 +41,7 @@ class Plugin extends BasePlugin
     ];
 
     /**
-     * The Apple News Channels panel in the entry editor.
+     * The Apple News panel in the entry editor.
      */
     protected array $vite = [
         'resources/js/cp.js',

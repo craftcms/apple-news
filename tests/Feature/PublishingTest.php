@@ -67,7 +67,8 @@ it('creates the article, then updates it with the latest revision', function () 
         'isProcessing' => false,
         'isShareable' => true,
         'status' => [
-            'label' => 'The article has been published, finished processing, and is visible in the News app.',
+            'label' => 'Live',
+            'description' => 'The article has been published, finished processing, and is visible in the News app.',
             'color' => 'green',
         ],
     ]);

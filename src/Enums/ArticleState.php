@@ -51,26 +51,30 @@ enum ArticleState: string
     }
 
     /**
-     * Describes an article’s state for the entry editor’s Apple News Channels panel.
+     * Describes an article’s state for the entry editor’s Apple News panel.
      *
      * @param  self|null  $state  The article’s state, or `null` if the entry hasn’t been published to the channel
-     * @return array{label: string, color: string|null} The status message, and the indicator color (`null` for an outline)
+     * @return array{label: string, description: string, color: string} The status badge’s label, a sentence describing the state, and the badge color
      */
     public static function status(?self $state): array
     {
-        [$message, $color] = match ($state) {
-            self::Queued => ['The article is in the queue to be published.', 'gray'],
-            self::QueuedUpdate => ['A previous version of the article has been published, and an update is currently in the queue to be published.', 'gray'],
-            self::Processing => ['The article has been published and is going through processing.', 'orange'],
-            self::ProcessingUpdate => ['A previous version of the article is visible in the News app, and an update is currently in processing.', 'orange'],
-            self::Live => ['The article has been published, finished processing, and is visible in the News app.', 'green'],
-            self::FailedProcessing => ['The article failed during processing and is not visible in the News app.', 'red'],
-            self::FailedProcessingUpdate => ['A previous version of the article is visible in the News app, but an update failed during processing.', 'red'],
-            self::Duplicate => ['The article is a duplicate of another article and is not visible in the News app.', null],
-            self::TakenDown => ['The article was previously visible in the News app, but was taken down.', null],
-            null => ['The article has not been published yet.', null],
+        [$label, $description, $color] = match ($state) {
+            self::Queued => ['Queued', 'The article is in the queue to be published.', 'gray'],
+            self::QueuedUpdate => ['Update queued', 'A previous version of the article has been published, and an update is currently in the queue to be published.', 'gray'],
+            self::Processing => ['Processing', 'The article has been published and is going through processing.', 'orange'],
+            self::ProcessingUpdate => ['Update processing', 'A previous version of the article is visible in the News app, and an update is currently in processing.', 'orange'],
+            self::Live => ['Live', 'The article has been published, finished processing, and is visible in the News app.', 'green'],
+            self::FailedProcessing => ['Failed', 'The article failed during processing and is not visible in the News app.', 'red'],
+            self::FailedProcessingUpdate => ['Update failed', 'A previous version of the article is visible in the News app, but an update failed during processing.', 'red'],
+            self::Duplicate => ['Duplicate', 'The article is a duplicate of another article and is not visible in the News app.', 'gray'],
+            self::TakenDown => ['Taken down', 'The article was previously visible in the News app, but was taken down.', 'gray'],
+            null => ['Not published', 'The article has not been published yet.', 'gray'],
         };
 
-        return ['label' => t($message, category: 'apple-news'), 'color' => $color];
+        return [
+            'label' => t($label, category: 'apple-news'),
+            'description' => t($description, category: 'apple-news'),
+            'color' => $color,
+        ];
     }
 }

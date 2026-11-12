@@ -9,7 +9,7 @@ window.Cp.booting((cp) => {
   cp.$elementDetailsPanels.register({
     id: 'apple-news:channels',
     get label() {
-      return t('Apple News Channels', {}, 'apple-news');
+      return t('Apple News', {}, 'apple-news');
     },
     icon: 'newspaper',
     component: ArticlePane,

@@ -13,7 +13,7 @@ use CraftCms\Cms\Support\Arr;
 use CraftCms\Cms\Support\Url;
 
 /**
- * Gives the entry editor what its Apple News Channels panel shows: the channels that match the entry and the state
+ * Gives the entry editor what its Apple News panel shows: the channels that match the entry and the state
  * of the entry’s article in each.
  *
  * The panel itself is registered from `resources/js/cp.js`.
