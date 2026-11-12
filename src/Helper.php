@@ -1,51 +1,46 @@
 <?php
 
-namespace craft\applenews;
+declare(strict_types=1);
 
-use craft\base\Field;
-use craft\base\FieldInterface;
-use craft\elements\Entry;
-use craft\errors\InvalidFieldException;
-use craft\helpers\Search;
-use craft\htmlfield\HtmlFieldData as FieldData;
+namespace CraftCms\AppleNews;
+
+use CraftCms\Cms\Entry\Elements\Entry;
+use CraftCms\Cms\Field\Contracts\FieldInterface;
+use CraftCms\Cms\Field\Exceptions\InvalidFieldException;
+use CraftCms\Cms\Markdown\Markdown as MarkdownParser;
+use CraftCms\Cms\Support\Facades\Markdown;
+use CraftCms\Cms\Support\Search;
 use DOMDocument;
 use DOMNode;
 use InvalidArgumentException;
 use League\HTMLToMarkdown\HtmlConverter;
-use yii\helpers\Markdown;
+use Stringable;
 
-/**
- * Apple News helper
- *
- * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @since 2.0
- */
+/** @since 2.0 */
 abstract class Helper
 {
-    /**
-     * @var HtmlConverter|null $_htmlConverter
-     * @see htmlConverter()
-     */
-    private static ?HtmlConverter $_htmlConverter = null;
+    private static ?HtmlConverter $htmlConverter = null;
 
     /**
      * Formats a language ID into the format required by the Apple News API (e.g. "en" or "en_US").
      *
-     * @param string $language The language ID
+     * @param  string  $language  The language ID
      * @return string The formatted language ID
      */
     public static function formatLanguage(string $language): string
     {
         $parts = preg_split('/[\-_]/', $language);
-        return strtolower($parts[0]) . (!empty($parts[1]) ? '_' . strtoupper($parts[1]) : '');
+
+        return strtolower($parts[0]).(! empty($parts[1]) ? '_'.strtoupper($parts[1]) : '');
     }
 
     /**
      * Creates a list of keywords for an article.
      *
-     * @param Entry $entry The entry
-     * @param string[] $fieldHandles The field handles that the keywords should be extracted from
+     * @param  Entry  $entry  The entry
+     * @param  string[]  $fieldHandles  The field handles that the keywords should be extracted from
      * @return string[] List of keywords for the article
+     *
      * @throws InvalidFieldException
      */
     public static function createKeywords(Entry $entry, array $fieldHandles): array
@@ -56,7 +51,6 @@ abstract class Helper
         /** @var FieldInterface[] $fields */
         $fields = [];
         foreach ($entry->getFieldLayout()->getCustomFields() as $field) {
-            /** @var Field $field */
             $fieldHandle = $field->handle;
             if (in_array($fieldHandle, $fieldHandles, true)) {
                 $fields[$fieldHandle] = $field;
@@ -84,14 +78,12 @@ abstract class Helper
     /**
      * Strips HTML tags from a given string, returning just the text. Block-level tags will be joined by two newlines.
      *
-     * @param string|FieldData $html HTML-formatted text, or a FieldData object
+     * @param  string|Stringable|null  $html  HTML-formatted text, or an HTML field value (such as a CKEditor field’s)
      * @return string Text without HTML tags
      */
-    public static function stripHtml(FieldData|string $html): string
+    public static function stripHtml(Stringable|string|null $html): string
     {
-        if ($html instanceof FieldData) {
-            $html = $html->getParsedContent();
-        }
+        $html = static::htmlString($html);
 
         // Replace block-level tags with newlines
         $blockTags = 'h1|h2|h3|h4|h5|h6|p|ul|ol|li|div';
@@ -114,22 +106,21 @@ abstract class Helper
     /**
      * Converts HTML-formatted text into Markdown, stripped of any tags that aren’t supported by Apple News Format.
      *
-     * @param string|FieldData $html HTML-formatted text, or a FieldData object
+     * @param  string|Stringable|null  $html  HTML-formatted text, or an HTML field value (such as a CKEditor field’s)
      * @return string Markdown-formatted text
      */
-    public static function html2Markdown(FieldData|string $html): string
+    public static function html2Markdown(Stringable|string|null $html): string
     {
-        if ($html instanceof FieldData) {
-            $html = $html->getParsedContent();
-        }
+        $html = static::htmlString($html);
 
         // Trim unwanted whitespace within block tags
         $blockTags = 'h1|h2|h3|h4|h5|h6|p|ul|ol|li|div';
-        $html = preg_replace("/(<(?:$blockTags).*?>)\s*/is", "$1", $html);
-        $html = trim($html, chr(0xC2) . chr(0xA0));
+        $html = preg_replace("/(<(?:$blockTags).*?>)\s*/is", '$1', $html);
+        $html = trim($html, chr(0xC2).chr(0xA0));
 
         // Remove comments
-        $html = preg_replace('<!--.*?-->', '', $html);
+        $html = preg_replace('/<!--.*?-->/s', '', $html);
+
         return static::htmlConverter()->convert($html);
     }
 
@@ -144,30 +135,32 @@ abstract class Helper
      * - <h1-6> => role=heading1-6 with either `heading1-6` or `heading` properties
      * - everything else => role=body with `body` properties
      *
-     * @param string|FieldData $html HTML-formatted text, or a FieldData object
-     * @param callable|array $properties An array defining the component properties that should be applied to each component type,
-     *                                   or a function that returns the full component definition, given the type and Markdown text.
-     *
+     * @param  string|Stringable|null  $html  HTML-formatted text, or an HTML field value (such as a CKEditor field’s)
+     * @param  callable|array  $properties  An array defining the component properties that should be applied to each component type,
+     *                                      or a function that returns the full component definition, given the type and Markdown text.
      * @return array Component definitions
+     *
      * @todo Add support for images + captions and videos
      */
-    public static function html2Components(FieldData|string $html, callable|array $properties = []): array
+    public static function html2Components(Stringable|string|null $html, callable|array $properties = []): array
     {
-        if ($html instanceof FieldData) {
-            $html = $html->getParsedContent();
-        }
+        $html = static::htmlString($html);
 
         // Remove comments
-        $html = preg_replace('<!--.*?-->', '', $html);
+        $html = preg_replace('/<!--.*?-->/s', '', $html);
+
+        if (trim($html) === '') {
+            return [];
+        }
 
         // Create a DOMDocument object for the HTML
         // (from HtmlConverter::convert)
-        $document = new DOMDocument();
+        $document = new DOMDocument;
         libxml_use_internal_errors(true);
-        $document->loadHTML('<?xml encoding="UTF-8">' . $html);
+        $document->loadHTML('<?xml encoding="UTF-8">'.$html);
         $document->encoding = 'UTF-8';
         libxml_clear_errors();
-        if (!($body = $document->getElementsByTagName('body')->item(0))) {
+        if (! ($body = $document->getElementsByTagName('body')->item(0))) {
             throw new InvalidArgumentException('Invalid HTML was provided');
         }
 
@@ -185,23 +178,22 @@ abstract class Helper
 
             switch ($node->nodeName) {
                 case 'blockquote':
-                {
+
                     $role = 'quote';
                     $types = ['quote'];
                     $isBody = false;
                     $captureText = true;
                     $captureOuterHtml = false;
                     break;
-                }
+
                 case 'code':
-                {
+
                     $role = 'body';
                     $types = ['code', 'body'];
                     $isBody = false;
                     $captureText = true;
                     $captureOuterHtml = false;
                     break;
-                }
 
                 case 'h1':
                 case 'h2':
@@ -209,34 +201,33 @@ abstract class Helper
                 case 'h4':
                 case 'h5':
                 case 'h6':
-                {
+
                     $level = substr($node->nodeName, 1);
-                    $role = 'heading' . $level;
-                    $types = ['heading' . $level, 'heading'];
+                    $role = 'heading'.$level;
+                    $types = ['heading'.$level, 'heading'];
                     $isBody = false;
                     $captureText = true;
                     $captureOuterHtml = false;
                     break;
-                }
 
                 case 'hr':
-                {
+
                     $role = 'divider';
                     $types = ['divider'];
                     $isBody = false;
                     $captureText = false;
                     $captureOuterHtml = false;
                     break;
-                }
+
                 default:
-                {
+
                     // div, p, ol, ul, #text, etc.
                     $role = 'body';
                     $types = ['body'];
                     $isBody = true;
                     $captureText = true;
                     $captureOuterHtml = true;
-                }
+
             }
 
             // Do we care about the text value?
@@ -251,7 +242,7 @@ abstract class Helper
                     }
                 }
                 $nodeHtml = trim($nodeHtml, "\n\r ");
-                if (!$nodeHtml) {
+                if (! $nodeHtml) {
                     continue;
                 }
                 $text = static::html2Markdown($nodeHtml);
@@ -262,7 +253,7 @@ abstract class Helper
             // If this is a body component and the last one was as well, append the text to the last one
             if ($isBody && $lastWasBody) {
                 $lastComponentIndex = count($componentInfos) - 1;
-                $componentInfos[$lastComponentIndex]['text'] .= "\n\n" . $text;
+                $componentInfos[$lastComponentIndex]['text'] .= "\n\n".$text;
             } else {
                 $componentInfos[] = [
                     'types' => $types,
@@ -286,7 +277,7 @@ abstract class Helper
                     }
                 }
             }
-            if (!$component) {
+            if (! $component) {
                 $component = [
                     'role' => $componentInfo['role'],
                 ];
@@ -316,31 +307,36 @@ abstract class Helper
     /**
      * Converts Markdown-formatted text into component definitions.
      *
-     * @param string $text Markdown-formatted text
-     * @param callable|array $properties An array defining the component properties that should be applied to each component type,
-     *                                        or a function that returns the full component definition, given the type and Markdown text.
+     * @param  string  $text  Markdown-formatted text
+     * @param  callable|array  $properties  An array defining the component properties that should be applied to each component type,
+     *                                      or a function that returns the full component definition, given the type and Markdown text.
      * @return array Component definitions
      */
     public static function markdown2Components(string $text, callable|array $properties = []): array
     {
         // Convert Markdown to HTML and run through html2Components()
-        $html = Markdown::process($text);
+        $html = Markdown::parse($text, MarkdownParser::FLAVOR_ORIGINAL);
+
         return static::html2Components($html, $properties);
     }
 
     /**
-     * Returns an instance of HtmlConverter.
+     * Returns the HTML for a string or an HTML field value.
      *
-     * @return HtmlConverter
+     * HTML field values (such as a CKEditor field’s) provide their content with reference tags parsed
+     * through `getParsedContent()`.
      */
-    protected static function htmlConverter(): HtmlConverter
+    protected static function htmlString(Stringable|string|null $html): string
     {
-        if (self::$_htmlConverter !== null) {
-            return self::$_htmlConverter;
+        if ($html instanceof Stringable && method_exists($html, 'getParsedContent')) {
+            return $html->getParsedContent();
         }
 
-        return self::$_htmlConverter = new HtmlConverter([
-            'strip_tags' => true,
-        ]);
+        return (string) $html;
+    }
+
+    protected static function htmlConverter(): HtmlConverter
+    {
+        return self::$htmlConverter ??= new HtmlConverter(['strip_tags' => true]);
     }
 }

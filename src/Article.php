@@ -1,19 +1,17 @@
 <?php
 
-namespace craft\applenews;
+declare(strict_types=1);
 
-use craft\elements\Asset;
-use craft\elements\Entry;
-use craft\helpers\FileHelper;
-use yii\base\BaseObject;
+namespace CraftCms\AppleNews;
 
-/**
- * Article
- *
- * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @since 2.0
- */
-class Article extends BaseObject implements ArticleInterface
+use CraftCms\Cms\Asset\Elements\Asset;
+use CraftCms\Cms\Entry\Elements\Entry;
+use CraftCms\Cms\Support\Arr;
+use CraftCms\Cms\Support\File;
+use CraftCms\Cms\Support\Typecast;
+
+/** @since 2.0 */
+class Article implements ArticleInterface
 {
     /**
      * @var Entry|null The associated entry
@@ -36,19 +34,24 @@ class Article extends BaseObject implements ArticleInterface
     protected array $content;
 
     /**
-     * Constructor
-     *
-     * @param Entry|null $entry
-     * @param array $config
+     * @param  array<string, mixed>  $config  Property values to set, before {@see init()} is called
      */
-    public function __construct(Entry $entry = null, array $config = [])
+    public function __construct(?Entry $entry = null, array $config = [])
     {
         $this->entry = $entry;
-        parent::__construct($config);
+        Typecast::configure($this, $config);
+        $this->init();
     }
 
     /**
-     * @inheritdoc
+     * Initializes the article.
+     *
+     * Subclasses can override this to define the article content, files, and metadata.
+     */
+    public function init(): void {}
+
+    /**
+     * {@inheritdoc}
      */
     public function getFiles(): array
     {
@@ -56,7 +59,7 @@ class Article extends BaseObject implements ArticleInterface
     }
 
     /**
-     * @param array $files The files that should be included in the article (uri => path)
+     * @param  array  $files  The files that should be included in the article (uri => path)
      */
     public function setFiles(array $files): void
     {
@@ -66,7 +69,7 @@ class Article extends BaseObject implements ArticleInterface
     /**
      * Adds a new file to the article and returns its URL.
      *
-     * @param string|Asset $file An asset or a path to a file
+     * @param  string|Asset  $file  An asset or a path to a file
      * @return string The URL that the article should use to reference the file
      */
     public function addFile(Asset|string $file): string
@@ -77,7 +80,7 @@ class Article extends BaseObject implements ArticleInterface
         }
 
         // Get a unique filename for the article
-        $basename = FileHelper::sanitizeFilename(str_replace('@', '-', pathinfo($file, PATHINFO_FILENAME)), [
+        $basename = File::sanitizeFilename(str_replace('@', '-', pathinfo($file, PATHINFO_FILENAME)), [
             'asciiOnly' => true,
             'separator' => '-',
         ]);
@@ -85,15 +88,16 @@ class Article extends BaseObject implements ArticleInterface
         $filename = "$basename.$ext";
         $i = 0;
         while (isset($this->files[$filename])) {
-            $filename = "{$basename}_" . ++$i . ".$ext";
+            $filename = "{$basename}_".++$i.".$ext";
         }
 
         $this->files[$filename] = $file;
-        return 'bundle://' . $filename;
+
+        return 'bundle://'.$filename;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getMetadata(): array
     {
@@ -101,7 +105,7 @@ class Article extends BaseObject implements ArticleInterface
     }
 
     /**
-     * @param array $metadata The metadata that should be included with the request
+     * @param  array  $metadata  The metadata that should be included with the request
      */
     public function setMetadata(array $metadata): void
     {
@@ -111,30 +115,16 @@ class Article extends BaseObject implements ArticleInterface
     /**
      * Adds a new metadata property to the article.
      *
-     * @param string $name The metadata property name. Can be a dot-delimited path for defining nested array properties (e.g. `links.sections`)
-     * @param mixed $value The metadata property value
+     * @param  string  $name  The metadata property name. Can be a dot-delimited path for defining nested array properties (e.g. `links.sections`)
+     * @param  mixed  $value  The metadata property value
      */
     public function addMetadata(string $name, mixed $value): void
     {
-        $arr = &$this->metadata;
-
-        if (str_contains($name, '.')) {
-            $path = explode('.', $name);
-            $name = array_pop($path);
-
-            foreach ($path as $step) {
-                if (!isset($arr[$step])) {
-                    $arr[$step] = [];
-                }
-                $arr = &$arr[$step];
-            }
-        }
-
-        $arr[$name] = $value;
+        Arr::set($this->metadata, $name, $value);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getContent(): array
     {
@@ -142,7 +132,7 @@ class Article extends BaseObject implements ArticleInterface
     }
 
     /**
-     * @param array $content The article content, described in Apple News Format
+     * @param  array  $content  The article content, described in Apple News Format
      */
     public function setContent(array $content): void
     {

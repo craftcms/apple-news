@@ -1,15 +1,12 @@
 <?php
 
-namespace craft\applenews;
+declare(strict_types=1);
 
-use craft\elements\Entry;
+namespace CraftCms\AppleNews;
 
-/**
- * Base Channel class
- *
- * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @since 2.0
- */
+use CraftCms\Cms\Entry\Elements\Entry;
+
+/** @since 2.0 */
 abstract class BaseChannel implements ChannelInterface
 {
     /**
@@ -28,7 +25,7 @@ abstract class BaseChannel implements ChannelInterface
     public string $apiSecret;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getChannelId(): string
     {
@@ -36,7 +33,7 @@ abstract class BaseChannel implements ChannelInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getApiKeyId(): string
     {
@@ -44,7 +41,7 @@ abstract class BaseChannel implements ChannelInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getApiSecret(): string
     {
@@ -52,7 +49,7 @@ abstract class BaseChannel implements ChannelInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function matchEntry(Entry $entry): bool
     {
@@ -60,7 +57,7 @@ abstract class BaseChannel implements ChannelInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function canPublish(Entry $entry): bool
     {

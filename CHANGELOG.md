@@ -1,5 +1,39 @@
 # Release Notes for Apple News for Craft CMS
 
+## 5.0.0 - 2026-11-12
+
+- Apple News now requires Craft CMS 6.0 or later and PHP 8.5 or later, and runs natively on Craft 6 without the `craftcms/yii2-adapter` package.
+- The plugin’s classes moved to the `CraftCms\AppleNews` namespace. See [UPGRADE.md](UPGRADE.md).
+- The Apple News Channels pane is now an Apple News details panel in the entry editor, with a card per channel that shows the article’s status in a badge.
+- The “Publish to Apple News” bulk action requires the “Save entries” permission for the section.
+- Plugin settings are now read from `config/craft/apple-news.php`. Run `php artisan vendor:publish --tag=apple-news` to create it.
+- Article publishing now uses Laravel queue jobs (`CraftCms\AppleNews\Jobs\PublishArticleJob`).
+- The Apple News API is now called with Laravel’s HTTP client. The plugin no longer requires `chapter-three/apple-news-api`.
+- Errors from the Apple News API now throw `Illuminate\Http\Client\RequestException`, which includes Apple’s error codes.
+- Added `CraftCms\AppleNews\Enums\ArticleState`, which replaces the `ArticleManager::STATE_*` constants.
+- Fixed a bug where an article stayed queued if publishing it failed, or if the entry could no longer be published by the time the queue job ran. The article now goes back to its previous state.
+- Fixed a bug where articles that Apple News marked as duplicates were shown as not published yet.
+- Fixed an error that occurred when passing an empty field value to `Helper::stripHtml()`, `html2Markdown()`, or `html2Components()`.
+- Fixed a bug where the “Publish to Apple News” bulk action published entries that the user wasn’t allowed to save, such as other authors’ entries.
+- Fixed a bug where an unknown channel ID sent to the `apple-news/article/*` actions caused a server error, and `publish` queued the entry for it anyway. The actions now return a validation error.
+- Fixed a bug where `Articles::queue()` queued entries for the given channels even if the channel didn’t match the entry or couldn’t publish it.
+- Publish jobs now retry connection errors, server errors and throttled requests up to three times. Other errors from Apple News fail the job right away.
+- Fixed a bug where two queue workers could publish the same entry at once, creating duplicate articles on Apple News.
+- Fixed a bug where changes saved while an article was being published weren’t published.
+- Fixed a bug where HTML comments weren’t removed from HTML converted to Markdown or article components.
+
+## 4.2.1 - 2026-11-10
+
+- Apple News now suggests the `craftcms/yii2-adapter` package, so the Plugin Store installs it alongside the plugin on Craft CMS 6.
+
+## 4.2.0 - 2026-11-10
+
+- Added support for Craft CMS 6, when the `craftcms/yii2-adapter` package is installed.
+- Fixed a bug where entries with published Apple News articles couldn’t be deleted.
+- Fixed PHP 8.4 deprecation warnings.
+- Fixed a bug where only admins could use the Apple News Channels pane and the “Publish to Apple News” bulk action. Publishing now requires permission to save the entry.
+- Fixed an error that occurred when passing an empty field value to `craft\applenews\Helper::stripHtml()`, `html2Markdown()`, or `html2Components()`.
+
 ## 4.1.0 - 2026-03-27
 
 - Fixed a bug where remote assets in an Apple News article might not download.

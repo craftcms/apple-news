@@ -12,8 +12,9 @@
 /README.md export-ignore
 /SECURITY.md export-ignore
 /composer.lock export-ignore
-/ecs.php export-ignore
+/pint.json export-ignore
 /phpstan.neon export-ignore
+/phpunit.xml export-ignore
 /.prettierrc.json export-ignore
 /.prettierignore export-ignore
 /gruntfile.js export-ignore
@@ -23,6 +24,7 @@
 /package-lock.json export-ignore
 /tsconfig.json export-ignore
 /webpack.config.js export-ignore
+/vite.config.js export-ignore
 /stubs/ export-ignore
 /tests/ export-ignore
 /packages/ export-ignore

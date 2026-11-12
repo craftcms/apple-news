@@ -2,17 +2,13 @@
 
 namespace applenewschannels;
 
-use Craft;
-use craft\applenews\Article;
-use craft\applenews\Helper;
-use craft\elements\Asset;
-use craft\elements\MatrixBlock;
-use craft\helpers\DateTimeHelper;
-use craft\htmlfield\HtmlFieldData;
+use CraftCms\AppleNews\Article;
+use CraftCms\AppleNews\Helper;
+use CraftCms\Cms\Asset\Elements\Asset;
+use CraftCms\Cms\Entry\Elements\Entry;
+use CraftCms\Cms\Support\DateTimeHelper;
+use CraftCms\Cms\Translation\Formatter;
 
-/**
- * Class MyNewsArticle
- */
 class MyNewsArticle extends Article
 {
     /**
@@ -42,7 +38,7 @@ class MyNewsArticle extends Article
         $this->byline = $this->entry->author->name;
 
         if ($this->entry->postDate) {
-            $this->byline .= ' | ' . Craft::$app->formatter->asDate($this->entry->postDate, 'short');
+            $this->byline .= ' | '.app(Formatter::class)->asDate($this->entry->postDate, 'short');
         }
 
         // Article content
@@ -81,9 +77,6 @@ class MyNewsArticle extends Article
         $this->addMetadata('isPreview', false);
     }
 
-    /**
-     * @return array
-     */
     protected function getComponents(): array
     {
         $components = [];
@@ -103,7 +96,7 @@ class MyNewsArticle extends Article
         $firstBody = true;
 
         foreach ($this->entry->articleBody->all() as $block) {
-            /** @var MatrixBlock $block */
+            /** @var Entry $block */
             switch ($block->type->handle) {
                 case 'heading':
                     $components[] = [
@@ -175,7 +168,6 @@ class MyNewsArticle extends Article
                     $image = $block->image->one();
                     if ($image) {
                         $imageUrl = $this->addFile($image);
-                        /** @var HtmlFieldData|null $caption */
                         $layout = $block->caption ? 'photoWithCaptionLayout' : 'photoLayout';
                         $photoComponents = [
                             [
@@ -203,7 +195,7 @@ class MyNewsArticle extends Article
                         }
                         $components[] = [
                             'role' => 'container',
-                            'layout' => ['ignoreDocumentMargin' => true,],
+                            'layout' => ['ignoreDocumentMargin' => true],
                             'components' => $photoComponents,
                         ];
                     }
@@ -256,8 +248,6 @@ class MyNewsArticle extends Article
      *             - Container (anchored to bottom)
      *                 - Title
      *                 - Byline
-     *
-     * @return array
      */
     protected function getHeaderWithFeaturedImage(): array
     {
@@ -269,7 +259,7 @@ class MyNewsArticle extends Article
                 'ignoreDocumentMargin' => true,
             ],
             'scene' => [
-                'type' => 'parallax_scale'
+                'type' => 'parallax_scale',
             ],
             'components' => [
                 [
@@ -339,8 +329,6 @@ class MyNewsArticle extends Article
      * - Section
      *     - Title
      *     - Byline
-     *
-     * @return array
      */
     protected function getPlainTextHeader(): array
     {
@@ -367,9 +355,6 @@ class MyNewsArticle extends Article
         ];
     }
 
-    /**
-     * @return array
-     */
     protected function getComponentLayouts(): array
     {
         return [
@@ -443,9 +428,6 @@ class MyNewsArticle extends Article
         ];
     }
 
-    /**
-     * @return array
-     */
     protected function getComponentStyles(): array
     {
         return [
@@ -454,9 +436,6 @@ class MyNewsArticle extends Article
         ];
     }
 
-    /**
-     * @return array
-     */
     protected function getComponentTextStyles(): array
     {
         if ($this->featuredImageUrl) {

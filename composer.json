@@ -6,7 +6,7 @@
     "apple news",
     "cms",
     "craftcms",
-    "yii2"
+    "laravel"
   ],
   "license": "MIT",
   "authors": [
@@ -19,49 +19,54 @@
     "email": "support@craftcms.com",
     "issues": "https://github.com/craftcms/apple-news/issues?state=open",
     "source": "https://github.com/craftcms/apple-news",
-    "docs": "https://github.com/craftcms/apple-news/blob/master/README.md",
-    "rss": "https://github.com/craftcms/apple-news/commits/master.atom"
+    "docs": "https://github.com/craftcms/apple-news/blob/5.x/README.md",
+    "rss": "https://github.com/craftcms/apple-news/commits/5.x.atom"
   },
   "require": {
-    "php": "^8.2.0",
-    "craftcms/cms": "^5.0.0-beta.1",
-    "chapter-three/apple-news-api": "^0.3.9",
+    "php": "^8.5",
+    "craftcms/cms": "^6.0.0-beta.1",
+    "guzzlehttp/guzzle": "^7.2",
     "league/html-to-markdown": "^5.0"
   },
   "require-dev": {
-    "craftcms/ecs": "dev-main",
-    "craftcms/phpstan": "dev-main",
-    "craftcms/rector": "dev-main",
-    "craftcms/ckeditor": "*",
-    "vlucas/phpdotenv": "^5.4"
+    "phpstan/phpstan": "^2.1",
+    "larastan/larastan": "^3.13",
+    "orchestra/testbench": "^11.0",
+    "pestphp/pest": "^5.0",
+    "pestphp/pest-plugin-laravel": "^5.0",
+    "laravel/pint": "^1.22"
   },
   "autoload": {
     "psr-4": {
-      "craft\\applenews\\": "src/"
+      "CraftCms\\AppleNews\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "CraftCms\\AppleNews\\Tests\\": "tests/",
+      "CraftCms\\Cms\\Database\\Factories\\": "vendor/craftcms/cms/database/Factories/"
     }
   },
   "scripts": {
-    "check-cs": "ecs check --ansi",
-    "fix-cs": "ecs check --ansi --fix",
+    "check-cs": "pint --test",
+    "fix-cs": "pint",
     "phpstan": "phpstan --memory-limit=1G",
-    "testunit": [
-      "Composer\\Config::disableProcessTimeout",
-      "codecept run unit"
-    ]
+    "test": "pest"
   },
   "extra": {
+    "class": "CraftCms\\AppleNews\\Plugin",
     "name": "Apple News",
     "handle": "apple-news",
     "description": "Publish entries to Apple News",
-    "documentationUrl": "https://github.com/craftcms/apple-news/blob/master/README.md"
+    "documentationUrl": "https://github.com/craftcms/apple-news/blob/5.x/README.md"
   },
   "config": {
     "platform": {
-      "php": "8.2"
+      "php": "8.5"
     },
     "allow-plugins": {
-      "yiisoft/yii2-composer": true,
-      "craftcms/plugin-installer": true
+      "craftcms/plugin-installer": true,
+      "pestphp/pest-plugin": true
     }
   },
   "minimum-stability": "dev",
