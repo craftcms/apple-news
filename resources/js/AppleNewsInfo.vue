@@ -14,7 +14,7 @@
   const columnHelper = createCraftColumnHelper();
   const columns = columnHelper.columns([
     columnHelper.accessor('name', {
-      header: t('Section', {}, 'apple-news'),
+      header: t('Section'),
       meta: {cellTag: 'th'},
       enableSorting: false,
       cell: ({row}) =>
@@ -28,13 +28,13 @@
                   size: 'small',
                   class: 'apple-news-info__default',
                 },
-                t('Default', {}, 'apple-news')
+                t('Default')
               )
             : null,
         ]),
     }),
     columnHelper.handle('id', {
-      header: t('ID', {}, 'apple-news'),
+      header: t('ID'),
       enableSorting: false,
       meta: {trackSize: 'minmax(min-content, 2fr)'},
     }),
