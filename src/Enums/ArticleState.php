@@ -59,21 +59,21 @@ enum ArticleState: string
     public static function status(?self $state): array
     {
         [$label, $description, $color] = match ($state) {
-            self::Queued => ['Queued', 'The article is in the queue to be published.', 'gray'],
-            self::QueuedUpdate => ['Update queued', 'A previous version of the article has been published, and an update is currently in the queue to be published.', 'gray'],
-            self::Processing => ['Processing', 'The article has been published and is going through processing.', 'orange'],
-            self::ProcessingUpdate => ['Update processing', 'A previous version of the article is visible in the News app, and an update is currently in processing.', 'orange'],
-            self::Live => ['Live', 'The article has been published, finished processing, and is visible in the News app.', 'green'],
-            self::FailedProcessing => ['Failed', 'The article failed during processing and is not visible in the News app.', 'red'],
-            self::FailedProcessingUpdate => ['Update failed', 'A previous version of the article is visible in the News app, but an update failed during processing.', 'red'],
-            self::Duplicate => ['Duplicate', 'The article is a duplicate of another article and is not visible in the News app.', 'gray'],
-            self::TakenDown => ['Taken down', 'The article was previously visible in the News app, but was taken down.', 'gray'],
-            null => ['Not published', 'The article has not been published yet.', 'gray'],
+            self::Queued => [t('Queued', category: 'apple-news'), t('The article is in the queue to be published.', category: 'apple-news'), 'gray'],
+            self::QueuedUpdate => [t('Update queued', category: 'apple-news'), t('A previous version of the article has been published, and an update is currently in the queue to be published.', category: 'apple-news'), 'gray'],
+            self::Processing => [t('Processing'), t('The article has been published and is going through processing.', category: 'apple-news'), 'orange'],
+            self::ProcessingUpdate => [t('Update processing', category: 'apple-news'), t('A previous version of the article is visible in the News app, and an update is currently in processing.', category: 'apple-news'), 'orange'],
+            self::Live => [t('Live'), t('The article has been published, finished processing, and is visible in the News app.', category: 'apple-news'), 'green'],
+            self::FailedProcessing => [t('Failed'), t('The article failed during processing and is not visible in the News app.', category: 'apple-news'), 'red'],
+            self::FailedProcessingUpdate => [t('Update failed', category: 'apple-news'), t('A previous version of the article is visible in the News app, but an update failed during processing.', category: 'apple-news'), 'red'],
+            self::Duplicate => [t('Duplicate', category: 'apple-news'), t('The article is a duplicate of another article and is not visible in the News app.', category: 'apple-news'), 'gray'],
+            self::TakenDown => [t('Taken down', category: 'apple-news'), t('The article was previously visible in the News app, but was taken down.', category: 'apple-news'), 'gray'],
+            null => [t('Not published', category: 'apple-news'), t('The article has not been published yet.', category: 'apple-news'), 'gray'],
         };
 
         return [
-            'label' => t($label, category: 'apple-news'),
-            'description' => t($description, category: 'apple-news'),
+            'label' => $label,
+            'description' => $description,
             'color' => $color,
         ];
     }

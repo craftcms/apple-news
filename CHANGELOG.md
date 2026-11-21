@@ -1,5 +1,9 @@
 # Release Notes for Apple News for Craft CMS
 
+## Unreleased
+
+- Apple News is now translated into every language the Craft CMS control panel supports.
+
 ## 5.0.0 - 2026-11-12
 
 - Apple News now requires Craft CMS 6.0 or later and PHP 8.5 or later, and runs natively on Craft 6 without the `craftcms/yii2-adapter` package.

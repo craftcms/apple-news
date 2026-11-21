@@ -127,9 +127,7 @@
           <ActionMenu
             slot="actions"
             :actions="actions(channel)"
-            :label="
-              t('Actions for {channel}', {channel: channel.name}, 'apple-news')
-            "
+            :label="t('Actions for {name}', {name: channel.name})"
           />
           <p class="apple-news-pane__status">
             {{ channel.status.description }}
