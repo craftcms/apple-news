@@ -185,7 +185,7 @@ class Plugin extends \craft\base\Plugin
                 "<div class=\"status $statusColor\" title=\"$statusMessage\"></div>" .
                 $channelManager->getChannelName($channelId) .
                 '</h5>' .
-                '<div class="value"><a class="btn menubtn" data-icon="settings" title="' . Craft::t('apple-news', 'Actions') . '"></a>' .
+                '<div class="value"><a class="btn menubtn" data-icon="settings" title="' . Craft::t('app', 'Actions') . '"></a>' .
                 '<div class="menu">' .
                 '<ul>';
 

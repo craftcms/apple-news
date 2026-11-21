@@ -1,5 +1,9 @@
 # Release Notes for Apple News for Craft CMS
 
+## Unreleased
+
+- Apple News is now translated into every language the Craft CMS control panel supports.
+
 ## 4.2.1 - 2026-11-10
 
 - Apple News now suggests the `craftcms/yii2-adapter` package, so the Plugin Store installs it alongside the plugin on Craft CMS 6.
