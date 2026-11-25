@@ -28,7 +28,7 @@ return [
     'Update failed' => 'Update mislukt',
     'Update processing' => 'Update wordt verwerkt',
     'Update queued' => 'Update in wachtrij',
-    'You don’t have permission to publish the selected entries.' => 'U hebt geen toestemming om de geselecteerde vermeldingen te publiceren.',
+    'You don’t have permission to publish the selected entries.' => 'U hebt geen toestemming om de geselecteerde items te publiceren.',
     'You haven’t defined any channels yet.' => 'U hebt nog geen kanalen gedefinieerd.',
     '{name} sections' => 'Secties van {name}',
 ];
